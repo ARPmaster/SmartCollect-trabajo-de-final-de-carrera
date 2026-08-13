@@ -1,0 +1,51 @@
+<resources>
+    <string name="app_name">AIcollect</string>
+    <string name="app_logo_text">COLLECT AI</string>
+    <string name="cd_open_menu">Menú</string>
+    <string name="cd_open_filters">Filtros</string>
+    <string name="filters_title">Filtros (por implementar)</string>
+    <string name="nav_home">Inicio</string>
+    <string name="nav_stats">My Vault</string>
+    <string name="cd_add_item">Nueva publicación</string>
+    <string name="total_collection_value_label">Total collection value</string>
+    <string name="total_collection_value_change">+5.2%</string>
+    <string name="total_collection_value_amount">$82,940.00</string>
+    <string name="total_collection_value_currency">USD</string>
+    <string name="total_collection_value_updated">Updated 2 hours ago</string>
+
+    <string name="cd_close_drawer">Cerrar menú</string>
+    <string name="drawer_user_name">Alex Coleccionista</string>
+    <string name="drawer_user_subtitle">Nivel Leyenda • 142 Cromos</string>
+    <string name="drawer_section_general">General</string>
+    <string name="drawer_dark_mode">Modo oscuro</string>
+    <string name="drawer_section_account">Ajustes de cuenta</string>
+    <string name="drawer_edit_profile">Editar Perfil</string>
+    <string name="drawer_security">Contraseña y Seguridad</string>
+    <string name="drawer_section_support">Soporte</string>
+    <string name="drawer_help">Ayuda y Soporte</string>
+    <string name="drawer_about">Sobre la aplicación</string>
+    <string name="drawer_logout">Cerrar Sesión</string>
+
+    <string name="login_title">Iniciar sesión</string>
+    <string name="login_email_label">Correo electrónico</string>
+    <string name="login_email_hint">collector@elite.com</string>
+    <string name="login_password_label">Contraseña</string>
+    <string name="login_password_hint">Tu contraseña</string>
+    <string name="login_forgot_password">¿Olvidaste tu contraseña?</string>
+    <string name="login_sign_in_button">Iniciar sesión</string>
+    <string name="login_signing_in">Iniciando sesión…</string>
+    <string name="login_google_button">Continuar con Google</string>
+    <string name="login_no_account">¿No tienes una cuenta?</string>
+    <string name="login_create_account">Crear cuenta</string>
+    <string name="cd_toggle_password_visibility">Mostrar u ocultar contraseña</string>
+    <string name="forgot_password_placeholder_title">Recuperar contraseña (fuera de alcance para esta entrega)</string>
+
+    <string name="register_title">Crear cuenta</string>
+    <string name="register_password_hint">Mínimo 6 caracteres</string>
+    <string name="register_confirm_password_label">Confirmar contraseña</string>
+    <string name="register_confirm_password_hint">Repite tu contraseña</string>
+    <string name="register_create_account_button">Crear cuenta</string>
+    <string name="register_creating_account">Creando cuenta…</string>
+    <string name="register_already_have_account">¿Ya tienes una cuenta?</string>
+    <string name="register_sign_in_link">Iniciar sesión</string>
+</resources>

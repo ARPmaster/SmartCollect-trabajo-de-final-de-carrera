@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Dark palette from Figma: Inicio: Mi Colección Refinada (Modo Oscuro), node 2026:42 -->
+    <color name="collect_background">#0A0A0A</color>
+    <color name="collect_surface_header">#000000</color>
+    <color name="collect_surface_card">#1E1E1E</color>
+    <color name="collect_surface_feed_item">#121212</color>
+    <color name="collect_border">#0DFFFFFF</color>
+    <color name="collect_text_primary">#FFFFFF</color>
+    <color name="collect_text_secondary">#6B7280</color>
+    <color name="collect_text_date">#C3C3C3</color>
+    <color name="collect_menu_icon">#D1D5DB</color>
+    <color name="collect_toolbar_border">#0DFFFFFF</color>
+    <color name="collect_text_secondary_50">#C6C6C9</color>
+    <color name="collect_switch_track_off">#3F3F46</color>
+
+    <!-- Drawer: no dark mockup in the brief, derived to match the app's dark palette -->
+    <color name="drawer_background">#161616</color>
+    <color name="drawer_chevron">#94A3B8</color>
+
+    <!-- Auth tokens (from Figma: Iniciar Sesión, Modo Oscuro 81:7) -->
+    <color name="auth_background">#000000</color>
+    <color name="auth_heading_text">#FFFFFF</color>
+    <color name="auth_field_label">@color/collect_gold</color>
+    <color name="auth_input_border">#E5E7EB</color>
+    <color name="auth_input_placeholder">#8E8E93</color>
+    <color name="auth_social_button_bg">#0A0A0A</color>
+    <color name="auth_social_button_text">#FFFFFF</color>
+    <color name="auth_footer_text">#8E8E93</color>
+</resources>

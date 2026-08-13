@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Collection screen tokens (from Figma: Inicio: Mi Colección Refinada, Modo Claro 2026:117 / Modo Oscuro 2026:42) -->
+    <color name="collect_background">#F9F7F2</color>
+    <color name="collect_surface_header">#FFFFFF</color>
+    <color name="collect_surface_card">#FFFFFF</color>
+    <color name="collect_surface_feed_item">#FFFFFF</color>
+    <color name="collect_border">#F3F4F6</color>
+    <color name="collect_text_primary">#0A0A0A</color>
+    <color name="collect_text_secondary">#6B7280</color>
+    <color name="collect_text_date">#6B7280</color>
+    <color name="collect_gold">#E5B543</color>
+    <color name="collect_green">#4ADE80</color>
+    <color name="collect_green_bg">#1A4ADE80</color>
+    <color name="collect_image_background">#111827</color>
+    <color name="collect_menu_icon">#4B5563</color>
+    <color name="collect_toolbar_border">#E5E7EB</color>
+    <color name="collect_text_secondary_50">#800A0A0A</color>
+    <color name="collect_switch_track_off">#D1D5DB</color>
+
+    <!-- Drawer tokens (from Figma: Drawer / Sidebar menu, node 2077:302 — no dark variant provided, derived to match the app's dark palette) -->
+    <color name="drawer_background">#F8F6F6</color>
+    <color name="drawer_text_muted">#94A3B8</color>
+    <color name="drawer_chevron">#64748B</color>
+    <color name="collect_gold_10">#1AE5B543</color>
+    <color name="collect_gold_20">#33E5B543</color>
+    <color name="collect_gold_30">#4DE5B543</color>
+
+    <!-- Auth tokens (from Figma: Iniciar Sesión, Modo Claro 82:350 / Modo Oscuro 81:7) -->
+    <color name="auth_background">#F8F6F6</color>
+    <color name="auth_header_bg">#FFFFFF</color>
+    <color name="auth_header_border">#1A4E4637</color>
+    <color name="auth_divider">#4DE1D9C9</color>
+    <color name="auth_heading_text">#16130C</color>
+    <color name="auth_field_label">#000000</color>
+    <color name="auth_input_bg">#FFFFFF</color>
+    <color name="auth_input_text">#16130C</color>
+    <color name="auth_input_border">#E1D9C9</color>
+    <color name="auth_input_placeholder">#808E8E93</color>
+    <color name="auth_social_button_bg">#FFFFFF</color>
+    <color name="auth_social_button_text">#000000</color>
+    <color name="auth_footer_text">#4E4E4E</color>
+    <color name="auth_icon">#8E8E93</color>
+</resources>

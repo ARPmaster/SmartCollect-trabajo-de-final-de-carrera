@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <style name="Theme.AIcollect" parent="Theme.MaterialComponents.DayNight.NoActionBar">
+        <item name="colorPrimary">@color/collect_gold</item>
+        <item name="colorPrimaryDark">@color/collect_gold</item>
+        <item name="colorAccent">@color/collect_gold</item>
+        <item name="android:windowBackground">@color/collect_background</item>
+        <item name="android:statusBarColor">@color/collect_surface_header</item>
+        <item name="android:windowLightStatusBar">true</item>
+    </style>
+</resources>

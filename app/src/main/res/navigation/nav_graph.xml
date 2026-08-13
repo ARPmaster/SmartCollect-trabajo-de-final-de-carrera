@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/nav_graph"
+    app:startDestination="@id/loginFragment">
+
+    <fragment
+        android:id="@+id/loginFragment"
+        android:name="com.example.aicollect.presentation.auth.LoginFragment"
+        android:label="Login"
+        tools:layout="@layout/fragment_login"
+        xmlns:tools="http://schemas.android.com/tools" />
+
+    <fragment
+        android:id="@+id/registerFragment"
+        android:name="com.example.aicollect.presentation.auth.RegisterFragment"
+        android:label="Register"
+        tools:layout="@layout/fragment_register"
+        xmlns:tools="http://schemas.android.com/tools" />
+
+    <fragment
+        android:id="@+id/forgotPasswordFragment"
+        android:name="com.example.aicollect.presentation.collection.PlaceholderFragment"
+        android:label="ForgotPassword">
+        <argument
+            android:name="title"
+            android:defaultValue="Recuperar contraseña (fuera de alcance para esta entrega)" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/homeFragment"
+        android:name="com.example.aicollect.presentation.collection.HomeFragment"
+        android:label="Home"
+        tools:layout="@layout/fragment_home"
+        xmlns:tools="http://schemas.android.com/tools" />
+
+    <fragment
+        android:id="@+id/addFragment"
+        android:name="com.example.aicollect.presentation.collection.PlaceholderFragment"
+        android:label="Add">
+        <argument
+            android:name="title"
+            android:defaultValue="Nueva Publicación (por implementar)" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/statsFragment"
+        android:name="com.example.aicollect.presentation.collection.PlaceholderFragment"
+        android:label="Stats">
+        <argument
+            android:name="title"
+            android:defaultValue="Estadísticas (por implementar)" />
+    </fragment>
+</navigation>
