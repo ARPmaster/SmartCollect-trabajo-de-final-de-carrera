@@ -28,8 +28,6 @@
 
     <!-- Auth tokens (from Figma: Iniciar Sesión, Modo Claro 82:350 / Modo Oscuro 81:7) -->
     <color name="auth_background">#F8F6F6</color>
-    <color name="auth_header_bg">#FFFFFF</color>
-    <color name="auth_header_border">#1A4E4637</color>
     <color name="auth_divider">#4DE1D9C9</color>
     <color name="auth_heading_text">#16130C</color>
     <color name="auth_field_label">#000000</color>
@@ -41,4 +39,23 @@
     <color name="auth_social_button_text">#000000</color>
     <color name="auth_footer_text">#4E4E4E</color>
     <color name="auth_icon">#8E8E93</color>
+
+    <!-- Filter bottom sheet tokens (from Figma: Inicio: Filtros, Modo Claro 2027:332 / Modo Oscuro 2027:211) -->
+    <color name="filter_input_bg">#FFFFFF</color>
+    <color name="filter_input_border">#D1D5DB</color>
+    <color name="filter_track_inactive">#E5E7EB</color>
+
+    <!-- My Vault / Estadísticas tokens (Figma 2014:76/2015:376 only mocked the dark "glass card" look;
+         light equivalents below are derived to respect the user's day/night choice like every other
+         screen — see values-night/colors.xml for the dark values that DO come from Figma). -->
+    <color name="vault_card_bg">#FFFFFF</color>
+    <color name="vault_card_border">#F3F4F6</color>
+    <!-- "Artículos Totales" icon frame: blends into the white card in light mode (no gray box). -->
+    <color name="vault_icon_box_bg">#FFFFFF</color>
+    <color name="vault_text_primary">#0A0A0A</color>
+    <color name="vault_text_secondary">#6B7280</color>
+    <color name="vault_progress_track">#E5E7EB</color>
+    <color name="vault_negative">#DC2626</color>
+    <!-- Fixed regardless of theme: text on top of the solid gold active chip/legend dot. -->
+    <color name="vault_chip_active_text">#0A0A0A</color>
 </resources>

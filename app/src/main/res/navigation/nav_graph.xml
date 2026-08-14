@@ -19,15 +19,6 @@
         xmlns:tools="http://schemas.android.com/tools" />
 
     <fragment
-        android:id="@+id/forgotPasswordFragment"
-        android:name="com.example.aicollect.presentation.collection.PlaceholderFragment"
-        android:label="ForgotPassword">
-        <argument
-            android:name="title"
-            android:defaultValue="Recuperar contraseña (fuera de alcance para esta entrega)" />
-    </fragment>
-
-    <fragment
         android:id="@+id/homeFragment"
         android:name="com.example.aicollect.presentation.collection.HomeFragment"
         android:label="Home"
@@ -45,10 +36,8 @@
 
     <fragment
         android:id="@+id/statsFragment"
-        android:name="com.example.aicollect.presentation.collection.PlaceholderFragment"
-        android:label="Stats">
-        <argument
-            android:name="title"
-            android:defaultValue="Estadísticas (por implementar)" />
-    </fragment>
+        android:name="com.example.aicollect.presentation.collection.MyVaultFragment"
+        android:label="My Vault"
+        tools:layout="@layout/fragment_my_vault"
+        xmlns:tools="http://schemas.android.com/tools" />
 </navigation>

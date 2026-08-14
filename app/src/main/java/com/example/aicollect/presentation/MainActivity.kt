@@ -38,11 +38,18 @@ class MainActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityMainBinding
     private lateinit var navController: NavController
+    private var latestTopInset = 0
     private var latestBottomInset = 0
     private val bottomBarBaseHeightPx by lazy { (80 * resources.displayMetrics.density).roundToInt() }
 
+    /** Toolbar (65dp) + its bottom border (1dp) — the app bar's own content height, insets aside. */
+    private val appBarContentHeightPx by lazy { (66 * resources.displayMetrics.density).roundToInt() }
+
     /** Auth screens render full-screen, without the drawer/toolbar/bottom-nav chrome (brief Sección 2/7). */
-    private val authDestinationIds = setOf(R.id.loginFragment, R.id.registerFragment, R.id.forgotPasswordFragment)
+    private val authDestinationIds = setOf(R.id.loginFragment, R.id.registerFragment)
+
+    /** The filter icon only makes sense filtering the Home feed — every other screen just keeps the hamburger menu. */
+    private val filterVisibleDestinationIds = setOf(R.id.homeFragment)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -120,6 +127,8 @@ class MainActivity : AppCompatActivity() {
 
         navController.addOnDestinationChangedListener { _, destination, _ ->
             applyChromeVisibility(isAuthDestination = destination.id in authDestinationIds)
+            binding.btnOpenFilters.visibility =
+                if (destination.id in filterVisibleDestinationIds) View.VISIBLE else View.GONE
         }
 
         setUpDarkModeToggle()
@@ -133,6 +142,7 @@ class MainActivity : AppCompatActivity() {
             if (isAuthDestination) DrawerLayout.LOCK_MODE_LOCKED_CLOSED else DrawerLayout.LOCK_MODE_UNLOCKED,
         )
         binding.navHostFragment.updateLayoutParams<CoordinatorLayout.LayoutParams> {
+            topMargin = if (isAuthDestination) 0 else latestTopInset + appBarContentHeightPx
             bottomMargin = if (isAuthDestination) 0 else bottomBarBaseHeightPx + latestBottomInset
         }
     }
@@ -173,6 +183,7 @@ class MainActivity : AppCompatActivity() {
                 WindowInsetsCompat.Type.statusBars() or WindowInsetsCompat.Type.displayCutout(),
             )
             val bottomSafeArea = insets.getInsets(WindowInsetsCompat.Type.navigationBars())
+            latestTopInset = topSafeArea.top
             latestBottomInset = bottomSafeArea.bottom
 
             binding.appBarLayout.updatePadding(top = topSafeArea.top)

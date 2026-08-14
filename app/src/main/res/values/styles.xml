@@ -13,4 +13,80 @@
         <item name="android:textColor">@color/collect_gold</item>
         <item name="android:textSize">10sp</item>
     </style>
+
+    <!-- My Vault (Figma 2014:76) -->
+    <style name="VaultChartMonthLabel">
+        <item name="android:layout_width">0dp</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_weight">1</item>
+        <item name="android:gravity">center</item>
+        <item name="android:fontFamily">sans-serif-medium</item>
+        <item name="android:textColor">@color/vault_text_secondary</item>
+        <item name="android:textSize">10sp</item>
+    </style>
+
+    <style name="VaultDistributionRow">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:orientation">vertical</item>
+    </style>
+
+    <style name="VaultDistributionHeaderRow">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:orientation">horizontal</item>
+    </style>
+
+    <style name="VaultDistributionLabel">
+        <item name="android:layout_width">0dp</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_weight">1</item>
+        <item name="android:textColor">@color/vault_text_primary</item>
+        <item name="android:textSize">16sp</item>
+    </style>
+
+    <style name="VaultDistributionValue">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:textColor">@color/collect_gold</item>
+        <item name="android:textSize">16sp</item>
+    </style>
+
+    <style name="VaultDistributionTrack">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">6dp</item>
+        <item name="android:layout_marginTop">8dp</item>
+        <item name="android:background">@drawable/bg_vault_progress_track</item>
+    </style>
+
+    <style name="VaultLegendRow">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_marginTop">8dp</item>
+        <item name="android:gravity">center_vertical</item>
+        <item name="android:orientation">horizontal</item>
+    </style>
+
+    <style name="VaultLegendDot">
+        <item name="android:layout_width">8dp</item>
+        <item name="android:layout_height">8dp</item>
+        <item name="android:background">@drawable/bg_vault_chip_active</item>
+    </style>
+
+    <style name="VaultLegendLabel">
+        <item name="android:layout_width">0dp</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_marginStart">8dp</item>
+        <item name="android:layout_weight">1</item>
+        <item name="android:textColor">@color/vault_text_primary</item>
+        <item name="android:textSize">16sp</item>
+    </style>
+
+    <style name="VaultLegendValue">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:fontFamily">monospace</item>
+        <item name="android:textColor">@color/collect_gold</item>
+        <item name="android:textSize">16sp</item>
+    </style>
 </resources>

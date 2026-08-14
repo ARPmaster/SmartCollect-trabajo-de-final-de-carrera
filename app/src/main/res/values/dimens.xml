@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="vault_top_item_spacing">12dp</dimen>
+</resources>

@@ -5,7 +5,6 @@ import android.text.InputType
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.core.os.bundleOf
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.updatePadding
@@ -18,7 +17,6 @@ import androidx.navigation.fragment.findNavController
 import androidx.navigation.navOptions
 import com.example.aicollect.R
 import com.example.aicollect.databinding.FragmentLoginBinding
-import com.example.aicollect.presentation.collection.PlaceholderFragment
 import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
@@ -58,7 +56,7 @@ class LoginFragment : Fragment() {
             insets
         }
 
-        binding.btnTogglePasswordVisibility?.setOnClickListener { togglePasswordVisibility() }
+        binding.btnTogglePasswordVisibility.setOnClickListener { togglePasswordVisibility() }
 
         binding.btnSignIn.setOnClickListener {
             viewModel.signIn(
@@ -68,10 +66,7 @@ class LoginFragment : Fragment() {
         }
 
         binding.tvForgotPassword.setOnClickListener {
-            findNavController().navigate(
-                R.id.forgotPasswordFragment,
-                bundleOf(PlaceholderFragment.ARG_TITLE to getString(R.string.forgot_password_placeholder_title)),
-            )
+            ForgotPasswordBottomSheetFragment().show(childFragmentManager, ForgotPasswordBottomSheetFragment.TAG)
         }
 
         binding.tvCreateAccount.setOnClickListener {
@@ -118,7 +113,7 @@ class LoginFragment : Fragment() {
             InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_VARIATION_PASSWORD
         }
         binding.etPassword.setSelection(cursorPosition)
-        binding.btnTogglePasswordVisibility?.setImageResource(
+        binding.btnTogglePasswordVisibility.setImageResource(
             if (isPasswordVisible) R.drawable.ic_eye_off else R.drawable.ic_eye,
         )
     }

@@ -13,6 +13,35 @@
     <string name="total_collection_value_currency">USD</string>
     <string name="total_collection_value_updated">Updated 2 hours ago</string>
 
+    <string name="vault_value_label">Valor total de la cartera</string>
+    <string name="vault_value_amount">$1,248,500.00</string>
+    <string name="vault_value_change">+12.4% este mes</string>
+    <string name="vault_chart_title">Evolución (6 meses)</string>
+    <string name="vault_chart_currency">USD</string>
+    <string name="vault_month_jan">ENE</string>
+    <string name="vault_month_feb">FEB</string>
+    <string name="vault_month_mar">MAR</string>
+    <string name="vault_month_apr">ABR</string>
+    <string name="vault_month_may">MAY</string>
+    <string name="vault_month_jun">JUN</string>
+    <string name="vault_distribution_title">Distribución por Deporte</string>
+    <string name="vault_sport_mlb">MLB (Béisbol)</string>
+    <string name="vault_sport_nba">NBA (Básquet)</string>
+    <string name="vault_sport_soccer">Soccer (Fútbol)</string>
+    <string name="vault_total_items_label">Artículos Totales</string>
+    <string name="vault_total_items_value">142</string>
+    <string name="vault_filter_title">Filtrar por Deporte</string>
+    <string name="vault_filter_futbol">Fútbol</string>
+    <string name="vault_filter_basquet">Básquet</string>
+    <string name="vault_filter_beisbol">Béisbol</string>
+    <string name="vault_filter_tenis">Tenis</string>
+    <string name="vault_donut_jerseys">Jerseys</string>
+    <string name="vault_donut_balones">Balones</string>
+    <string name="vault_donut_tarjetas">Tarjetas</string>
+    <string name="vault_donut_otros">Otros</string>
+    <string name="vault_top_items_title">Artículos más Valorados</string>
+    <string name="vault_see_all">Ver todo</string>
+
     <string name="cd_close_drawer">Cerrar menú</string>
     <string name="drawer_user_name">Alex Coleccionista</string>
     <string name="drawer_user_subtitle">Nivel Leyenda • 142 Cromos</string>
@@ -38,7 +67,13 @@
     <string name="login_no_account">¿No tienes una cuenta?</string>
     <string name="login_create_account">Crear cuenta</string>
     <string name="cd_toggle_password_visibility">Mostrar u ocultar contraseña</string>
-    <string name="forgot_password_placeholder_title">Recuperar contraseña (fuera de alcance para esta entrega)</string>
+
+    <string name="forgot_password_title">Recuperar contraseña</string>
+    <string name="forgot_password_description">Introduce tu correo electrónico y te enviaremos un enlace para restablecer tu contraseña.</string>
+    <string name="forgot_password_submit_button">Enviar enlace de recuperación</string>
+    <string name="forgot_password_sending">Enviando…</string>
+    <string name="forgot_password_success">Te hemos enviado un correo con las instrucciones para restablecer tu contraseña.</string>
+    <string name="cd_close_forgot_password">Cerrar recuperar contraseña</string>
 
     <string name="register_title">Crear cuenta</string>
     <string name="register_password_hint">Mínimo 6 caracteres</string>
@@ -48,4 +83,39 @@
     <string name="register_creating_account">Creando cuenta…</string>
     <string name="register_already_have_account">¿Ya tienes una cuenta?</string>
     <string name="register_sign_in_link">Iniciar sesión</string>
+
+    <string name="filters_sheet_title">Filtrar Colección</string>
+    <string name="cd_close_filters">Cerrar filtros</string>
+    <string name="filter_value_range_label">RANGO DE VALOR</string>
+    <string name="filter_value_range_bounds">$0 - $100k</string>
+    <string name="filter_min_label">MÍN</string>
+    <string name="filter_max_label">MÁX</string>
+    <string name="filter_currency_symbol">$</string>
+    <string name="filter_sport_label">DEPORTE</string>
+    <string name="filter_item_type_label">TIPO DE ARTÍCULO</string>
+    <string name="filter_condition_label">ESTADO</string>
+    <string name="filter_apply_button">Aplicar Filtros</string>
+
+    <string-array name="filter_sport_options">
+        <item>Todos</item>
+        <item>Baloncesto</item>
+        <item>Fútbol Americano</item>
+        <item>Fútbol</item>
+        <item>Béisbol</item>
+        <item>Otro</item>
+    </string-array>
+
+    <string-array name="filter_item_type_options">
+        <item>Cualquiera</item>
+        <item>Camiseta</item>
+        <item>Zapatillas</item>
+        <item>Balón</item>
+        <item>Otro</item>
+    </string-array>
+
+    <string-array name="filter_condition_options">
+        <item>Nuevo</item>
+        <item>Buen estado</item>
+        <item>Malas condiciones</item>
+    </string-array>
 </resources>

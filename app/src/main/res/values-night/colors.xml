@@ -27,4 +27,18 @@
     <color name="auth_social_button_bg">#0A0A0A</color>
     <color name="auth_social_button_text">#FFFFFF</color>
     <color name="auth_footer_text">#8E8E93</color>
+
+    <!-- Filter bottom sheet tokens (from Figma: Inicio: Filtros, Modo Oscuro 2027:211) -->
+    <color name="filter_input_bg">#0A0A0A</color>
+    <color name="filter_input_border">#4D4E4637</color>
+    <color name="filter_track_inactive">#4E4637</color>
+
+    <!-- My Vault / Estadísticas tokens (from Figma 2014:76 / 2015:376, dark "glass card" look) -->
+    <color name="vault_card_bg">#991C1C1E</color>
+    <color name="vault_card_border">#1AE5B543</color>
+    <color name="vault_icon_box_bg">#151516</color>
+    <color name="vault_text_primary">#EAE1D6</color>
+    <color name="vault_text_secondary">#8E8E93</color>
+    <color name="vault_progress_track">#151516</color>
+    <color name="vault_negative">#FFB4AB</color>
 </resources>

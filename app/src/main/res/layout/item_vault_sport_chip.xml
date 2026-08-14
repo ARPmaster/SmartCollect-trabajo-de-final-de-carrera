@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<TextView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:layout_marginEnd="12dp"
+    android:background="@drawable/bg_vault_chip_inactive"
+    android:fontFamily="sans-serif-medium"
+    android:letterSpacing="0.1"
+    android:paddingHorizontal="17dp"
+    android:paddingVertical="9dp"
+    android:textAllCaps="true"
+    android:textColor="@color/vault_text_secondary"
+    android:textSize="10sp"
+    tools:text="FÚTBOL"
+    xmlns:tools="http://schemas.android.com/tools" />

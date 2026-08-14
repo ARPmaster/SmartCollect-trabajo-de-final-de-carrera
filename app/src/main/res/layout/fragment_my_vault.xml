@@ -1,0 +1,381 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/collect_background"
+    android:clipToPadding="false"
+    android:fillViewport="true">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:paddingHorizontal="20dp"
+        android:paddingTop="16dp"
+        android:paddingBottom="32dp">
+
+        <!-- Total portfolio value -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_horizontal"
+            android:orientation="vertical"
+            android:paddingVertical="24dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="sans-serif-medium"
+                android:letterSpacing="0.1"
+                android:text="@string/vault_value_label"
+                android:textAllCaps="true"
+                android:textColor="@color/vault_text_secondary"
+                android:textSize="12sp" />
+
+            <TextView
+                android:id="@+id/tv_vault_amount"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:fontFamily="sans-serif-black"
+                android:text="@string/vault_value_amount"
+                android:textColor="@color/collect_gold"
+                android:textSize="30sp" />
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="6dp"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <ImageView
+                    android:layout_width="12dp"
+                    android:layout_height="12dp"
+                    android:contentDescription="@null"
+                    android:src="@drawable/ic_trend_up" />
+
+                <TextView
+                    android:id="@+id/tv_vault_change"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="6dp"
+                    android:text="@string/vault_value_change"
+                    android:textColor="@color/collect_green"
+                    android:textSize="14sp" />
+            </LinearLayout>
+        </LinearLayout>
+
+        <!-- Evolution chart card -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/bg_vault_card"
+            android:orientation="vertical"
+            android:padding="24dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="@string/vault_chart_title"
+                    android:textColor="@color/vault_text_primary"
+                    android:textSize="16sp" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/vault_chart_currency"
+                    android:textColor="@color/vault_text_secondary"
+                    android:textSize="16sp" />
+            </LinearLayout>
+
+            <com.example.aicollect.presentation.collection.PortfolioLineChartView
+                android:id="@+id/chart_portfolio"
+                android:layout_width="match_parent"
+                android:layout_height="140dp"
+                android:layout_marginTop="16dp" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:alpha="0.6"
+                android:orientation="horizontal">
+
+                <TextView style="@style/VaultChartMonthLabel" android:text="@string/vault_month_jan" />
+                <TextView style="@style/VaultChartMonthLabel" android:text="@string/vault_month_feb" />
+                <TextView style="@style/VaultChartMonthLabel" android:text="@string/vault_month_mar" />
+                <TextView style="@style/VaultChartMonthLabel" android:text="@string/vault_month_apr" />
+                <TextView style="@style/VaultChartMonthLabel" android:text="@string/vault_month_may" />
+                <TextView style="@style/VaultChartMonthLabel" android:text="@string/vault_month_jun" />
+            </LinearLayout>
+        </LinearLayout>
+
+        <!-- Distribution by sport -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="24dp"
+            android:background="@drawable/bg_vault_card"
+            android:orientation="vertical"
+            android:padding="25dp">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/vault_distribution_title"
+                android:textColor="@color/vault_text_primary"
+                android:textSize="16sp" />
+
+            <LinearLayout
+                android:id="@+id/row_distribution_mlb"
+                style="@style/VaultDistributionRow"
+                android:layout_marginTop="24dp">
+
+                <LinearLayout style="@style/VaultDistributionHeaderRow">
+                    <TextView
+                        style="@style/VaultDistributionLabel"
+                        android:text="@string/vault_sport_mlb" />
+                    <TextView
+                        android:id="@+id/tv_distribution_mlb_value"
+                        style="@style/VaultDistributionValue"
+                        tools:text="45%" />
+                </LinearLayout>
+
+                <FrameLayout
+                    android:id="@+id/track_distribution_mlb"
+                    style="@style/VaultDistributionTrack">
+                    <View
+                        android:id="@+id/fill_distribution_mlb"
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_gravity="start"
+                        android:background="@drawable/bg_vault_progress_fill" />
+                </FrameLayout>
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/row_distribution_nba"
+                style="@style/VaultDistributionRow"
+                android:layout_marginTop="12dp">
+
+                <LinearLayout style="@style/VaultDistributionHeaderRow">
+                    <TextView
+                        style="@style/VaultDistributionLabel"
+                        android:text="@string/vault_sport_nba" />
+                    <TextView
+                        android:id="@+id/tv_distribution_nba_value"
+                        style="@style/VaultDistributionValue"
+                        tools:text="30%" />
+                </LinearLayout>
+
+                <FrameLayout
+                    android:id="@+id/track_distribution_nba"
+                    style="@style/VaultDistributionTrack">
+                    <View
+                        android:id="@+id/fill_distribution_nba"
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_gravity="start"
+                        android:background="@drawable/bg_vault_progress_fill" />
+                </FrameLayout>
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/row_distribution_soccer"
+                style="@style/VaultDistributionRow"
+                android:layout_marginTop="12dp">
+
+                <LinearLayout style="@style/VaultDistributionHeaderRow">
+                    <TextView
+                        style="@style/VaultDistributionLabel"
+                        android:text="@string/vault_sport_soccer" />
+                    <TextView
+                        android:id="@+id/tv_distribution_soccer_value"
+                        style="@style/VaultDistributionValue"
+                        tools:text="25%" />
+                </LinearLayout>
+
+                <FrameLayout
+                    android:id="@+id/track_distribution_soccer"
+                    style="@style/VaultDistributionTrack">
+                    <View
+                        android:id="@+id/fill_distribution_soccer"
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_gravity="start"
+                        android:background="@drawable/bg_vault_progress_fill" />
+                </FrameLayout>
+            </LinearLayout>
+        </LinearLayout>
+
+        <!-- Quick stat chip -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="24dp"
+            android:background="@drawable/bg_vault_card"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:padding="13dp">
+
+            <FrameLayout
+                android:layout_width="28dp"
+                android:layout_height="36dp"
+                android:background="@drawable/bg_vault_stat_icon_box">
+
+                <ImageView
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:layout_gravity="center"
+                    android:contentDescription="@null"
+                    android:src="@drawable/ic_vault_box" />
+            </FrameLayout>
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="12dp"
+                android:layout_weight="1"
+                android:text="@string/vault_total_items_label"
+                android:textColor="@color/vault_text_primary"
+                android:textSize="16sp" />
+
+            <TextView
+                android:id="@+id/tv_total_items_value"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/vault_total_items_value"
+                android:textColor="@color/vault_text_primary"
+                android:textSize="16sp" />
+        </LinearLayout>
+
+        <!-- Sport filter chips -->
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="24dp"
+            android:text="@string/vault_filter_title"
+            android:textColor="@color/vault_text_primary"
+            android:textSize="16sp" />
+
+        <HorizontalScrollView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:scrollbars="none">
+
+            <LinearLayout
+                android:id="@+id/row_sport_chips"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal" />
+        </HorizontalScrollView>
+
+        <!-- Distribution donut -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:background="@drawable/bg_vault_card"
+            android:gravity="center_horizontal"
+            android:orientation="vertical"
+            android:padding="25dp">
+
+            <com.example.aicollect.presentation.collection.SportDonutChartView
+                android:id="@+id/chart_donut"
+                android:layout_width="128dp"
+                android:layout_height="128dp" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="24dp"
+                android:orientation="vertical">
+
+                <LinearLayout style="@style/VaultLegendRow">
+                    <View style="@style/VaultLegendDot" android:backgroundTint="@color/collect_gold" />
+                    <TextView style="@style/VaultLegendLabel" android:text="@string/vault_donut_jerseys" />
+                    <TextView
+                        android:id="@+id/tv_legend_jerseys_value"
+                        style="@style/VaultLegendValue"
+                        tools:text="50%" />
+                </LinearLayout>
+
+                <LinearLayout style="@style/VaultLegendRow">
+                    <View style="@style/VaultLegendDot" android:backgroundTint="@color/collect_gold" android:alpha="0.7" />
+                    <TextView style="@style/VaultLegendLabel" android:text="@string/vault_donut_balones" />
+                    <TextView
+                        android:id="@+id/tv_legend_balones_value"
+                        style="@style/VaultLegendValue"
+                        android:alpha="0.7"
+                        tools:text="30%" />
+                </LinearLayout>
+
+                <LinearLayout style="@style/VaultLegendRow">
+                    <View style="@style/VaultLegendDot" android:backgroundTint="@color/collect_gold" android:alpha="0.4" />
+                    <TextView style="@style/VaultLegendLabel" android:text="@string/vault_donut_tarjetas" />
+                    <TextView
+                        android:id="@+id/tv_legend_tarjetas_value"
+                        style="@style/VaultLegendValue"
+                        android:alpha="0.4"
+                        tools:text="15%" />
+                </LinearLayout>
+
+                <LinearLayout style="@style/VaultLegendRow">
+                    <View style="@style/VaultLegendDot" android:backgroundTint="@color/vault_text_secondary" />
+                    <TextView style="@style/VaultLegendLabel" android:text="@string/vault_donut_otros" />
+                    <TextView
+                        android:id="@+id/tv_legend_otros_value"
+                        style="@style/VaultLegendValue"
+                        android:textColor="@color/vault_text_secondary"
+                        tools:text="5%" />
+                </LinearLayout>
+            </LinearLayout>
+        </LinearLayout>
+
+        <!-- Top valued items -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="40dp"
+            android:gravity="bottom"
+            android:orientation="horizontal">
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="@string/vault_top_items_title"
+                android:textColor="@color/vault_text_primary"
+                android:textSize="16sp" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="monospace"
+                android:letterSpacing="0.1"
+                android:text="@string/vault_see_all"
+                android:textAllCaps="true"
+                android:textColor="@color/collect_gold"
+                android:textSize="10sp"
+                android:textStyle="bold" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/list_top_items"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:orientation="vertical" />
+    </LinearLayout>
+</ScrollView>

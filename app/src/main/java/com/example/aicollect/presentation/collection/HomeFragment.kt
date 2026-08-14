@@ -7,6 +7,7 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.aicollect.R
+import com.example.aicollect.application.collection.CollectionPriceFilter
 import com.example.aicollect.databinding.FragmentHomeBinding
 
 class HomeFragment : Fragment() {
@@ -27,6 +28,18 @@ class HomeFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         binding.rvFeed.layoutManager = LinearLayoutManager(requireContext())
         binding.rvFeed.adapter = CollectionFeedAdapter(sampleCollectionFeedItems)
+
+        parentFragmentManager.setFragmentResultListener(
+            FilterBottomSheetFragment.REQUEST_KEY,
+            viewLifecycleOwner,
+        ) { _, bundle ->
+            val minPrice = bundle.getInt(FilterBottomSheetFragment.KEY_MIN_PRICE)
+            val maxPrice = bundle.getInt(FilterBottomSheetFragment.KEY_MAX_PRICE)
+            val filtered = sampleCollectionFeedItems.filter { item ->
+                CollectionPriceFilter.isWithinRange(item.price, minPrice, maxPrice)
+            }
+            binding.rvFeed.adapter = CollectionFeedAdapter(filtered)
+        }
     }
 
     override fun onDestroyView() {
