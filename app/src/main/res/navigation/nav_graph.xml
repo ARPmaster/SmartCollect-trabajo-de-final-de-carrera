@@ -40,4 +40,32 @@
         android:label="My Vault"
         tools:layout="@layout/fragment_my_vault"
         xmlns:tools="http://schemas.android.com/tools" />
+
+    <fragment
+        android:id="@+id/editProfileFragment"
+        android:name="com.example.aicollect.presentation.settings.EditProfileFragment"
+        android:label="EditProfile"
+        tools:layout="@layout/fragment_edit_profile"
+        xmlns:tools="http://schemas.android.com/tools" />
+
+    <fragment
+        android:id="@+id/securityFragment"
+        android:name="com.example.aicollect.presentation.settings.SecurityFragment"
+        android:label="Security"
+        tools:layout="@layout/fragment_security"
+        xmlns:tools="http://schemas.android.com/tools" />
+
+    <fragment
+        android:id="@+id/helpFragment"
+        android:name="com.example.aicollect.presentation.settings.HelpFragment"
+        android:label="Help"
+        tools:layout="@layout/fragment_help"
+        xmlns:tools="http://schemas.android.com/tools" />
+
+    <fragment
+        android:id="@+id/aboutFragment"
+        android:name="com.example.aicollect.presentation.settings.AboutFragment"
+        android:label="About"
+        tools:layout="@layout/fragment_about"
+        xmlns:tools="http://schemas.android.com/tools" />
 </navigation>

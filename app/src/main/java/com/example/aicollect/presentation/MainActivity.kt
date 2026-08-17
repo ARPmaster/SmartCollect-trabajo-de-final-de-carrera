@@ -20,6 +20,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavController
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.navOptions
+import coil.load
 import com.example.aicollect.R
 import com.example.aicollect.application.auth.AuthRepository
 import com.example.aicollect.data.DarkModePreferences
@@ -45,8 +46,19 @@ class MainActivity : AppCompatActivity() {
     /** Toolbar (65dp) + its bottom border (1dp) — the app bar's own content height, insets aside. */
     private val appBarContentHeightPx by lazy { (66 * resources.displayMetrics.density).roundToInt() }
 
-    /** Auth screens render full-screen, without the drawer/toolbar/bottom-nav chrome (brief Sección 2/7). */
-    private val authDestinationIds = setOf(R.id.loginFragment, R.id.registerFragment)
+    /**
+     * Auth screens and drawer detail screens render full-screen, without the shared
+     * drawer/toolbar/bottom-nav chrome (brief Sección 2/7) — each owns its own back-arrow header
+     * instead, matching the Figma mocks for Editar Perfil/Seguridad/Ayuda/Sobre la app.
+     */
+    private val fullScreenDestinationIds = setOf(
+        R.id.loginFragment,
+        R.id.registerFragment,
+        R.id.editProfileFragment,
+        R.id.securityFragment,
+        R.id.helpFragment,
+        R.id.aboutFragment,
+    )
 
     /** The filter icon only makes sense filtering the Home feed — every other screen just keeps the hamburger menu. */
     private val filterVisibleDestinationIds = setOf(R.id.homeFragment)
@@ -74,15 +86,15 @@ class MainActivity : AppCompatActivity() {
         binding.navView.btnCloseDrawer.setOnClickListener {
             binding.drawerLayout.closeDrawer(GravityCompat.START)
         }
-        // Destinations not implemented yet (Editar Perfil, Seguridad, Ayuda, Sobre per brief).
         listOf(
-            binding.navView.rowEditProfile,
-            binding.navView.rowSecurity,
-            binding.navView.rowHelp,
-            binding.navView.rowAbout,
-        ).forEach { row ->
+            binding.navView.rowEditProfile to R.id.editProfileFragment,
+            binding.navView.rowSecurity to R.id.securityFragment,
+            binding.navView.rowHelp to R.id.helpFragment,
+            binding.navView.rowAbout to R.id.aboutFragment,
+        ).forEach { (row, destinationId) ->
             row.setOnClickListener {
                 binding.drawerLayout.closeDrawer(GravityCompat.START)
+                navController.navigate(destinationId)
             }
         }
 
@@ -126,24 +138,43 @@ class MainActivity : AppCompatActivity() {
         }
 
         navController.addOnDestinationChangedListener { _, destination, _ ->
-            applyChromeVisibility(isAuthDestination = destination.id in authDestinationIds)
+            applyChromeVisibility(isFullScreenDestination = destination.id in fullScreenDestinationIds)
             binding.btnOpenFilters.visibility =
                 if (destination.id in filterVisibleDestinationIds) View.VISIBLE else View.GONE
+            // Cheap: local FirebaseAuth reads + a Coil call that hits its memory cache after the
+            // first load, so refreshing on every nav change keeps EditProfile's edits reflected
+            // here without needing an explicit "profile changed" event/callback.
+            refreshDrawerProfile()
         }
 
         setUpDarkModeToggle()
     }
 
-    private fun applyChromeVisibility(isAuthDestination: Boolean) {
-        val chromeVisibility = if (isAuthDestination) View.GONE else View.VISIBLE
+    private fun refreshDrawerProfile() {
+        val displayName = authRepository.getCurrentUserDisplayName()
+        val emailPrefix = authRepository.getCurrentUserEmail()?.substringBefore('@')
+        binding.navView.tvDrawerUserName.text = when {
+            !displayName.isNullOrBlank() -> displayName
+            !emailPrefix.isNullOrBlank() -> emailPrefix
+            else -> getString(R.string.drawer_user_name)
+        }
+        binding.navView.ivDrawerAvatar.load(authRepository.getCurrentUserPhotoUrl()) {
+            placeholder(R.drawable.drawer_avatar)
+            error(R.drawable.drawer_avatar)
+            fallback(R.drawable.drawer_avatar)
+        }
+    }
+
+    private fun applyChromeVisibility(isFullScreenDestination: Boolean) {
+        val chromeVisibility = if (isFullScreenDestination) View.GONE else View.VISIBLE
         binding.appBarLayout.visibility = chromeVisibility
         binding.bottomNavBar.root.visibility = chromeVisibility
         binding.drawerLayout.setDrawerLockMode(
-            if (isAuthDestination) DrawerLayout.LOCK_MODE_LOCKED_CLOSED else DrawerLayout.LOCK_MODE_UNLOCKED,
+            if (isFullScreenDestination) DrawerLayout.LOCK_MODE_LOCKED_CLOSED else DrawerLayout.LOCK_MODE_UNLOCKED,
         )
         binding.navHostFragment.updateLayoutParams<CoordinatorLayout.LayoutParams> {
-            topMargin = if (isAuthDestination) 0 else latestTopInset + appBarContentHeightPx
-            bottomMargin = if (isAuthDestination) 0 else bottomBarBaseHeightPx + latestBottomInset
+            topMargin = if (isFullScreenDestination) 0 else latestTopInset + appBarContentHeightPx
+            bottomMargin = if (isFullScreenDestination) 0 else bottomBarBaseHeightPx + latestBottomInset
         }
     }
 
@@ -191,7 +222,7 @@ class MainActivity : AppCompatActivity() {
             binding.navView.root.updatePadding(top = topSafeArea.top, bottom = bottomSafeArea.bottom)
 
             val currentDestinationId = navController.currentDestination?.id
-            applyChromeVisibility(isAuthDestination = currentDestinationId != null && currentDestinationId in authDestinationIds)
+            applyChromeVisibility(isFullScreenDestination = currentDestinationId != null && currentDestinationId in fullScreenDestinationIds)
 
             insets
         }

@@ -43,8 +43,7 @@
     <string name="vault_see_all">Ver todo</string>
 
     <string name="cd_close_drawer">Cerrar menú</string>
-    <string name="drawer_user_name">Alex Coleccionista</string>
-    <string name="drawer_user_subtitle">Nivel Leyenda • 142 Cromos</string>
+    <string name="drawer_user_name">Mi cuenta</string>
     <string name="drawer_section_general">General</string>
     <string name="drawer_dark_mode">Modo oscuro</string>
     <string name="drawer_section_account">Ajustes de cuenta</string>
@@ -76,6 +75,8 @@
     <string name="cd_close_forgot_password">Cerrar recuperar contraseña</string>
 
     <string name="register_title">Crear cuenta</string>
+    <string name="register_username_label">Nombre de usuario</string>
+    <string name="register_username_hint">Entre 6 y 16 caracteres</string>
     <string name="register_password_hint">Mínimo 6 caracteres</string>
     <string name="register_confirm_password_label">Confirmar contraseña</string>
     <string name="register_confirm_password_hint">Repite tu contraseña</string>
@@ -118,4 +119,55 @@
         <item>Buen estado</item>
         <item>Malas condiciones</item>
     </string-array>
+
+    <string name="cd_back">Volver</string>
+
+    <string name="edit_profile_header_title">Editar Perfil</string>
+    <string name="edit_profile_change_photo">Cambiar foto</string>
+    <string name="edit_profile_full_name_label">Nombre</string>
+    <string name="edit_profile_save_button">Guardar Cambios</string>
+    <string name="edit_profile_saving">Guardando…</string>
+    <string name="edit_profile_success">Perfil actualizado correctamente.</string>
+    <string name="edit_profile_photo_read_error">No se pudo leer la imagen seleccionada.</string>
+    <string name="edit_profile_photo_uploading_wait">Espera a que termine de subirse la foto…</string>
+    <string name="cd_change_photo">Cambiar foto de perfil</string>
+
+    <string name="security_header_title">Seguridad</string>
+    <string name="security_change_email_label">Cambiar correo</string>
+    <string name="security_new_password_label">Contraseña nueva</string>
+    <string name="security_confirm_password_label">Verificar contraseña</string>
+    <string name="security_save_button">Guardar Cambios</string>
+    <string name="security_saving">Guardando…</string>
+    <string name="security_success">Datos de seguridad actualizados correctamente.</string>
+
+    <string name="help_header_title">Ayuda y Soporte</string>
+    <string name="help_section_title">Preguntas Frecuentes</string>
+    <string name="help_contact_button">Contactar por Correo</string>
+    <string name="help_support_email">adrianforgithub@gmail.com</string>
+    <string name="help_support_email_subject">Ayuda con Collect AI</string>
+    <string name="help_no_email_app_error">No se encontró ninguna app de correo instalada.</string>
+
+    <string name="help_question_1">¿Cómo añado un ítem a mi colección?</string>
+    <string name="help_answer_1">Pulsa el botón «+» de la barra inferior, sube una foto del objeto y confirma el candidato que el sistema te sugiera (o introdúcelo a mano). El artículo se añadirá a tu colección tras guardarlo.</string>
+    <string name="help_question_2">¿Se pueden filtrar los artículos de mi colección?</string>
+    <string name="help_answer_2">Sí. En Inicio, pulsa el icono de filtro en la parte superior para acotar tu colección por rango de valor, deporte, tipo de artículo o estado.</string>
+    <string name="help_question_3">¿Cómo se calcula el precio de mi colección?</string>
+    <string name="help_answer_3">Cada artículo se valora a partir de datos de mercado agregados. Mientras la integración con StockX no esté activa, se usan precios de referencia de prueba con la misma estructura que tendrán los datos reales.</string>
+    <string name="help_question_4">¿Cada cuánto se actualizan los precios?</string>
+    <string name="help_answer_4">La valoración se recalcula cada vez que se actualiza la fuente de precios de referencia de un artículo; no es en tiempo real.</string>
+    <string name="help_question_5">¿Dónde se guardan mis datos?</string>
+    <string name="help_answer_5">Tu colección, fotos y datos de cuenta se guardan en tu perfil de Firebase, protegidos por reglas que solo permiten el acceso a tu propio usuario autenticado.</string>
+    <string name="help_question_6">¿Qué pasa si no recuerdo mi contraseña?</string>
+    <string name="help_answer_6">En la pantalla de inicio de sesión, pulsa «¿Olvidaste tu contraseña?» e introduce tu correo; te enviaremos un enlace para restablecerla.</string>
+
+    <string name="about_header_title">Sobre la aplicación</string>
+    <string name="about_app_name">COLLECT AI</string>
+    <string name="about_version_format">Versión %1$s</string>
+    <string name="about_mission_title">Nuestra misión</string>
+    <string name="about_mission_body">Collect AI es la plataforma definitiva para coleccionistas en la que cualquiera puede controlar su inventario deportivo.</string>
+    <string name="about_terms">Términos y Condiciones</string>
+    <string name="about_terms_answer">Al usar Collect AI aceptas que la aplicación es una herramienta de gestión de colecciones personales: te ayuda a catalogar tus objetos y a consultar una valoración de mercado orientativa, no una tasación oficial ni una garantía de precio de venta. Eres responsable de la veracidad de los datos que introduces y de mantener segura tu cuenta. Nos reservamos el derecho de suspender cuentas que hagan un uso indebido del servicio. El uso continuado de la app tras cambios en estos términos implica su aceptación.</string>
+    <string name="about_privacy">Política de Privacidad</string>
+    <string name="about_privacy_answer">Recopilamos únicamente los datos necesarios para ofrecerte el servicio: tu correo, nombre de perfil, foto de perfil (si la subes) y los datos e imágenes de los artículos que añades a tu colección. Todo se almacena de forma segura en Firebase (Google), protegido por reglas de acceso que solo permiten leer y escribir tus propios datos. No vendemos ni compartimos tu información con terceros con fines publicitarios. Puedes solicitar la eliminación de tu cuenta y de todos tus datos en cualquier momento escribiéndonos a soporte.</string>
+    <string name="about_footer">Hecho con pasión por el equipo de Collect AI.</string>
 </resources>

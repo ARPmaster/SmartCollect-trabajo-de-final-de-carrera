@@ -5,6 +5,7 @@ import android.text.InputType
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.content.ContextCompat
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.updatePadding
@@ -19,6 +20,7 @@ import com.example.aicollect.R
 import com.example.aicollect.databinding.FragmentRegisterBinding
 import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 /** "Crear cuenta" screen, wired to Firebase Auth via [AuthRepository.signUp]. */
@@ -56,6 +58,7 @@ class RegisterFragment : Fragment() {
         binding.btnCreateAccount.setOnClickListener {
             viewModel.signUp(
                 email = binding.etEmail.text?.toString().orEmpty().trim(),
+                username = binding.etUsername.text?.toString().orEmpty().trim(),
                 password = binding.etPassword.text?.toString().orEmpty(),
                 confirmPassword = binding.etConfirmPassword.text?.toString().orEmpty(),
             )
@@ -76,6 +79,7 @@ class RegisterFragment : Fragment() {
         val isLoading = state is RegisterUiState.Loading
         binding.btnCreateAccount.isEnabled = !isLoading
         binding.etEmail.isEnabled = !isLoading
+        binding.etUsername.isEnabled = !isLoading
         binding.etPassword.isEnabled = !isLoading
         binding.etConfirmPassword.isEnabled = !isLoading
         binding.btnCreateAccount.text = getString(
@@ -85,7 +89,21 @@ class RegisterFragment : Fragment() {
         when (state) {
             is RegisterUiState.Success -> navigateToHome()
             is RegisterUiState.Error -> Snackbar.make(binding.root, state.message, Snackbar.LENGTH_LONG).show()
+            is RegisterUiState.UsernameTaken -> showUsernameTakenFeedback(state.message)
             else -> Unit
+        }
+    }
+
+    /** Red border on the username box for [USERNAME_TAKEN_BORDER_MS], plus a high-visibility red Snackbar. */
+    private fun showUsernameTakenFeedback(message: String) {
+        binding.boxUsername.background = ContextCompat.getDrawable(requireContext(), R.drawable.bg_auth_input_error)
+        Snackbar.make(binding.root, message, Snackbar.LENGTH_LONG)
+            .setBackgroundTint(ContextCompat.getColor(requireContext(), R.color.vault_negative))
+            .setTextColor(ContextCompat.getColor(requireContext(), android.R.color.white))
+            .show()
+        viewLifecycleOwner.lifecycleScope.launch {
+            delay(USERNAME_TAKEN_BORDER_MS)
+            binding.boxUsername.background = ContextCompat.getDrawable(requireContext(), R.drawable.bg_auth_input)
         }
     }
 
@@ -114,5 +132,9 @@ class RegisterFragment : Fragment() {
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
+    }
+
+    private companion object {
+        const val USERNAME_TAKEN_BORDER_MS = 2000L
     }
 }
