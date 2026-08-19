@@ -4,7 +4,9 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.aicollect.R
 import com.example.aicollect.application.collection.CollectionPriceFilter
@@ -27,7 +29,7 @@ class HomeFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         binding.rvFeed.layoutManager = LinearLayoutManager(requireContext())
-        binding.rvFeed.adapter = CollectionFeedAdapter(sampleCollectionFeedItems)
+        binding.rvFeed.adapter = CollectionFeedAdapter(sampleCollectionFeedItems, ::navigateToItemDetail)
 
         parentFragmentManager.setFragmentResultListener(
             FilterBottomSheetFragment.REQUEST_KEY,
@@ -38,8 +40,19 @@ class HomeFragment : Fragment() {
             val filtered = sampleCollectionFeedItems.filter { item ->
                 CollectionPriceFilter.isWithinRange(item.price, minPrice, maxPrice)
             }
-            binding.rvFeed.adapter = CollectionFeedAdapter(filtered)
+            binding.rvFeed.adapter = CollectionFeedAdapter(filtered, ::navigateToItemDetail)
         }
+    }
+
+    /** Matches the tapped item back to its position in the unfiltered sample list — the
+     * filtered adapter's own position wouldn't line up with [ItemDetailFragment]'s sample data
+     * once an earlier item gets filtered out. */
+    private fun navigateToItemDetail(item: CollectionFeedItem) {
+        val itemIndex = sampleCollectionFeedItems.indexOf(item).coerceAtLeast(0)
+        findNavController().navigate(
+            R.id.itemDetailFragment,
+            bundleOf(ItemDetailFragment.ARG_ITEM_INDEX to itemIndex),
+        )
     }
 
     override fun onDestroyView() {

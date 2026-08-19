@@ -68,4 +68,15 @@
         android:label="About"
         tools:layout="@layout/fragment_about"
         xmlns:tools="http://schemas.android.com/tools" />
+
+    <fragment
+        android:id="@+id/itemDetailFragment"
+        android:name="com.example.aicollect.presentation.collection.ItemDetailFragment"
+        android:label="ItemDetail"
+        tools:layout="@layout/fragment_item_detail"
+        xmlns:tools="http://schemas.android.com/tools">
+        <argument
+            android:name="itemIndex"
+            android:defaultValue="0" />
+    </fragment>
 </navigation>

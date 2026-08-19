@@ -11,6 +11,7 @@ private const val VIEW_TYPE_FEED_ITEM = 1
 
 class CollectionFeedAdapter(
     private val items: List<CollectionFeedItem>,
+    private val onItemClick: (CollectionFeedItem) -> Unit = {},
 ) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
     override fun getItemCount(): Int = items.size + 1
@@ -23,7 +24,7 @@ class CollectionFeedAdapter(
         return if (viewType == VIEW_TYPE_HEADER) {
             HeaderViewHolder(ItemTotalValueHeaderBinding.inflate(inflater, parent, false))
         } else {
-            FeedItemViewHolder(ItemCollectionFeedBinding.inflate(inflater, parent, false))
+            FeedItemViewHolder(ItemCollectionFeedBinding.inflate(inflater, parent, false), onItemClick)
         }
     }
 
@@ -37,6 +38,7 @@ class CollectionFeedAdapter(
 
     private class FeedItemViewHolder(
         private val binding: ItemCollectionFeedBinding,
+        private val onItemClick: (CollectionFeedItem) -> Unit,
     ) : RecyclerView.ViewHolder(binding.root) {
         fun bind(item: CollectionFeedItem) {
             binding.tvCategory.text = item.category
@@ -44,6 +46,7 @@ class CollectionFeedAdapter(
             binding.tvPrice.text = item.price
             binding.tvDescription.text = item.description
             binding.tvDate.text = item.date
+            binding.root.setOnClickListener { onItemClick(item) }
         }
     }
 }

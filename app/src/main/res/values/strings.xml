@@ -13,6 +13,10 @@
     <string name="total_collection_value_currency">USD</string>
     <string name="total_collection_value_updated">Updated 2 hours ago</string>
 
+    <string name="item_detail_condition_label">Estado</string>
+    <string name="item_detail_category_label">Categoría</string>
+    <string name="cd_item_detail_back">Volver</string>
+
     <string name="vault_value_label">Valor total de la cartera</string>
     <string name="vault_value_amount">$1,248,500.00</string>
     <string name="vault_value_change">+12.4% este mes</string>

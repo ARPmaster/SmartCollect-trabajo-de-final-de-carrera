@@ -60,6 +60,14 @@ class MainActivity : AppCompatActivity() {
         R.id.aboutFragment,
     )
 
+    /**
+     * Detalle de objeto/carta (Figma 73:55/74:180) keeps the shared app bar and bottom nav —
+     * it's a regular destination reached from Home/My Vault, not the Drawer's settings flow —
+     * but swaps the toolbar's hamburger icon for a back arrow (brief Sección 2: "El Toolbar
+     * cambia entre icono ☰... y flecha atrás... pantallas de detalle").
+     */
+    private val backButtonDestinationIds = setOf(R.id.itemDetailFragment)
+
     /** The filter icon only makes sense filtering the Home feed — every other screen just keeps the hamburger menu. */
     private val filterVisibleDestinationIds = setOf(R.id.homeFragment)
 
@@ -76,7 +84,11 @@ class MainActivity : AppCompatActivity() {
         setUpInsets()
 
         binding.btnOpenMenu.setOnClickListener {
-            binding.drawerLayout.openDrawer(GravityCompat.START)
+            if (navController.currentDestination?.id in backButtonDestinationIds) {
+                navController.popBackStack()
+            } else {
+                binding.drawerLayout.openDrawer(GravityCompat.START)
+            }
         }
 
         binding.btnOpenFilters.setOnClickListener {
@@ -138,7 +150,15 @@ class MainActivity : AppCompatActivity() {
         }
 
         navController.addOnDestinationChangedListener { _, destination, _ ->
-            applyChromeVisibility(isFullScreenDestination = destination.id in fullScreenDestinationIds)
+            applyChromeVisibility(
+                showAppBar = destination.id !in fullScreenDestinationIds,
+                showBottomNav = destination.id !in fullScreenDestinationIds,
+                lockDrawer = destination.id in fullScreenDestinationIds || destination.id in backButtonDestinationIds,
+            )
+            val isBackButtonMode = destination.id in backButtonDestinationIds
+            binding.btnOpenMenu.setImageResource(if (isBackButtonMode) R.drawable.ic_drawer_back else R.drawable.ic_hamburger)
+            binding.btnOpenMenu.contentDescription =
+                getString(if (isBackButtonMode) R.string.cd_item_detail_back else R.string.cd_open_menu)
             binding.btnOpenFilters.visibility =
                 if (destination.id in filterVisibleDestinationIds) View.VISIBLE else View.GONE
             // Cheap: local FirebaseAuth reads + a Coil call that hits its memory cache after the
@@ -165,16 +185,15 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun applyChromeVisibility(isFullScreenDestination: Boolean) {
-        val chromeVisibility = if (isFullScreenDestination) View.GONE else View.VISIBLE
-        binding.appBarLayout.visibility = chromeVisibility
-        binding.bottomNavBar.root.visibility = chromeVisibility
+    private fun applyChromeVisibility(showAppBar: Boolean, showBottomNav: Boolean, lockDrawer: Boolean) {
+        binding.appBarLayout.visibility = if (showAppBar) View.VISIBLE else View.GONE
+        binding.bottomNavBar.root.visibility = if (showBottomNav) View.VISIBLE else View.GONE
         binding.drawerLayout.setDrawerLockMode(
-            if (isFullScreenDestination) DrawerLayout.LOCK_MODE_LOCKED_CLOSED else DrawerLayout.LOCK_MODE_UNLOCKED,
+            if (lockDrawer) DrawerLayout.LOCK_MODE_LOCKED_CLOSED else DrawerLayout.LOCK_MODE_UNLOCKED,
         )
         binding.navHostFragment.updateLayoutParams<CoordinatorLayout.LayoutParams> {
-            topMargin = if (isFullScreenDestination) 0 else latestTopInset + appBarContentHeightPx
-            bottomMargin = if (isFullScreenDestination) 0 else bottomBarBaseHeightPx + latestBottomInset
+            topMargin = if (showAppBar) latestTopInset + appBarContentHeightPx else 0
+            bottomMargin = if (showBottomNav) bottomBarBaseHeightPx + latestBottomInset else 0
         }
     }
 
@@ -222,7 +241,13 @@ class MainActivity : AppCompatActivity() {
             binding.navView.root.updatePadding(top = topSafeArea.top, bottom = bottomSafeArea.bottom)
 
             val currentDestinationId = navController.currentDestination?.id
-            applyChromeVisibility(isFullScreenDestination = currentDestinationId != null && currentDestinationId in fullScreenDestinationIds)
+            val isFullScreen = currentDestinationId != null && currentDestinationId in fullScreenDestinationIds
+            val isBackButtonMode = currentDestinationId != null && currentDestinationId in backButtonDestinationIds
+            applyChromeVisibility(
+                showAppBar = !isFullScreen,
+                showBottomNav = !isFullScreen,
+                lockDrawer = isFullScreen || isBackButtonMode,
+            )
 
             insets
         }

@@ -8,8 +8,10 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import androidx.core.content.ContextCompat
+import androidx.core.os.bundleOf
 import androidx.core.view.doOnLayout
 import androidx.fragment.app.Fragment
+import androidx.navigation.fragment.findNavController
 import com.example.aicollect.R
 import com.example.aicollect.databinding.FragmentMyVaultBinding
 import com.example.aicollect.databinding.ItemVaultTopValuedBinding
@@ -88,7 +90,7 @@ class MyVaultFragment : Fragment() {
     }
 
     private fun setUpTopValuedItems() {
-        sampleTopValuedItems.forEach { item ->
+        sampleTopValuedItems.forEachIndexed { index, item ->
             val itemBinding = ItemVaultTopValuedBinding.inflate(layoutInflater, binding.listTopItems, false)
             itemBinding.ivItemImage.setImageResource(item.image)
             itemBinding.tvItemName.text = item.name
@@ -101,6 +103,15 @@ class MyVaultFragment : Fragment() {
             if (item !== sampleTopValuedItems.last()) {
                 (itemBinding.root.layoutParams as ViewGroup.MarginLayoutParams).bottomMargin =
                     resources.getDimensionPixelSize(R.dimen.vault_top_item_spacing)
+            }
+            // Same 2 sample items, same order as ItemDetailFragment's placeholder data — see
+            // its kdoc for why this index-matching approach is fine while there's no real
+            // items repository yet.
+            itemBinding.root.setOnClickListener {
+                findNavController().navigate(
+                    R.id.itemDetailFragment,
+                    bundleOf(ItemDetailFragment.ARG_ITEM_INDEX to index),
+                )
             }
             binding.listTopItems.addView(itemBinding.root)
         }
