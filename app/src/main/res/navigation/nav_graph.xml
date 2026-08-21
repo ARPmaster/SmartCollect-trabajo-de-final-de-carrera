@@ -26,13 +26,25 @@
         xmlns:tools="http://schemas.android.com/tools" />
 
     <fragment
-        android:id="@+id/addFragment"
-        android:name="com.example.aicollect.presentation.collection.PlaceholderFragment"
-        android:label="Add">
-        <argument
-            android:name="title"
-            android:defaultValue="Nueva Publicación (por implementar)" />
-    </fragment>
+        android:id="@+id/newPostCaptureFragment"
+        android:name="com.example.aicollect.presentation.newpost.NewPostCaptureFragment"
+        android:label="NewPostCapture"
+        tools:layout="@layout/fragment_new_post_capture"
+        xmlns:tools="http://schemas.android.com/tools" />
+
+    <fragment
+        android:id="@+id/newPostDisambiguationFragment"
+        android:name="com.example.aicollect.presentation.newpost.NewPostDisambiguationFragment"
+        android:label="NewPostDisambiguation"
+        tools:layout="@layout/fragment_new_post_disambiguation"
+        xmlns:tools="http://schemas.android.com/tools" />
+
+    <fragment
+        android:id="@+id/newItemFormFragment"
+        android:name="com.example.aicollect.presentation.newpost.NewItemFormFragment"
+        android:label="NewItemForm"
+        tools:layout="@layout/fragment_new_item_form"
+        xmlns:tools="http://schemas.android.com/tools" />
 
     <fragment
         android:id="@+id/statsFragment"
@@ -76,7 +88,7 @@
         tools:layout="@layout/fragment_item_detail"
         xmlns:tools="http://schemas.android.com/tools">
         <argument
-            android:name="itemIndex"
-            android:defaultValue="0" />
+            android:name="itemId"
+            app:argType="string" />
     </fragment>
 </navigation>

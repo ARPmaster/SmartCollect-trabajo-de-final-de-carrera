@@ -1,7 +1,6 @@
 package com.example.aicollect.presentation.collection
 
-import android.content.Context
-import android.graphics.Color
+import android.content.res.ColorStateList
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -11,21 +10,37 @@ import androidx.core.content.ContextCompat
 import androidx.core.os.bundleOf
 import androidx.core.view.doOnLayout
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
+import coil.load
 import com.example.aicollect.R
+import com.example.aicollect.application.items.Item
+import com.example.aicollect.application.items.PortfolioAnalytics
 import com.example.aicollect.databinding.FragmentMyVaultBinding
 import com.example.aicollect.databinding.ItemVaultTopValuedBinding
+import com.google.android.material.snackbar.Snackbar
+import dagger.hilt.android.AndroidEntryPoint
+import kotlin.math.roundToInt
+import kotlinx.coroutines.launch
 
 /**
- * "My Vault" / Estadísticas (Figma 2014:76 / 2015:376). Chart data, distribution and top items
- * are sample data (same placeholder items as [HomeFragment]) — there is no items repository yet,
- * this screen doesn't depend on the recognizeItem pipeline. Sport filter chips are interactive
- * but don't filter anything yet, same conscious limitation as [FilterBottomSheetFragment].
+ * "My Vault" / Estadísticas (Figma 2014:76 / 2015:376), wired to real Firestore items via
+ * [MyVaultViewModel] — sport filter chips stay interactive-but-not-filtering (pre-existing,
+ * documented limitation, same as [FilterBottomSheetFragment]'s sport/type/condition selectors).
+ * The original item-type donut (Jerseys/Balones/Tarjetas/Otros) is repurposed to show
+ * distribution by `estado` (Nuevo/Buen estado/Malas condiciones) — the real Item schema has no
+ * "tipo de artículo" field, only deporte/estado (see PROJECT_CONTEXT.md).
  */
+@AndroidEntryPoint
 class MyVaultFragment : Fragment() {
 
     private var _binding: FragmentMyVaultBinding? = null
     private val binding get() = _binding!!
+
+    private val viewModel: MyVaultViewModel by viewModels()
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -38,25 +53,98 @@ class MyVaultFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
-        binding.chartPortfolio.values = samplePortfolioEvolution
-        setUpDistributionBar(binding.trackDistributionMlb, binding.fillDistributionMlb, binding.tvDistributionMlbValue, 45)
-        setUpDistributionBar(binding.trackDistributionNba, binding.fillDistributionNba, binding.tvDistributionNbaValue, 30)
-        setUpDistributionBar(binding.trackDistributionSoccer, binding.fillDistributionSoccer, binding.tvDistributionSoccerValue, 25)
-
-        binding.tvLegendJerseysValue.text = "50%"
-        binding.tvLegendBalonesValue.text = "30%"
-        binding.tvLegendTarjetasValue.text = "15%"
-        binding.tvLegendOtrosValue.text = "5%"
-        binding.chartDonut.segments = sampleDonutSegments(requireContext())
-
         setUpSportChips()
-        setUpTopValuedItems()
+
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.uiState.collect { render(it) }
+            }
+        }
     }
 
-    private fun setUpDistributionBar(track: View, fill: View, valueLabel: TextView, percent: Int) {
-        valueLabel.text = "$percent%"
-        track.doOnLayout { fill.layoutParams = fill.layoutParams.apply { width = (track.width * percent / 100f).toInt() } }
+    private fun render(state: MyVaultUiState) {
+        when (state) {
+            is MyVaultUiState.Loading -> Unit
+            is MyVaultUiState.Content -> bind(state.items)
+            is MyVaultUiState.Error -> Snackbar.make(binding.root, state.message, Snackbar.LENGTH_LONG).show()
+        }
+    }
+
+    private fun bind(items: List<Item>) {
+        binding.scrollContent.visibility = if (items.isEmpty()) View.GONE else View.VISIBLE
+        binding.tvEmptyState.visibility = if (items.isEmpty()) View.VISIBLE else View.GONE
+        if (items.isEmpty()) return
+
+        val evolution = PortfolioAnalytics.monthlyEvolution(items)
+        binding.tvVaultAmount.text = ItemFormatting.formatValue(PortfolioAnalytics.totalValue(items), CURRENCY)
+        val changeLabel = ItemFormatting.formatChangePercent(PortfolioAnalytics.changePercent(evolution))
+        binding.rowVaultChange.visibility = if (changeLabel != null) View.VISIBLE else View.GONE
+        binding.tvVaultChange.text = changeLabel.orEmpty()
+        binding.chartPortfolio.values = evolution
+
+        val monthLabels = PortfolioAnalytics.monthLabels()
+        listOf(binding.tvMonth1, binding.tvMonth2, binding.tvMonth3, binding.tvMonth4, binding.tvMonth5, binding.tvMonth6)
+            .forEachIndexed { index, view -> view.text = monthLabels.getOrNull(index).orEmpty() }
+
+        setUpSportDistribution(items)
+        setUpConditionDistribution(items)
+
+        binding.tvTotalItemsValue.text = items.size.toString()
+
+        setUpTopValuedItems(items)
+    }
+
+    private fun setUpSportDistribution(items: List<Item>) {
+        val distribution = PortfolioAnalytics.distributionBy(items) { it.deporte }
+        val rows = listOf(
+            Triple(binding.rowDistribution1, binding.tvDistribution1Label, binding.tvDistribution1Value) to
+                (binding.trackDistribution1 to binding.fillDistribution1),
+            Triple(binding.rowDistribution2, binding.tvDistribution2Label, binding.tvDistribution2Value) to
+                (binding.trackDistribution2 to binding.fillDistribution2),
+            Triple(binding.rowDistribution3, binding.tvDistribution3Label, binding.tvDistribution3Value) to
+                (binding.trackDistribution3 to binding.fillDistribution3),
+        )
+        rows.forEachIndexed { index, (labels, track) ->
+            val (row, label, value) = labels
+            val (trackView, fillView) = track
+            val entry = distribution.getOrNull(index)
+            row.visibility = if (entry != null) View.VISIBLE else View.GONE
+            if (entry != null) {
+                label.text = entry.first
+                value.text = "${entry.second}%"
+                trackView.doOnLayout {
+                    fillView.layoutParams = fillView.layoutParams.apply { width = (trackView.width * entry.second / 100f).toInt() }
+                }
+            }
+        }
+    }
+
+    /** Unlike [setUpSportDistribution] (dynamic set of sports, sorted by frequency), estado has
+     * exactly 3 fixed values with a meaningful order (Nuevo=gold, Buen estado=green, Malas
+     * condiciones=red) — computed directly instead of through [PortfolioAnalytics.distributionBy]
+     * so the color always matches the same estado, not whichever happens to be most common. */
+    private fun setUpConditionDistribution(items: List<Item>) {
+        val estadoOrder = resources.getStringArray(R.array.filter_condition_options)
+        val colors = listOf(R.color.collect_gold, R.color.collect_green, R.color.vault_negative)
+        val percents = estadoOrder.map { estado ->
+            val count = items.count { it.estado == estado }
+            ((count * 100f) / items.size).roundToInt()
+        }
+        val slots = listOf(
+            Triple(binding.dotLegend1, binding.tvLegend1Label, binding.tvLegend1Value),
+            Triple(binding.dotLegend2, binding.tvLegend2Label, binding.tvLegend2Value),
+            Triple(binding.dotLegend3, binding.tvLegend3Label, binding.tvLegend3Value),
+        )
+        slots.forEachIndexed { index, (dot, label, value) ->
+            val color = ContextCompat.getColor(requireContext(), colors[index])
+            dot.backgroundTintList = ColorStateList.valueOf(color)
+            value.setTextColor(color)
+            label.text = estadoOrder.getOrNull(index).orEmpty()
+            value.text = "${percents.getOrNull(index) ?: 0}%"
+        }
+        binding.chartDonut.segments = estadoOrder.indices.map { index ->
+            DonutSegment(percent = percents[index], color = ContextCompat.getColor(requireContext(), colors[index]))
+        }
     }
 
     private fun setUpSportChips() {
@@ -89,28 +177,38 @@ class MyVaultFragment : Fragment() {
         select(chips.first())
     }
 
-    private fun setUpTopValuedItems() {
-        sampleTopValuedItems.forEachIndexed { index, item ->
+    private fun setUpTopValuedItems(items: List<Item>) {
+        binding.listTopItems.removeAllViews()
+        val topItems = PortfolioAnalytics.topValued(items)
+        topItems.forEachIndexed { index, item ->
             val itemBinding = ItemVaultTopValuedBinding.inflate(layoutInflater, binding.listTopItems, false)
-            itemBinding.ivItemImage.setImageResource(item.image)
-            itemBinding.tvItemName.text = item.name
-            itemBinding.tvItemSubtitle.text = item.subtitle
-            itemBinding.tvItemValue.text = item.value
-            itemBinding.tvItemChange.text = item.changeLabel
+            itemBinding.ivItemImage.load(item.imageUrls.firstOrNull())
+            itemBinding.tvItemName.text = item.nombre
+            itemBinding.tvItemSubtitle.text = listOfNotNull(
+                item.marca.takeIf { it.isNotBlank() },
+                item.estado.takeIf { it.isNotBlank() },
+            ).joinToString(" • ").ifEmpty { item.deporte }
+            itemBinding.tvItemValue.text = ItemFormatting.formatValue(item.valoracionActual, item.valoracionMoneda)
+
+            val changePercent = PortfolioAnalytics.itemChangePercent(item)
+            val changeLabel = ItemFormatting.formatChangePercent(changePercent)
+            itemBinding.tvItemChange.text = changeLabel.orEmpty()
+            itemBinding.tvItemChange.visibility = if (changeLabel != null) View.VISIBLE else View.GONE
             itemBinding.tvItemChange.setTextColor(
-                ContextCompat.getColor(requireContext(), if (item.isPositive) R.color.collect_green else R.color.vault_negative),
+                ContextCompat.getColor(
+                    requireContext(),
+                    if ((changePercent ?: 0f) >= 0f) R.color.collect_green else R.color.vault_negative,
+                ),
             )
-            if (item !== sampleTopValuedItems.last()) {
+
+            if (index != topItems.lastIndex) {
                 (itemBinding.root.layoutParams as ViewGroup.MarginLayoutParams).bottomMargin =
                     resources.getDimensionPixelSize(R.dimen.vault_top_item_spacing)
             }
-            // Same 2 sample items, same order as ItemDetailFragment's placeholder data — see
-            // its kdoc for why this index-matching approach is fine while there's no real
-            // items repository yet.
             itemBinding.root.setOnClickListener {
                 findNavController().navigate(
                     R.id.itemDetailFragment,
-                    bundleOf(ItemDetailFragment.ARG_ITEM_INDEX to index),
+                    bundleOf(ItemDetailFragment.ARG_ITEM_ID to item.id),
                 )
             }
             binding.listTopItems.addView(itemBinding.root)
@@ -122,45 +220,7 @@ class MyVaultFragment : Fragment() {
         _binding = null
     }
 
-    private val samplePortfolioEvolution = listOf(0.55f, 0.42f, 0.5f, 0.68f, 0.6f, 0.78f, 0.9f, 1f)
-
-    private data class VaultTopItem(
-        val name: String,
-        val subtitle: String,
-        val image: Int,
-        val value: String,
-        val changeLabel: String,
-        val isPositive: Boolean,
-    )
-
-    private val sampleTopValuedItems = listOf(
-        VaultTopItem(
-            name = "1996 NBA Finals Jersey",
-            subtitle = "Firmada • Memorabilia",
-            image = R.drawable.item_signed_jersey,
-            value = "$425,000",
-            changeLabel = "+4.2%",
-            isPositive = true,
-        ),
-        VaultTopItem(
-            name = "2005 Tiffany Dunk Low",
-            subtitle = "Deadstock • Sneaker",
-            image = R.drawable.item_grail_sneaker,
-            value = "$210,000",
-            changeLabel = "+1.8%",
-            isPositive = true,
-        ),
-    )
-
-    private fun sampleDonutSegments(context: Context) = listOf(
-        DonutSegment(percent = 50, color = ContextCompat.getColor(context, R.color.collect_gold)),
-        DonutSegment(percent = 30, color = withAlpha(ContextCompat.getColor(context, R.color.collect_gold), 0.7f)),
-        DonutSegment(percent = 15, color = withAlpha(ContextCompat.getColor(context, R.color.collect_gold), 0.4f)),
-        DonutSegment(percent = 5, color = ContextCompat.getColor(context, R.color.vault_text_secondary)),
-    )
-
-    private fun withAlpha(color: Int, alpha: Float): Int {
-        val a = (Color.alpha(color) * alpha).toInt()
-        return Color.argb(a, Color.red(color), Color.green(color), Color.blue(color))
+    private companion object {
+        const val CURRENCY = "EUR"
     }
 }

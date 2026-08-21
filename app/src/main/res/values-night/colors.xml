@@ -41,4 +41,15 @@
     <color name="vault_text_secondary">#8E8E93</color>
     <color name="vault_progress_track">#151516</color>
     <color name="vault_negative">#FFB4AB</color>
+
+    <!-- Desambiguación de candidatos: badges pastel del claro se ven lavados sobre fondo oscuro
+         (sin mockup oscuro real, ver values/colors.xml), derivados para mantener el mismo
+         significado semántico (verde = alta confianza, gris = el resto). -->
+    <color name="candidate_best_match_badge_text">#E5B543</color>
+    <color name="candidate_confidence_high_bg">#16241A</color>
+    <color name="candidate_confidence_high_border">#1F7A42</color>
+    <color name="candidate_confidence_high_text">#4ADE80</color>
+    <color name="candidate_confidence_low_bg">#1A1A1A</color>
+    <color name="candidate_confidence_low_border">#2A2A2A</color>
+    <color name="candidate_confidence_low_text">#9CA3AF</color>
 </resources>

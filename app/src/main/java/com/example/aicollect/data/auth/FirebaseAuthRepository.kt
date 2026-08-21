@@ -23,7 +23,7 @@ class FirebaseAuthRepository @Inject constructor(
         firebaseAuth.signInWithEmailAndPassword(email, password).await()
         Unit
     }
-
+    /** Funcion con @param va*/
     override suspend fun signUp(email: String, password: String, username: String): Result<Unit> = runCatching {
         val trimmedUsername = username.trim()
         firebaseAuth.createUserWithEmailAndPassword(email, password).await()

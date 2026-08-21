@@ -1,10 +1,9 @@
 package com.example.aicollect.application.collection
 
-/** Parses price labels shown in the collection feed (e.g. "250€") into their numeric value. */
+/** Whether a real item's `valoracionActual` (0.0 for unvalued items, never fabricated) falls
+ * inside the range picked in the Home filter sheet. */
 object CollectionPriceFilter {
 
-    fun parsePrice(priceLabel: String): Int = priceLabel.filter { it.isDigit() }.toIntOrNull() ?: 0
-
-    fun isWithinRange(priceLabel: String, minPrice: Int, maxPrice: Int): Boolean =
-        parsePrice(priceLabel) in minPrice..maxPrice
+    fun isWithinRange(price: Double, minPrice: Int, maxPrice: Int): Boolean =
+        price in minPrice.toDouble()..maxPrice.toDouble()
 }

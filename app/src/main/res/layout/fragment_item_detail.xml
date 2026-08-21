@@ -163,12 +163,12 @@
                     android:alpha="0.6"
                     android:orientation="horizontal">
 
-                    <TextView style="@style/VaultChartMonthLabel" android:text="@string/vault_month_jan" />
-                    <TextView style="@style/VaultChartMonthLabel" android:text="@string/vault_month_feb" />
-                    <TextView style="@style/VaultChartMonthLabel" android:text="@string/vault_month_mar" />
-                    <TextView style="@style/VaultChartMonthLabel" android:text="@string/vault_month_apr" />
-                    <TextView style="@style/VaultChartMonthLabel" android:text="@string/vault_month_may" />
-                    <TextView style="@style/VaultChartMonthLabel" android:text="@string/vault_month_jun" />
+                    <TextView android:id="@+id/tv_month_1" style="@style/VaultChartMonthLabel" tools:text="MAR" />
+                    <TextView android:id="@+id/tv_month_2" style="@style/VaultChartMonthLabel" tools:text="ABR" />
+                    <TextView android:id="@+id/tv_month_3" style="@style/VaultChartMonthLabel" tools:text="MAY" />
+                    <TextView android:id="@+id/tv_month_4" style="@style/VaultChartMonthLabel" tools:text="JUN" />
+                    <TextView android:id="@+id/tv_month_5" style="@style/VaultChartMonthLabel" tools:text="JUL" />
+                    <TextView android:id="@+id/tv_month_6" style="@style/VaultChartMonthLabel" tools:text="AGO" />
                 </LinearLayout>
             </LinearLayout>
         </LinearLayout>

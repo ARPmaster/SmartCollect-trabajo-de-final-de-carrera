@@ -16,6 +16,7 @@ import androidx.core.view.updateLayoutParams
 import androidx.core.view.updatePadding
 import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.drawerlayout.widget.DrawerLayout
+import androidx.activity.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavController
 import androidx.navigation.fragment.NavHostFragment
@@ -26,6 +27,7 @@ import com.example.aicollect.application.auth.AuthRepository
 import com.example.aicollect.data.DarkModePreferences
 import com.example.aicollect.databinding.ActivityMainBinding
 import com.example.aicollect.presentation.collection.FilterBottomSheetFragment
+import com.example.aicollect.presentation.newpost.NewPostViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 import kotlin.math.roundToInt
@@ -36,6 +38,8 @@ class MainActivity : AppCompatActivity() {
 
     @Inject
     lateinit var authRepository: AuthRepository
+
+    private val newPostViewModel: NewPostViewModel by viewModels()
 
     private lateinit var binding: ActivityMainBinding
     private lateinit var navController: NavController
@@ -58,6 +62,11 @@ class MainActivity : AppCompatActivity() {
         R.id.securityFragment,
         R.id.helpFragment,
         R.id.aboutFragment,
+        // Nueva Publicación (brief Sección 6): captura → desambiguación → formulario is a linear
+        // modal flow, same chrome treatment as Auth/Drawer settings.
+        R.id.newPostCaptureFragment,
+        R.id.newPostDisambiguationFragment,
+        R.id.newItemFormFragment,
     )
 
     /**
@@ -127,7 +136,10 @@ class MainActivity : AppCompatActivity() {
             navController.navigate(R.id.homeFragment)
         }
         bottomBar.findViewById<View>(R.id.btn_nav_add).setOnClickListener {
-            navController.navigate(R.id.addFragment)
+            // Discard any leftover state from a previous, possibly-abandoned run of the flow
+            // (candidates, captured photo) before starting a fresh one.
+            newPostViewModel.reset()
+            navController.navigate(R.id.newPostCaptureFragment)
         }
         bottomBar.findViewById<View>(R.id.btn_nav_stats).setOnClickListener {
             navController.navigate(R.id.statsFragment)

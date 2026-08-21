@@ -8,43 +8,25 @@
     <string name="nav_stats">My Vault</string>
     <string name="cd_add_item">Nueva publicación</string>
     <string name="total_collection_value_label">Total collection value</string>
-    <string name="total_collection_value_change">+5.2%</string>
-    <string name="total_collection_value_amount">$82,940.00</string>
-    <string name="total_collection_value_currency">USD</string>
-    <string name="total_collection_value_updated">Updated 2 hours ago</string>
 
     <string name="item_detail_condition_label">Estado</string>
     <string name="item_detail_category_label">Categoría</string>
     <string name="cd_item_detail_back">Volver</string>
 
     <string name="vault_value_label">Valor total de la cartera</string>
-    <string name="vault_value_amount">$1,248,500.00</string>
-    <string name="vault_value_change">+12.4% este mes</string>
     <string name="vault_chart_title">Evolución (6 meses)</string>
-    <string name="vault_chart_currency">USD</string>
-    <string name="vault_month_jan">ENE</string>
-    <string name="vault_month_feb">FEB</string>
-    <string name="vault_month_mar">MAR</string>
-    <string name="vault_month_apr">ABR</string>
-    <string name="vault_month_may">MAY</string>
-    <string name="vault_month_jun">JUN</string>
+    <string name="vault_chart_currency">EUR</string>
     <string name="vault_distribution_title">Distribución por Deporte</string>
-    <string name="vault_sport_mlb">MLB (Béisbol)</string>
-    <string name="vault_sport_nba">NBA (Básquet)</string>
-    <string name="vault_sport_soccer">Soccer (Fútbol)</string>
+    <string name="vault_condition_distribution_title">Distribución por Estado</string>
     <string name="vault_total_items_label">Artículos Totales</string>
-    <string name="vault_total_items_value">142</string>
     <string name="vault_filter_title">Filtrar por Deporte</string>
     <string name="vault_filter_futbol">Fútbol</string>
     <string name="vault_filter_basquet">Básquet</string>
     <string name="vault_filter_beisbol">Béisbol</string>
     <string name="vault_filter_tenis">Tenis</string>
-    <string name="vault_donut_jerseys">Jerseys</string>
-    <string name="vault_donut_balones">Balones</string>
-    <string name="vault_donut_tarjetas">Tarjetas</string>
-    <string name="vault_donut_otros">Otros</string>
     <string name="vault_top_items_title">Artículos más Valorados</string>
     <string name="vault_see_all">Ver todo</string>
+    <string name="vault_empty_state">Aún no tienes artículos en tu colección. Pulsa el botón «+» para añadir el primero.</string>
 
     <string name="cd_close_drawer">Cerrar menú</string>
     <string name="drawer_user_name">Mi cuenta</string>
@@ -170,8 +152,53 @@
     <string name="about_mission_title">Nuestra misión</string>
     <string name="about_mission_body">Collect AI es la plataforma definitiva para coleccionistas en la que cualquiera puede controlar su inventario deportivo.</string>
     <string name="about_terms">Términos y Condiciones</string>
-    <string name="about_terms_answer">Al usar Collect AI aceptas que la aplicación es una herramienta de gestión de colecciones personales: te ayuda a catalogar tus objetos y a consultar una valoración de mercado orientativa, no una tasación oficial ni una garantía de precio de venta. Eres responsable de la veracidad de los datos que introduces y de mantener segura tu cuenta. Nos reservamos el derecho de suspender cuentas que hagan un uso indebido del servicio. El uso continuado de la app tras cambios en estos términos implica su aceptación.</string>
+    <string name="about_terms_answer">Estos términos regulan el uso de Collect AI, aplicación gestionada por Adrián Rey Pérez (contacto: adrianforgithub@gmail.com).\n\nQué es el servicio: Collect AI es una herramienta de gestión de colecciones personales. Te ayuda a catalogar tus objetos y a consultar una valoración de mercado orientativa, generada a partir de los datos disponibles y, cuando uses el reconocimiento automático, con ayuda de inteligencia artificial (Google Cloud Vision y Google Gemini). Estas valoraciones son orientativas: no constituyen una tasación oficial ni garantizan un precio de venta.\n\nReconocimiento automático: al fotografiar un objeto, la app puede sugerirte varios candidatos generados por IA. Ningún artículo se guarda en tu colección de forma automática: siempre debes confirmar uno de los candidatos o introducir los datos manualmente antes de que se añada.\n\nTu cuenta: eres responsable de la veracidad de los datos que introduces, de mantener segura tu contraseña y de la actividad de tu cuenta. El nombre de usuario que elijas debe ser único y no puede suplantar a terceros. Nos reservamos el derecho de suspender cuentas que hagan un uso indebido del servicio (contenido ilícito, intentos de vulnerar la seguridad, suplantación de identidad).\n\nPropiedad del contenido: las fotografías y los datos que subes siguen siendo tuyos; nos concedes únicamente la licencia necesaria para almacenarlos y mostrártelos dentro de la app.\n\nCambios y jurisdicción: si modificamos estos términos de forma relevante, te lo notificaremos en la app; el uso continuado del servicio tras el cambio implica su aceptación. Estos términos se rigen por la legislación española y de la Unión Europea.</string>
     <string name="about_privacy">Política de Privacidad</string>
-    <string name="about_privacy_answer">Recopilamos únicamente los datos necesarios para ofrecerte el servicio: tu correo, nombre de perfil, foto de perfil (si la subes) y los datos e imágenes de los artículos que añades a tu colección. Todo se almacena de forma segura en Firebase (Google), protegido por reglas de acceso que solo permiten leer y escribir tus propios datos. No vendemos ni compartimos tu información con terceros con fines publicitarios. Puedes solicitar la eliminación de tu cuenta y de todos tus datos en cualquier momento escribiéndonos a soporte.</string>
+    <string name="about_privacy_answer">Responsable del tratamiento: Adrián Rey Pérez, contacto: adrianforgithub@gmail.com.\n\nQué datos recopilamos: tu correo electrónico, nombre de perfil y nombre de usuario, foto de perfil (si decides subirla), y los datos e imágenes de los artículos que añades a tu colección, incluidas las fotografías que envíes para el reconocimiento automático de objetos.\n\nPara qué los usamos y con qué base legal: gestionar tu cuenta y autenticarte, como parte de la ejecución del servicio que nos solicitas (art. 6.1.b RGPD); generar sugerencias de reconocimiento mediante inteligencia artificial cuando fotografías un objeto, también como ejecución del servicio (art. 6.1.b); y atender tus consultas de soporte, por interés legítimo en responderte (art. 6.1.f).\n\nCon quién compartimos tus datos: con Google, a través de Firebase (Authentication, Firestore, Storage y Cloud Functions) y de las API de Google Cloud Vision y Google Gemini, que actúan como encargados del tratamiento bajo contrato con nosotros. Parte de este procesamiento puede implicar el envío de datos a servidores de Google fuera del Espacio Económico Europeo; estas transferencias están amparadas por las Cláusulas Contractuales Tipo de la Comisión Europea y/o el marco de adecuación EU-U.S. Data Privacy Framework. No vendemos ni cedemos tus datos a terceros con fines publicitarios.\n\nDecisiones automatizadas: los candidatos que sugiere la IA nunca se guardan solos; siempre confirmas o editas tú el resultado antes de que se añada a tu colección, así que no tomamos decisiones totalmente automatizadas que produzcan efectos legales sobre ti.\n\nCuánto tiempo conservamos tus datos: mientras tu cuenta esté activa. Si solicitas la baja, eliminamos tus datos personales y el contenido de tu colección en un plazo razonable, salvo que la ley exija conservarlos más tiempo.\n\nTus derechos: puedes acceder a tus datos, rectificarlos, solicitar su supresión, limitar u oponerte a su tratamiento, y pedir su portabilidad, escribiéndonos a adrianforgithub@gmail.com. También puedes presentar una reclamación ante la Agencia Española de Protección de Datos (www.aepd.es) si consideras que no hemos tratado tus datos correctamente.\n\nMenores de edad: este servicio no está dirigido a menores de 14 años y no recopilamos conscientemente datos de menores de esa edad.\n\nSeguridad: tus datos se almacenan en Firebase protegidos por reglas de acceso que solo permiten leer y escribir tus propios datos.</string>
     <string name="about_footer">Hecho con pasión por el equipo de Collect AI.</string>
+
+    <!-- Nueva Publicación - Objeto: diseño oficial aceptado, capturas del usuario 2026-08-21
+         (una sola pantalla: subir fotos + formulario, ver PROJECT_CONTEXT). -->
+    <string name="new_post_title">Nueva Publicación - Objeto</string>
+    <string name="new_post_upload_title">Subir imágenes</string>
+    <string name="new_post_upload_subtitle">Toca para añadir fotos del objeto (máx. 5)</string>
+    <string name="new_post_add_photo_button">Añadir foto</string>
+    <string name="new_post_pick_gallery_button">Seleccionar imágenes</string>
+    <string name="new_post_analyzing">Analizando imagen…</string>
+    <string name="new_post_camera_permission_denied">Se necesita permiso de cámara para tomar la foto.</string>
+    <string name="new_post_photo_read_error">No se pudo leer la imagen seleccionada.</string>
+    <string name="cd_new_post_preview">Vista previa de la foto</string>
+    <string name="new_post_name_label">Título del objeto</string>
+    <string name="new_post_name_hint">Ej. Bate de beisbol autografiado por leyenda</string>
+    <string name="new_post_description_label">Descripción detallada</string>
+    <string name="new_post_description_hint">Describe el estado, marca, historia o cualquier detalle relevante del objeto</string>
+    <string name="new_post_sport_label">Deporte</string>
+    <string name="new_post_sport_placeholder">Selecciona un deporte</string>
+    <string name="new_post_condition_label">Estado</string>
+    <string name="new_post_condition_placeholder">Selecciona el estado del objeto</string>
+    <string name="new_post_publish_button">Publicar objeto</string>
+    <string name="new_post_publishing">Publicando…</string>
+    <string name="new_post_success">Artículo guardado en tu colección.</string>
+    <string name="new_post_name_required_error">El título no puede estar vacío.</string>
+    <string name="new_post_sport_required_error">Selecciona un deporte.</string>
+    <string name="new_post_condition_required_error">Selecciona un estado.</string>
+
+    <!-- Nueva Publicación: desambiguación de candidatos (Figma 2090:9, diseño oficial aceptado 2026-08-21) -->
+    <string name="disambiguation_title">Selecciona el objeto correcto</string>
+    <string name="disambiguation_subtitle">Toca el que coincide con tu objeto</string>
+    <string name="disambiguation_best_match_badge">Mejor coincidencia</string>
+    <string name="disambiguation_confidence_percent_format">%1$d%%</string>
+    <string name="disambiguation_none_combined">Ninguno de estos · introducir manualmente</string>
+    <string name="disambiguation_empty_state">No se encontraron coincidencias fiables para esta foto. Puedes introducir los datos del objeto manualmente.</string>
+
+    <string name="home_empty_state">Aún no tienes artículos en tu colección. Pulsa el botón «+» para añadir el primero.</string>
+    <string name="home_load_error">No se pudo cargar tu colección. Inténtalo de nuevo.</string>
+
+    <string-array name="sport_options">
+        <item>Baloncesto</item>
+        <item>Fútbol Americano</item>
+        <item>Fútbol</item>
+        <item>Béisbol</item>
+        <item>Otro</item>
+    </string-array>
 </resources>

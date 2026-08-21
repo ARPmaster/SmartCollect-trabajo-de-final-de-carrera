@@ -58,4 +58,16 @@
     <color name="vault_negative">#DC2626</color>
     <!-- Fixed regardless of theme: text on top of the solid gold active chip/legend dot. -->
     <color name="vault_chip_active_text">#0A0A0A</color>
+
+    <!-- Desambiguación de candidatos (Figma 2090:9, sin variante oscura documentada — ver
+         values-night/colors.xml para los valores derivados). Reutiliza vault_card_bg/vault_card_border
+         para el cuerpo de cada tarjeta; estos son solo los tonos específicos del spec. -->
+    <color name="candidate_best_match_border">#B8860B</color>
+    <color name="candidate_best_match_badge_text">#8A6D1F</color>
+    <color name="candidate_confidence_high_bg">#F0FDF4</color>
+    <color name="candidate_confidence_high_border">#BBF7D0</color>
+    <color name="candidate_confidence_high_text">#15803D</color>
+    <color name="candidate_confidence_low_bg">#F9FAFB</color>
+    <color name="candidate_confidence_low_border">#E5E7EB</color>
+    <color name="candidate_confidence_low_text">#4B5563</color>
 </resources>
