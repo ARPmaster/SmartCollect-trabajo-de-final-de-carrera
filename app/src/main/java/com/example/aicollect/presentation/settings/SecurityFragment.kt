@@ -16,8 +16,11 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
+import androidx.navigation.navOptions
 import com.example.aicollect.R
+import com.example.aicollect.databinding.DialogDeleteAccountBinding
 import com.example.aicollect.databinding.FragmentSecurityBinding
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
@@ -77,10 +80,55 @@ class SecurityFragment : Fragment() {
             )
         }
 
+        binding.btnDeleteAccount.setOnClickListener { showDeleteAccountDialog() }
+
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
-                viewModel.uiState.collect { state -> render(state) }
+                launch { viewModel.uiState.collect { state -> render(state) } }
+                launch { viewModel.deleteAccountState.collect { state -> renderDeleteAccount(state) } }
             }
+        }
+    }
+
+    /** Pide la contraseña actual como confirmación adicional antes de una acción irreversible
+     * (roadmap "Eliminar cuenta y datos", 2026-08-24) — el campo vive en un diálogo aparte, no en
+     * la pantalla, para que no se pueda disparar por error junto al resto del formulario. */
+    private fun showDeleteAccountDialog() {
+        val dialogBinding = DialogDeleteAccountBinding.inflate(layoutInflater)
+        MaterialAlertDialogBuilder(requireContext())
+            .setTitle(R.string.security_delete_account_dialog_title)
+            .setMessage(R.string.security_delete_account_dialog_message)
+            .setView(dialogBinding.root)
+            .setPositiveButton(R.string.security_delete_account_confirm_button) { _, _ ->
+                viewModel.deleteAccount(dialogBinding.etPassword.text?.toString().orEmpty())
+            }
+            .setNegativeButton(R.string.security_delete_account_cancel_button, null)
+            .show()
+    }
+
+    private fun renderDeleteAccount(state: DeleteAccountUiState) {
+        binding.btnDeleteAccount.isEnabled = state !is DeleteAccountUiState.Deleting
+        binding.btnDeleteAccount.text = getString(
+            if (state is DeleteAccountUiState.Deleting) {
+                R.string.security_delete_account_deleting
+            } else {
+                R.string.security_delete_account_button
+            },
+        )
+
+        when (state) {
+            is DeleteAccountUiState.Success -> {
+                // La cuenta ya no existe — vuelve al login limpiando todo el back stack, mismo
+                // patrón que el logout normal de MainActivity.
+                findNavController().navigate(
+                    R.id.loginFragment,
+                    null,
+                    navOptions { popUpTo(R.id.nav_graph) { inclusive = true } },
+                )
+            }
+            is DeleteAccountUiState.Error ->
+                Snackbar.make(binding.root, state.message, Snackbar.LENGTH_LONG).show()
+            else -> Unit
         }
     }
 

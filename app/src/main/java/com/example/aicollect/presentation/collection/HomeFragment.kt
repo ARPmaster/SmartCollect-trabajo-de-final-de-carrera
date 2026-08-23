@@ -13,10 +13,8 @@ import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.aicollect.R
-import com.example.aicollect.application.collection.CollectionPriceFilter
-import com.example.aicollect.application.items.Item
 import com.example.aicollect.databinding.FragmentHomeBinding
-import com.google.android.material.snackbar.Snackbar
+import com.example.aicollect.presentation.showSnackbar
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 
@@ -28,10 +26,9 @@ class HomeFragment : Fragment() {
 
     private val viewModel: HomeViewModel by viewModels()
 
-    /** Set while the price filter sheet has an active range; re-applied every time [render]
-     * runs so a live Firestore update doesn't silently drop the current filter. */
-    private var activePriceRange: IntRange? = null
-    private var latestItems: List<Item> = emptyList()
+    /** Created once and reused across state emissions — [render] calls [CollectionFeedAdapter.submitList]
+     * instead of replacing the adapter, so RecyclerView can diff+animate instead of a full rebind. */
+    private val feedAdapter = CollectionFeedAdapter(onItemClick = ::navigateToItemDetail)
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -45,6 +42,7 @@ class HomeFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         binding.rvFeed.layoutManager = LinearLayoutManager(requireContext())
+        binding.rvFeed.adapter = feedAdapter
 
         parentFragmentManager.setFragmentResultListener(
             FilterBottomSheetFragment.REQUEST_KEY,
@@ -52,8 +50,7 @@ class HomeFragment : Fragment() {
         ) { _, bundle ->
             val minPrice = bundle.getInt(FilterBottomSheetFragment.KEY_MIN_PRICE)
             val maxPrice = bundle.getInt(FilterBottomSheetFragment.KEY_MAX_PRICE)
-            activePriceRange = minPrice..maxPrice
-            renderCurrentState()
+            viewModel.setPriceRange(minPrice, maxPrice)
         }
 
         viewLifecycleOwner.lifecycleScope.launch {
@@ -67,29 +64,13 @@ class HomeFragment : Fragment() {
         when (state) {
             is HomeUiState.Loading -> Unit
             is HomeUiState.Content -> {
-                latestItems = state.items
-                renderCurrentState()
+                binding.rvFeed.visibility = if (state.isCollectionEmpty) View.GONE else View.VISIBLE
+                binding.tvEmptyState.visibility = if (state.isCollectionEmpty) View.VISIBLE else View.GONE
+
+                feedAdapter.submitList(buildFeedRows(state.visibleItems.map { it.toFeedItem() }, state.summary))
             }
-            is HomeUiState.Error -> Snackbar.make(binding.root, state.message, Snackbar.LENGTH_LONG).show()
+            is HomeUiState.Error -> showSnackbar(binding.root, state.message).show()
         }
-    }
-
-    private fun renderCurrentState() {
-        val range = activePriceRange
-        val visibleItems = if (range != null) {
-            latestItems.filter { CollectionPriceFilter.isWithinRange(it.valoracionActual ?: 0.0, range.first, range.last) }
-        } else {
-            latestItems
-        }
-
-        binding.rvFeed.visibility = if (latestItems.isEmpty()) View.GONE else View.VISIBLE
-        binding.tvEmptyState.visibility = if (latestItems.isEmpty()) View.VISIBLE else View.GONE
-
-        binding.rvFeed.adapter = CollectionFeedAdapter(
-            items = visibleItems.map { it.toFeedItem() },
-            summary = viewModel.summaryFor(latestItems),
-            onItemClick = ::navigateToItemDetail,
-        )
     }
 
     private fun navigateToItemDetail(item: CollectionFeedItem) {

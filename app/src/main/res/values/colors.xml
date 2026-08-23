@@ -70,4 +70,9 @@
     <color name="candidate_confidence_low_bg">#F9FAFB</color>
     <color name="candidate_confidence_low_border">#E5E7EB</color>
     <color name="candidate_confidence_low_text">#4B5563</color>
+
+    <!-- Overlay de carga de Nueva Publicación y botones circulares +/- sobre la foto: negro
+         translúcido deliberado, mismo valor en claro y oscuro (no es un color de superficie del
+         tema, es un scrim fijo). -->
+    <color name="new_post_loading_scrim">#B3000000</color>
 </resources>

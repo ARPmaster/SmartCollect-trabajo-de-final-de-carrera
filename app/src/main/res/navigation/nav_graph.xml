@@ -26,10 +26,10 @@
         xmlns:tools="http://schemas.android.com/tools" />
 
     <fragment
-        android:id="@+id/newPostCaptureFragment"
-        android:name="com.example.aicollect.presentation.newpost.NewPostCaptureFragment"
-        android:label="NewPostCapture"
-        tools:layout="@layout/fragment_new_post_capture"
+        android:id="@+id/newPostFragment"
+        android:name="com.example.aicollect.presentation.newpost.NewPostFragment"
+        android:label="NewPost"
+        tools:layout="@layout/fragment_new_post"
         xmlns:tools="http://schemas.android.com/tools" />
 
     <fragment
@@ -37,13 +37,6 @@
         android:name="com.example.aicollect.presentation.newpost.NewPostDisambiguationFragment"
         android:label="NewPostDisambiguation"
         tools:layout="@layout/fragment_new_post_disambiguation"
-        xmlns:tools="http://schemas.android.com/tools" />
-
-    <fragment
-        android:id="@+id/newItemFormFragment"
-        android:name="com.example.aicollect.presentation.newpost.NewItemFormFragment"
-        android:label="NewItemForm"
-        tools:layout="@layout/fragment_new_item_form"
         xmlns:tools="http://schemas.android.com/tools" />
 
     <fragment
@@ -86,6 +79,17 @@
         android:name="com.example.aicollect.presentation.collection.ItemDetailFragment"
         android:label="ItemDetail"
         tools:layout="@layout/fragment_item_detail"
+        xmlns:tools="http://schemas.android.com/tools">
+        <argument
+            android:name="itemId"
+            app:argType="string" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/editItemFragment"
+        android:name="com.example.aicollect.presentation.edititem.EditItemFragment"
+        android:label="EditItem"
+        tools:layout="@layout/fragment_edit_item"
         xmlns:tools="http://schemas.android.com/tools">
         <argument
             android:name="itemId"

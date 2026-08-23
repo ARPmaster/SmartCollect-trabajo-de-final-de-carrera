@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
@@ -12,12 +13,10 @@ import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
 import coil.load
 import com.example.aicollect.R
-import com.example.aicollect.application.items.Item
-import com.example.aicollect.application.items.PortfolioAnalytics
 import com.example.aicollect.databinding.FragmentItemDetailBinding
-import com.google.android.material.snackbar.Snackbar
+import com.example.aicollect.presentation.showSnackbar
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import dagger.hilt.android.AndroidEntryPoint
-import java.util.Locale
 import kotlinx.coroutines.launch
 
 /**
@@ -46,54 +45,80 @@ class ItemDetailFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        val itemId = arguments?.getString(ARG_ITEM_ID)
-        if (itemId == null) {
+        val id = arguments?.getString(ARG_ITEM_ID)
+        if (id == null) {
             findNavController().popBackStack()
             return
         }
-        viewModel.load(itemId)
+        viewModel.load(id)
+
+        binding.btnEditItem.setOnClickListener {
+            findNavController().navigate(R.id.editItemFragment, bundleOf(ARG_ITEM_ID to id))
+        }
+        binding.btnDeleteItem.setOnClickListener { showDeleteConfirmationDialog() }
 
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
-                viewModel.uiState.collect { render(it) }
+                launch { viewModel.uiState.collect { render(it) } }
+                launch { viewModel.deleteState.collect { renderDelete(it) } }
             }
+        }
+    }
+
+    /** Pide confirmación antes de borrar (roadmap CRUD, 2026-08-24) — acción irreversible, borra
+     * también las fotos del item en Storage (ver [ItemDetailViewModel.deleteItem]). */
+    private fun showDeleteConfirmationDialog() {
+        MaterialAlertDialogBuilder(requireContext())
+            .setTitle(R.string.item_detail_delete_confirm_title)
+            .setMessage(getString(R.string.item_detail_delete_confirm_message, binding.tvItemTitle.text))
+            .setPositiveButton(R.string.item_detail_delete_confirm_button) { _, _ -> viewModel.deleteItem() }
+            .setNegativeButton(R.string.item_detail_delete_cancel_button, null)
+            .show()
+    }
+
+    private fun renderDelete(state: DeleteItemUiState) {
+        val isDeleting = state is DeleteItemUiState.Deleting
+        binding.btnDeleteItem.isEnabled = !isDeleting
+        binding.btnEditItem.isEnabled = !isDeleting
+
+        when (state) {
+            is DeleteItemUiState.Success -> {
+                showSnackbar(binding.root, R.string.item_detail_deleted_success).show()
+                findNavController().popBackStack()
+            }
+            is DeleteItemUiState.Error -> showSnackbar(binding.root, state.message).show()
+            else -> Unit
         }
     }
 
     private fun render(state: ItemDetailUiState) {
         when (state) {
             is ItemDetailUiState.Loading -> Unit
-            is ItemDetailUiState.Content -> bind(state.item)
+            is ItemDetailUiState.Content -> bind(state)
             is ItemDetailUiState.Error -> {
-                Snackbar.make(binding.root, state.message, Snackbar.LENGTH_LONG).show()
+                showSnackbar(binding.root, state.message).show()
                 findNavController().popBackStack()
             }
         }
     }
 
-    private fun bind(item: Item) {
-        binding.ivItemImage.load(item.imageUrls.firstOrNull())
-        binding.tvItemTitle.text = item.nombre
-        binding.tvItemPrice.text = ItemFormatting.formatValue(item.valoracionActual, item.valoracionMoneda)
-        binding.tvItemCondition.text = item.estado
-        binding.tvItemCategory.text = item.deporte
-        binding.tvItemSportIcon.text = sportEmoji(item.deporte)
-        binding.chartPortfolio.values = PortfolioAnalytics.monthlyEvolution(listOf(item))
+    private fun bind(state: ItemDetailUiState.Content) {
+        binding.ivItemImage.load(state.imageUrl)
+        binding.tvItemTitle.text = state.nombre
+        binding.tvItemPrice.text = state.priceLabel
+        binding.tvItemCondition.text = state.estado
+        binding.tvItemCategory.text = state.deporte
+        binding.tvItemSportIcon.text = state.sportEmoji
+        binding.chartPortfolio.values = state.evolution
 
-        val monthLabels = PortfolioAnalytics.monthLabels()
+        binding.tvValuationRange.visibility = if (state.valuationRangeLabel != null) View.VISIBLE else View.GONE
+        binding.tvValuationRange.text = state.valuationRangeLabel.orEmpty()
+
         val monthViews = listOf(
             binding.tvMonth1, binding.tvMonth2, binding.tvMonth3,
             binding.tvMonth4, binding.tvMonth5, binding.tvMonth6,
         )
-        monthViews.forEachIndexed { index, view -> view.text = monthLabels.getOrNull(index).orEmpty() }
-    }
-
-    private fun sportEmoji(deporte: String): String = when (deporte.lowercase(Locale("es", "ES"))) {
-        "baloncesto" -> "🏀"
-        "fútbol" -> "⚽"
-        "fútbol americano" -> "🏈"
-        "béisbol" -> "⚾"
-        else -> "🏆"
+        monthViews.forEachIndexed { index, view -> view.text = state.monthLabels.getOrNull(index).orEmpty() }
     }
 
     override fun onDestroyView() {

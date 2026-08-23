@@ -13,6 +13,26 @@
     <string name="item_detail_category_label">Categoría</string>
     <string name="cd_item_detail_back">Volver</string>
 
+    <string name="item_detail_valuation_label">Valoración de mercado</string>
+    <string name="item_detail_valuation_disclaimer">Valor orientativo buscado con IA y calculado a partir de varias fuentes — no es una venta confirmada.</string>
+
+    <string name="cd_item_detail_edit">Editar objeto</string>
+    <string name="cd_item_detail_delete">Eliminar objeto</string>
+    <string name="item_detail_delete_confirm_title">Eliminar objeto</string>
+    <string name="item_detail_delete_confirm_message">Se eliminará \"%1$s\" y sus fotos de tu colección. Esta acción no se puede deshacer.</string>
+    <string name="item_detail_delete_confirm_button">Eliminar</string>
+    <string name="item_detail_delete_cancel_button">Cancelar</string>
+    <string name="item_detail_deleted_success">Artículo eliminado.</string>
+    <string name="item_detail_delete_error">No se pudo eliminar el artículo. Inténtalo de nuevo.</string>
+
+    <string name="edit_item_title">Editar objeto</string>
+    <string name="edit_item_save_button">Guardar cambios</string>
+    <string name="edit_item_saving">Guardando…</string>
+    <string name="edit_item_success">Cambios guardados.</string>
+    <string name="edit_item_name_required_error">El título no puede estar vacío.</string>
+    <string name="edit_item_sport_required_error">Selecciona un deporte.</string>
+    <string name="edit_item_condition_required_error">Selecciona un estado.</string>
+
     <string name="vault_value_label">Valor total de la cartera</string>
     <string name="vault_chart_title">Evolución (6 meses)</string>
     <string name="vault_chart_currency">EUR</string>
@@ -126,6 +146,18 @@
     <string name="security_saving">Guardando…</string>
     <string name="security_success">Datos de seguridad actualizados correctamente.</string>
 
+    <string name="security_delete_account_label">Eliminar cuenta</string>
+    <string name="security_delete_account_description">Esto elimina tu cuenta, todos tus artículos y fotos de forma permanente. No se puede deshacer.</string>
+    <string name="security_delete_account_button">Eliminar cuenta</string>
+    <string name="security_delete_account_dialog_title">¿Eliminar tu cuenta?</string>
+    <string name="security_delete_account_dialog_message">Se borrará tu cuenta, tus artículos y tus fotos de forma permanente. Introduce tu contraseña para confirmar.</string>
+    <string name="security_delete_account_password_hint">Contraseña</string>
+    <string name="security_delete_account_confirm_button">Eliminar definitivamente</string>
+    <string name="security_delete_account_cancel_button">Cancelar</string>
+    <string name="security_delete_account_deleting">Eliminando cuenta…</string>
+    <string name="security_delete_account_wrong_password">Contraseña incorrecta.</string>
+    <string name="security_delete_account_password_required">Introduce tu contraseña para confirmar.</string>
+
     <string name="help_header_title">Ayuda y Soporte</string>
     <string name="help_section_title">Preguntas Frecuentes</string>
     <string name="help_contact_button">Contactar por Correo</string>
@@ -168,6 +200,9 @@
     <string name="new_post_camera_permission_denied">Se necesita permiso de cámara para tomar la foto.</string>
     <string name="new_post_photo_read_error">No se pudo leer la imagen seleccionada.</string>
     <string name="cd_new_post_preview">Vista previa de la foto</string>
+    <string name="cd_new_post_remove_photo">Quitar foto</string>
+    <string name="cd_new_post_add_more_photo">Añadir otra foto</string>
+    <string name="new_post_max_photos_reached">Ya has añadido el máximo de 3 fotos.</string>
     <string name="new_post_name_label">Título del objeto</string>
     <string name="new_post_name_hint">Ej. Bate de beisbol autografiado por leyenda</string>
     <string name="new_post_description_label">Descripción detallada</string>
@@ -178,10 +213,19 @@
     <string name="new_post_condition_placeholder">Selecciona el estado del objeto</string>
     <string name="new_post_publish_button">Publicar objeto</string>
     <string name="new_post_publishing">Publicando…</string>
+    <string name="new_post_publishing_valuation">Buscando el valor de mercado…</string>
     <string name="new_post_success">Artículo guardado en tu colección.</string>
     <string name="new_post_name_required_error">El título no puede estar vacío.</string>
     <string name="new_post_sport_required_error">Selecciona un deporte.</string>
     <string name="new_post_condition_required_error">Selecciona un estado.</string>
+    <string name="new_post_analysis_dialog_title">¿Cómo quieres continuar?</string>
+    <string name="new_post_analysis_dialog_message">Puedes analizar la imagen para rellenar el formulario automáticamente, o introducir los datos tú mismo.</string>
+    <string name="new_post_analysis_dialog_auto">Analizar automáticamente</string>
+    <string name="new_post_analysis_dialog_manual">Rellenar manualmente</string>
+    <string name="new_post_duplicate_title">Objeto parecido encontrado</string>
+    <string name="new_post_duplicate_message">Ya tienes algo parecido a esto en tu colección: \"%1$s\". ¿Quieres publicarlo de todas formas?</string>
+    <string name="new_post_duplicate_confirm">Publicar de todas formas</string>
+    <string name="new_post_duplicate_cancel">Cancelar</string>
 
     <!-- Nueva Publicación: desambiguación de candidatos (Figma 2090:9, diseño oficial aceptado 2026-08-21) -->
     <string name="disambiguation_title">Selecciona el objeto correcto</string>

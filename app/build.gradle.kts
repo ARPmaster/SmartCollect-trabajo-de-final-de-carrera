@@ -70,4 +70,8 @@ dependencies {
     //dependency injection
     implementation(libs.hilt.android)
     ksp(libs.hilt.compiler)
+    //local persistence (Room — caché local de Item, single source of truth para la UI, 2026-08-24)
+    implementation("androidx.room:room-runtime:2.7.1")
+    implementation("androidx.room:room-ktx:2.7.1")
+    ksp("androidx.room:room-compiler:2.7.1")
 }

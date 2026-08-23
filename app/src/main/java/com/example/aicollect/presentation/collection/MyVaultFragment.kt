@@ -17,13 +17,10 @@ import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
 import coil.load
 import com.example.aicollect.R
-import com.example.aicollect.application.items.Item
-import com.example.aicollect.application.items.PortfolioAnalytics
 import com.example.aicollect.databinding.FragmentMyVaultBinding
 import com.example.aicollect.databinding.ItemVaultTopValuedBinding
-import com.google.android.material.snackbar.Snackbar
+import com.example.aicollect.presentation.showSnackbar
 import dagger.hilt.android.AndroidEntryPoint
-import kotlin.math.roundToInt
 import kotlinx.coroutines.launch
 
 /**
@@ -65,37 +62,36 @@ class MyVaultFragment : Fragment() {
     private fun render(state: MyVaultUiState) {
         when (state) {
             is MyVaultUiState.Loading -> Unit
-            is MyVaultUiState.Content -> bind(state.items)
-            is MyVaultUiState.Error -> Snackbar.make(binding.root, state.message, Snackbar.LENGTH_LONG).show()
+            is MyVaultUiState.Empty -> {
+                binding.scrollContent.visibility = View.GONE
+                binding.tvEmptyState.visibility = View.VISIBLE
+            }
+            is MyVaultUiState.Content -> bind(state)
+            is MyVaultUiState.Error -> showSnackbar(binding.root, state.message).show()
         }
     }
 
-    private fun bind(items: List<Item>) {
-        binding.scrollContent.visibility = if (items.isEmpty()) View.GONE else View.VISIBLE
-        binding.tvEmptyState.visibility = if (items.isEmpty()) View.VISIBLE else View.GONE
-        if (items.isEmpty()) return
+    private fun bind(state: MyVaultUiState.Content) {
+        binding.scrollContent.visibility = View.VISIBLE
+        binding.tvEmptyState.visibility = View.GONE
 
-        val evolution = PortfolioAnalytics.monthlyEvolution(items)
-        binding.tvVaultAmount.text = ItemFormatting.formatValue(PortfolioAnalytics.totalValue(items), CURRENCY)
-        val changeLabel = ItemFormatting.formatChangePercent(PortfolioAnalytics.changePercent(evolution))
-        binding.rowVaultChange.visibility = if (changeLabel != null) View.VISIBLE else View.GONE
-        binding.tvVaultChange.text = changeLabel.orEmpty()
-        binding.chartPortfolio.values = evolution
+        binding.tvVaultAmount.text = state.totalValueLabel
+        binding.rowVaultChange.visibility = if (state.changeLabel != null) View.VISIBLE else View.GONE
+        binding.tvVaultChange.text = state.changeLabel.orEmpty()
+        binding.chartPortfolio.values = state.evolution
 
-        val monthLabels = PortfolioAnalytics.monthLabels()
         listOf(binding.tvMonth1, binding.tvMonth2, binding.tvMonth3, binding.tvMonth4, binding.tvMonth5, binding.tvMonth6)
-            .forEachIndexed { index, view -> view.text = monthLabels.getOrNull(index).orEmpty() }
+            .forEachIndexed { index, view -> view.text = state.monthLabels.getOrNull(index).orEmpty() }
 
-        setUpSportDistribution(items)
-        setUpConditionDistribution(items)
+        setUpSportDistribution(state.sportDistribution)
+        setUpConditionDistribution(state.conditionPercentByEstado)
 
-        binding.tvTotalItemsValue.text = items.size.toString()
+        binding.tvTotalItemsValue.text = state.totalItemsLabel
 
-        setUpTopValuedItems(items)
+        setUpTopValuedItems(state.topValuedItems)
     }
 
-    private fun setUpSportDistribution(items: List<Item>) {
-        val distribution = PortfolioAnalytics.distributionBy(items) { it.deporte }
+    private fun setUpSportDistribution(distribution: List<Pair<String, Int>>) {
         val rows = listOf(
             Triple(binding.rowDistribution1, binding.tvDistribution1Label, binding.tvDistribution1Value) to
                 (binding.trackDistribution1 to binding.fillDistribution1),
@@ -123,13 +119,10 @@ class MyVaultFragment : Fragment() {
      * exactly 3 fixed values with a meaningful order (Nuevo=gold, Buen estado=green, Malas
      * condiciones=red) — computed directly instead of through [PortfolioAnalytics.distributionBy]
      * so the color always matches the same estado, not whichever happens to be most common. */
-    private fun setUpConditionDistribution(items: List<Item>) {
+    private fun setUpConditionDistribution(percentByEstado: Map<String, Int>) {
         val estadoOrder = resources.getStringArray(R.array.filter_condition_options)
         val colors = listOf(R.color.collect_gold, R.color.collect_green, R.color.vault_negative)
-        val percents = estadoOrder.map { estado ->
-            val count = items.count { it.estado == estado }
-            ((count * 100f) / items.size).roundToInt()
-        }
+        val percents = estadoOrder.map { estado -> percentByEstado[estado] ?: 0 }
         val slots = listOf(
             Triple(binding.dotLegend1, binding.tvLegend1Label, binding.tvLegend1Value),
             Triple(binding.dotLegend2, binding.tvLegend2Label, binding.tvLegend2Value),
@@ -177,27 +170,21 @@ class MyVaultFragment : Fragment() {
         select(chips.first())
     }
 
-    private fun setUpTopValuedItems(items: List<Item>) {
+    private fun setUpTopValuedItems(topItems: List<TopValuedItemUi>) {
         binding.listTopItems.removeAllViews()
-        val topItems = PortfolioAnalytics.topValued(items)
         topItems.forEachIndexed { index, item ->
             val itemBinding = ItemVaultTopValuedBinding.inflate(layoutInflater, binding.listTopItems, false)
-            itemBinding.ivItemImage.load(item.imageUrls.firstOrNull())
+            itemBinding.ivItemImage.load(item.imageUrl)
             itemBinding.tvItemName.text = item.nombre
-            itemBinding.tvItemSubtitle.text = listOfNotNull(
-                item.marca.takeIf { it.isNotBlank() },
-                item.estado.takeIf { it.isNotBlank() },
-            ).joinToString(" • ").ifEmpty { item.deporte }
-            itemBinding.tvItemValue.text = ItemFormatting.formatValue(item.valoracionActual, item.valoracionMoneda)
+            itemBinding.tvItemSubtitle.text = item.subtitle
+            itemBinding.tvItemValue.text = item.valueLabel
 
-            val changePercent = PortfolioAnalytics.itemChangePercent(item)
-            val changeLabel = ItemFormatting.formatChangePercent(changePercent)
-            itemBinding.tvItemChange.text = changeLabel.orEmpty()
-            itemBinding.tvItemChange.visibility = if (changeLabel != null) View.VISIBLE else View.GONE
+            itemBinding.tvItemChange.text = item.changeLabel.orEmpty()
+            itemBinding.tvItemChange.visibility = if (item.changeLabel != null) View.VISIBLE else View.GONE
             itemBinding.tvItemChange.setTextColor(
                 ContextCompat.getColor(
                     requireContext(),
-                    if ((changePercent ?: 0f) >= 0f) R.color.collect_green else R.color.vault_negative,
+                    if (item.isPositiveChange) R.color.collect_green else R.color.vault_negative,
                 ),
             )
 
@@ -218,9 +205,5 @@ class MyVaultFragment : Fragment() {
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
-    }
-
-    private companion object {
-        const val CURRENCY = "EUR"
     }
 }

@@ -2,6 +2,7 @@ package com.example.aicollect.data.auth
 
 import com.example.aicollect.application.auth.AuthRepository
 import com.example.aicollect.application.auth.UsernameTakenException
+import com.google.firebase.auth.EmailAuthProvider
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseAuthRecentLoginRequiredException
 import com.google.firebase.auth.UserProfileChangeRequest
@@ -110,6 +111,58 @@ class FirebaseAuthRepository @Inject constructor(
         Unit
     }
 
+    override suspend fun reauthenticate(password: String): Result<Unit> = runCatching {
+        val user = firebaseAuth.currentUser ?: throw IllegalStateException("No hay sesión activa.")
+        val email = user.email ?: throw IllegalStateException("No hay sesión activa.")
+        val credential = EmailAuthProvider.getCredential(email, password)
+        user.reauthenticate(credential).await()
+        Unit
+    }
+
+    /**
+     * 2026-08-24: hecho enteramente con el SDK de Android, sin Cloud Function — decisión explícita
+     * del usuario ("no quiero otra cloud function cuando no es necesaria"), igual que
+     * `signUp`/`updateDisplayName` ya hacen varias escrituras encadenadas desde el cliente. Orden
+     * deliberado, MISMO motivo que si fuera una Cloud Function: el token de sesión sigue siendo
+     * válido durante los pasos 1-4 (necesario para que las reglas de seguridad permitan borrar los
+     * datos de este usuario), así que Auth se borra el último — si cualquier paso anterior falla
+     * (red, batería, app cerrada a medias), la cuenta sigue viva y el usuario puede pulsar
+     * "Eliminar cuenta" otra vez sin quedar bloqueado fuera de su propia sesión; cada paso es
+     * idempotente (borrar algo que ya no existe no falla).
+     */
+    override suspend fun deleteAccount(): Result<Unit> = runCatching {
+        val user = firebaseAuth.currentUser ?: throw IllegalStateException("No hay sesión activa.")
+        val uid = user.uid
+
+        // ---------- 1. Borrar cada item: su documento + sus fotos en Storage ----------
+        val itemsRef = firestore.collection(USERS_COLLECTION).document(uid).collection(ITEMS_COLLECTION)
+        val itemDocs = itemsRef.get().await().documents
+        for (itemDoc in itemDocs) {
+            val folderRef = firebaseStorage.reference.child("users/$uid/items/${itemDoc.id}")
+            runCatching { folderRef.listAll().await() }.getOrNull()?.items?.forEach { file ->
+                runCatching { file.delete().await() }
+            }
+            itemDoc.reference.delete().await()
+        }
+
+        // ---------- 2. Borrar la foto de perfil, si tiene ----------
+        // No hay documento `users/{uid}` de nivel superior que borrar aquí — el perfil vive en
+        // Firebase Auth (nombre/email/foto), Firestore solo tiene la subcolección `items` (ya
+        // borrada arriba). Confirmado 2026-08-24: intentar borrar ese documento inexistente daba
+        // "Missing or insufficient permissions" (no hay ninguna regla para ese path en la consola,
+        // nunca hizo falta hasta este intento).
+        runCatching { firebaseStorage.reference.child("users/$uid/profile.jpg").delete().await() }
+
+        // ---------- 3. Liberar la reserva de username ----------
+        user.displayName?.trim()?.lowercase()?.takeIf { it.isNotBlank() }?.let { normalized ->
+            runCatching { firestore.collection(USERNAMES_COLLECTION).document(normalized).delete().await() }
+        }
+
+        // ---------- 4. Borrar la cuenta de Firebase Auth — siempre la última ----------
+        user.delete().await()
+        Unit
+    }
+
     override suspend fun updateProfilePhoto(imageBytes: ByteArray): Result<String> = runCatching {
         val user = firebaseAuth.currentUser ?: throw IllegalStateException("No hay sesión activa.")
         val photoRef = firebaseStorage.reference.child("users/${user.uid}/profile.jpg")
@@ -141,5 +194,7 @@ class FirebaseAuthRepository @Inject constructor(
             "Por seguridad, cierra sesión y vuelve a iniciar sesión antes de cambiar estos datos."
         const val USERNAMES_COLLECTION = "usernames"
         const val USERNAME_OWNER_FIELD = "uid"
+        const val USERS_COLLECTION = "users"
+        const val ITEMS_COLLECTION = "items"
     }
 }

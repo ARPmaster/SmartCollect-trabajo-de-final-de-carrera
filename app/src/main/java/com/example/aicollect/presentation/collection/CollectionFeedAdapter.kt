@@ -3,6 +3,8 @@ package com.example.aicollect.presentation.collection
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.recyclerview.widget.DiffUtil
+import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import coil.load
 import com.example.aicollect.databinding.ItemCollectionFeedBinding
@@ -19,16 +21,30 @@ data class CollectionSummary(
     val itemCountLabel: String,
 )
 
-class CollectionFeedAdapter(
-    private val items: List<CollectionFeedItem>,
-    private val summary: CollectionSummary,
-    private val onItemClick: (CollectionFeedItem) -> Unit = {},
-) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
+/** One row of the Home feed: the summary header, or a collection item — a single sealed list so
+ * [CollectionFeedAdapter] (a [ListAdapter]) can diff the whole feed in one shot instead of the
+ * Fragment rebuilding the adapter from scratch on every state emission. */
+sealed interface FeedRow {
+    data class Header(val summary: CollectionSummary) : FeedRow
+    data class ItemRow(val item: CollectionFeedItem) : FeedRow
+}
 
-    override fun getItemCount(): Int = items.size + 1
+private object FeedRowDiffCallback : DiffUtil.ItemCallback<FeedRow>() {
+    override fun areItemsTheSame(oldItem: FeedRow, newItem: FeedRow): Boolean = when {
+        oldItem is FeedRow.Header && newItem is FeedRow.Header -> true
+        oldItem is FeedRow.ItemRow && newItem is FeedRow.ItemRow -> oldItem.item.id == newItem.item.id
+        else -> false
+    }
+
+    override fun areContentsTheSame(oldItem: FeedRow, newItem: FeedRow): Boolean = oldItem == newItem
+}
+
+class CollectionFeedAdapter(
+    private val onItemClick: (CollectionFeedItem) -> Unit = {},
+) : ListAdapter<FeedRow, RecyclerView.ViewHolder>(FeedRowDiffCallback) {
 
     override fun getItemViewType(position: Int): Int =
-        if (position == 0) VIEW_TYPE_HEADER else VIEW_TYPE_FEED_ITEM
+        if (getItem(position) is FeedRow.Header) VIEW_TYPE_HEADER else VIEW_TYPE_FEED_ITEM
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
         val inflater = LayoutInflater.from(parent.context)
@@ -40,10 +56,9 @@ class CollectionFeedAdapter(
     }
 
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
-        if (holder is HeaderViewHolder) {
-            holder.bind(summary)
-        } else if (holder is FeedItemViewHolder) {
-            holder.bind(items[position - 1])
+        when (val row = getItem(position)) {
+            is FeedRow.Header -> (holder as HeaderViewHolder).bind(row.summary)
+            is FeedRow.ItemRow -> (holder as FeedItemViewHolder).bind(row.item)
         }
     }
 
@@ -71,3 +86,7 @@ class CollectionFeedAdapter(
         }
     }
 }
+
+/** Builds the flat [FeedRow] list an [CollectionFeedAdapter] diffs against — header always first. */
+fun buildFeedRows(items: List<CollectionFeedItem>, summary: CollectionSummary): List<FeedRow> =
+    listOf(FeedRow.Header(summary)) + items.map { FeedRow.ItemRow(it) }

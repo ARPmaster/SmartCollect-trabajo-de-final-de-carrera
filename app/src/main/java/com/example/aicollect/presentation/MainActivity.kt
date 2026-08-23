@@ -23,22 +23,18 @@ import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.navOptions
 import coil.load
 import com.example.aicollect.R
-import com.example.aicollect.application.auth.AuthRepository
 import com.example.aicollect.data.DarkModePreferences
 import com.example.aicollect.databinding.ActivityMainBinding
 import com.example.aicollect.presentation.collection.FilterBottomSheetFragment
 import com.example.aicollect.presentation.newpost.NewPostViewModel
 import dagger.hilt.android.AndroidEntryPoint
-import javax.inject.Inject
 import kotlin.math.roundToInt
 import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
 
-    @Inject
-    lateinit var authRepository: AuthRepository
-
+    private val mainViewModel: MainViewModel by viewModels()
     private val newPostViewModel: NewPostViewModel by viewModels()
 
     private lateinit var binding: ActivityMainBinding
@@ -64,9 +60,10 @@ class MainActivity : AppCompatActivity() {
         R.id.aboutFragment,
         // Nueva Publicación (brief Sección 6): captura → desambiguación → formulario is a linear
         // modal flow, same chrome treatment as Auth/Drawer settings.
-        R.id.newPostCaptureFragment,
+        R.id.newPostFragment,
         R.id.newPostDisambiguationFragment,
-        R.id.newItemFormFragment,
+        // Editar objeto (roadmap CRUD, 2026-08-24): mismo tratamiento modal que Nueva Publicación.
+        R.id.editItemFragment,
     )
 
     /**
@@ -122,7 +119,7 @@ class MainActivity : AppCompatActivity() {
         binding.navView.btnLogout.setOnClickListener {
             binding.drawerLayout.closeDrawer(GravityCompat.START)
             lifecycleScope.launch {
-                authRepository.signOut()
+                mainViewModel.signOut()
                 navController.navigate(
                     R.id.loginFragment,
                     null,
@@ -139,7 +136,7 @@ class MainActivity : AppCompatActivity() {
             // Discard any leftover state from a previous, possibly-abandoned run of the flow
             // (candidates, captured photo) before starting a fresh one.
             newPostViewModel.reset()
-            navController.navigate(R.id.newPostCaptureFragment)
+            navController.navigate(R.id.newPostFragment)
         }
         bottomBar.findViewById<View>(R.id.btn_nav_stats).setOnClickListener {
             navController.navigate(R.id.statsFragment)
@@ -183,14 +180,9 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun refreshDrawerProfile() {
-        val displayName = authRepository.getCurrentUserDisplayName()
-        val emailPrefix = authRepository.getCurrentUserEmail()?.substringBefore('@')
-        binding.navView.tvDrawerUserName.text = when {
-            !displayName.isNullOrBlank() -> displayName
-            !emailPrefix.isNullOrBlank() -> emailPrefix
-            else -> getString(R.string.drawer_user_name)
-        }
-        binding.navView.ivDrawerAvatar.load(authRepository.getCurrentUserPhotoUrl()) {
+        val profile = mainViewModel.drawerProfile()
+        binding.navView.tvDrawerUserName.text = profile.displayNameOrFallback ?: getString(R.string.drawer_user_name)
+        binding.navView.ivDrawerAvatar.load(profile.photoUrl) {
             placeholder(R.drawable.drawer_avatar)
             error(R.drawable.drawer_avatar)
             fallback(R.drawable.drawer_avatar)
