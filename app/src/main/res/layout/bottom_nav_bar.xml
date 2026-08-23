@@ -39,7 +39,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="2dp"
-                android:fontFamily="monospace"
+                android:fontFamily="sans-serif-medium"
                 android:text="@string/nav_home"
                 android:textColor="@color/collect_gold"
                 android:textSize="10sp" />
@@ -94,7 +94,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="2dp"
-                android:fontFamily="monospace"
+                android:fontFamily="sans-serif-medium"
                 android:text="@string/nav_stats"
                 android:textColor="@color/collect_text_secondary_50"
                 android:textSize="10sp" />

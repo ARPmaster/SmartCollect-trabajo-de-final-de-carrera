@@ -163,6 +163,9 @@
                 android:layout_height="56dp"
                 android:layout_marginTop="12dp"
                 android:background="@drawable/bg_auth_button_social"
+                android:clickable="true"
+                android:focusable="true"
+                android:foreground="?attr/selectableItemBackground"
                 android:gravity="center"
                 android:orientation="horizontal">
 

@@ -73,6 +73,12 @@ class LoginFragment : Fragment() {
             findNavController().navigate(R.id.registerFragment)
         }
 
+        // Botón visual del Figma sin login de Google real detrás todavía (2026-08-24, pedido
+        // explícito) — un aviso es mejor que dejarlo sin reacción al tocarlo.
+        binding.btnGoogleSignIn.setOnClickListener {
+            Snackbar.make(binding.root, R.string.login_google_coming_soon, Snackbar.LENGTH_SHORT).show()
+        }
+
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
                 viewModel.uiState.collect { state -> render(state) }

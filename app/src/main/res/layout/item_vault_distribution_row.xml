@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    style="@style/VaultDistributionRow">
+
+    <LinearLayout style="@style/VaultDistributionHeaderRow">
+        <TextView
+            android:id="@+id/tv_distribution_label"
+            style="@style/VaultDistributionLabel"
+            tools:text="Baloncesto" />
+        <TextView
+            android:id="@+id/tv_distribution_value"
+            style="@style/VaultDistributionValue"
+            tools:text="45%" />
+    </LinearLayout>
+
+    <FrameLayout
+        android:id="@+id/track_distribution"
+        style="@style/VaultDistributionTrack">
+        <View
+            android:id="@+id/fill_distribution"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_gravity="start"
+            android:background="@drawable/bg_vault_progress_fill" />
+    </FrameLayout>
+</LinearLayout>

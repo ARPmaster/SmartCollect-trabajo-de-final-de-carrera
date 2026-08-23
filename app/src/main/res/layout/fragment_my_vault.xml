@@ -142,89 +142,16 @@
                 android:textColor="@color/vault_text_primary"
                 android:textSize="16sp" />
 
+            <!-- Una fila por deporte presente en la colección (2026-08-24, pedido explícito: antes
+                 solo mostraba los 3 principales, ahora todos) — construidas programáticamente en
+                 MyVaultFragment.setUpSportDistribution() a partir de item_vault_distribution_row.xml,
+                 mismo patrón que las miniaturas de foto de Nueva Publicación. -->
             <LinearLayout
-                android:id="@+id/row_distribution_1"
-                style="@style/VaultDistributionRow"
-                android:layout_marginTop="24dp">
-
-                <LinearLayout style="@style/VaultDistributionHeaderRow">
-                    <TextView
-                        android:id="@+id/tv_distribution_1_label"
-                        style="@style/VaultDistributionLabel"
-                        tools:text="Baloncesto" />
-                    <TextView
-                        android:id="@+id/tv_distribution_1_value"
-                        style="@style/VaultDistributionValue"
-                        tools:text="45%" />
-                </LinearLayout>
-
-                <FrameLayout
-                    android:id="@+id/track_distribution_1"
-                    style="@style/VaultDistributionTrack">
-                    <View
-                        android:id="@+id/fill_distribution_1"
-                        android:layout_width="0dp"
-                        android:layout_height="match_parent"
-                        android:layout_gravity="start"
-                        android:background="@drawable/bg_vault_progress_fill" />
-                </FrameLayout>
-            </LinearLayout>
-
-            <LinearLayout
-                android:id="@+id/row_distribution_2"
-                style="@style/VaultDistributionRow"
-                android:layout_marginTop="12dp">
-
-                <LinearLayout style="@style/VaultDistributionHeaderRow">
-                    <TextView
-                        android:id="@+id/tv_distribution_2_label"
-                        style="@style/VaultDistributionLabel"
-                        tools:text="Fútbol" />
-                    <TextView
-                        android:id="@+id/tv_distribution_2_value"
-                        style="@style/VaultDistributionValue"
-                        tools:text="30%" />
-                </LinearLayout>
-
-                <FrameLayout
-                    android:id="@+id/track_distribution_2"
-                    style="@style/VaultDistributionTrack">
-                    <View
-                        android:id="@+id/fill_distribution_2"
-                        android:layout_width="0dp"
-                        android:layout_height="match_parent"
-                        android:layout_gravity="start"
-                        android:background="@drawable/bg_vault_progress_fill" />
-                </FrameLayout>
-            </LinearLayout>
-
-            <LinearLayout
-                android:id="@+id/row_distribution_3"
-                style="@style/VaultDistributionRow"
-                android:layout_marginTop="12dp">
-
-                <LinearLayout style="@style/VaultDistributionHeaderRow">
-                    <TextView
-                        android:id="@+id/tv_distribution_3_label"
-                        style="@style/VaultDistributionLabel"
-                        tools:text="Béisbol" />
-                    <TextView
-                        android:id="@+id/tv_distribution_3_value"
-                        style="@style/VaultDistributionValue"
-                        tools:text="25%" />
-                </LinearLayout>
-
-                <FrameLayout
-                    android:id="@+id/track_distribution_3"
-                    style="@style/VaultDistributionTrack">
-                    <View
-                        android:id="@+id/fill_distribution_3"
-                        android:layout_width="0dp"
-                        android:layout_height="match_parent"
-                        android:layout_gravity="start"
-                        android:background="@drawable/bg_vault_progress_fill" />
-                </FrameLayout>
-            </LinearLayout>
+                android:id="@+id/rows_sport_distribution"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="24dp"
+                android:orientation="vertical" />
         </LinearLayout>
 
         <!-- Quick stat chip -->

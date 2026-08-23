@@ -188,7 +188,10 @@ class NewPostViewModel @Inject constructor(
             procedencia = candidate?.procedencia,
             deporte = sport,
             estado = condition,
-            confianzaIdentificacion = candidate?.confianza,
+            // 2026-08-24, decisión confirmada por el usuario: guarda el score de ranking del
+            // candidato (visión + consenso + confianza combinados), no la confianza cruda de
+            // Gemini — antes era candidate.confianza.
+            confianzaIdentificacion = candidate?.score,
         )
 
         viewModelScope.launch {

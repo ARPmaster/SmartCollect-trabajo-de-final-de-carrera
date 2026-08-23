@@ -18,6 +18,7 @@ import androidx.navigation.fragment.findNavController
 import coil.load
 import com.example.aicollect.R
 import com.example.aicollect.databinding.FragmentMyVaultBinding
+import com.example.aicollect.databinding.ItemVaultDistributionRowBinding
 import com.example.aicollect.databinding.ItemVaultTopValuedBinding
 import com.example.aicollect.presentation.showSnackbar
 import dagger.hilt.android.AndroidEntryPoint
@@ -91,27 +92,26 @@ class MyVaultFragment : Fragment() {
         setUpTopValuedItems(state.topValuedItems)
     }
 
+    /** Una fila por cada deporte presente (2026-08-24, pedido explícito: antes solo mostraba los
+     * 3 principales por un límite del layout, no una decisión de producto). Reconstruye la lista
+     * entera cada vez, mismo criterio que las miniaturas de foto de Nueva Publicación — son pocos
+     * elementos (un puñado de deportes distintos como mucho), no compensa llevar un registro de
+     * qué cambió. */
     private fun setUpSportDistribution(distribution: List<Pair<String, Int>>) {
-        val rows = listOf(
-            Triple(binding.rowDistribution1, binding.tvDistribution1Label, binding.tvDistribution1Value) to
-                (binding.trackDistribution1 to binding.fillDistribution1),
-            Triple(binding.rowDistribution2, binding.tvDistribution2Label, binding.tvDistribution2Value) to
-                (binding.trackDistribution2 to binding.fillDistribution2),
-            Triple(binding.rowDistribution3, binding.tvDistribution3Label, binding.tvDistribution3Value) to
-                (binding.trackDistribution3 to binding.fillDistribution3),
-        )
-        rows.forEachIndexed { index, (labels, track) ->
-            val (row, label, value) = labels
-            val (trackView, fillView) = track
-            val entry = distribution.getOrNull(index)
-            row.visibility = if (entry != null) View.VISIBLE else View.GONE
-            if (entry != null) {
-                label.text = entry.first
-                value.text = "${entry.second}%"
-                trackView.doOnLayout {
-                    fillView.layoutParams = fillView.layoutParams.apply { width = (trackView.width * entry.second / 100f).toInt() }
-                }
+        binding.rowsSportDistribution.removeAllViews()
+        distribution.forEachIndexed { index, (sport, percent) ->
+            val rowBinding = ItemVaultDistributionRowBinding.inflate(layoutInflater, binding.rowsSportDistribution, false)
+            rowBinding.tvDistributionLabel.text = sport
+            rowBinding.tvDistributionValue.text = "$percent%"
+            rowBinding.trackDistribution.doOnLayout {
+                rowBinding.fillDistribution.layoutParams =
+                    rowBinding.fillDistribution.layoutParams.apply { width = (rowBinding.trackDistribution.width * percent / 100f).toInt() }
             }
+            if (index > 0) {
+                (rowBinding.root.layoutParams as ViewGroup.MarginLayoutParams).topMargin =
+                    resources.getDimensionPixelSize(R.dimen.vault_distribution_row_spacing)
+            }
+            binding.rowsSportDistribution.addView(rowBinding.root)
         }
     }
 

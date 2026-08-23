@@ -69,6 +69,7 @@
     <string name="login_sign_in_button">Iniciar sesión</string>
     <string name="login_signing_in">Iniciando sesión…</string>
     <string name="login_google_button">Continuar con Google</string>
+    <string name="login_google_coming_soon">Iniciar sesión con Google llegará próximamente.</string>
     <string name="login_no_account">¿No tienes una cuenta?</string>
     <string name="login_create_account">Crear cuenta</string>
     <string name="cd_toggle_password_visibility">Mostrar u ocultar contraseña</string>
