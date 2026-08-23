@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="100dp"
+    android:layout_height="100dp">
+
+    <ImageView
+        android:id="@+id/iv_thumbnail"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/vault_icon_box_bg"
+        android:contentDescription="@string/cd_new_post_preview"
+        android:scaleType="centerCrop" />
+
+    <ImageButton
+        android:id="@+id/btn_remove"
+        android:layout_width="24dp"
+        android:layout_height="24dp"
+        android:layout_gravity="top|end"
+        android:layout_margin="4dp"
+        android:background="@drawable/bg_circle_dark_overlay"
+        android:contentDescription="@string/cd_new_post_remove_photo"
+        android:padding="5dp"
+        android:src="@drawable/ic_minus" />
+</FrameLayout>
