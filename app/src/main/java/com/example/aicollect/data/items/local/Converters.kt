@@ -1,14 +1,12 @@
+/** Convierte entre las listas del modelo de dominio (fotos, historial de precios, búsquedas de
+ * valoración) y el texto plano que Room guarda en columnas simples, ya que el proyecto no usa
+ * ninguna librería de serialización JSON.*/
 package com.example.aicollect.data.items.local
 
 import androidx.room.TypeConverter
 import com.example.aicollect.application.items.PricePoint
 import com.example.aicollect.application.items.ValuationSearch
 
-/**
- * No hay ninguna librería JSON en el proyecto (ver PROJECT_CONTEXT.md, decisión consciente de no
- * añadir otro procesador de anotaciones a un toolchain ya frágil) — se codifican las listas con
- * separadores de control ASCII que nunca aparecen en una URL de Storage ni en un número/fecha.
- */
 class Converters {
 
     @TypeConverter
@@ -49,8 +47,6 @@ class Converters {
         }
 
     private companion object {
-        // ASCII Unit/Record Separator control chars — never legally appear in a Storage URL,
-        // a Long, or a Double, so a plain split() is safe without escaping.
         const val ITEM_SEPARATOR = ""
         const val FIELD_SEPARATOR = ""
     }

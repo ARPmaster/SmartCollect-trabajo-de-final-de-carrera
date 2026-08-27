@@ -1,3 +1,5 @@
+/** ViewModel de la pantalla de registro: valida correo, usuario y contraseñas, delega la creación
+ * de cuenta en AuthRepository y expone el resultado como estado de UI.*/
 package com.example.aicollect.presentation.auth
 
 import androidx.lifecycle.ViewModel
@@ -17,7 +19,6 @@ sealed interface RegisterUiState {
     data object Success : RegisterUiState
     data class Error(val message: String) : RegisterUiState
 
-    /** Distinct from [Error] because the Fragment reacts with a timed red border, not just a Snackbar. */
     data class UsernameTaken(val message: String) : RegisterUiState
 }
 

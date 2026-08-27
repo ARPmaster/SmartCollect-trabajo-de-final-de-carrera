@@ -1,9 +1,10 @@
+// Extensión que convierte una fila `item_faq` en un acordeón (pregunta/respuesta) que se
+// expande al tocarla, reutilizada por las pantallas de Ayuda y Sobre la aplicación.
 package com.example.aicollect.presentation.settings
 
 import android.view.View
 import com.example.aicollect.databinding.ItemFaqBinding
 
-/** Wires an `item_faq` row as a tap-to-expand accordion, shared by [HelpFragment] and [AboutFragment]. */
 fun ItemFaqBinding.bindAccordion(questionRes: Int, answerRes: Int) {
     tvQuestion.setText(questionRes)
     tvAnswer.setText(answerRes)

@@ -1,3 +1,5 @@
+// ViewModel de "Seguridad": valida y aplica cambios de email/contraseña, y gestiona la
+// eliminación de cuenta reautenticando al usuario antes de borrarla.
 package com.example.aicollect.presentation.settings
 
 import androidx.lifecycle.ViewModel
@@ -37,9 +39,6 @@ class SecurityViewModel @Inject constructor(
 
     fun currentEmail(): String = authRepository.getCurrentUserEmail().orEmpty()
 
-    /** Completa el roadmap "Eliminar cuenta y datos" — reautentica con [password] antes de llamar
-     * al backend (medida de UX/seguridad, ver [AuthRepository.reauthenticate] kdoc), y solo si eso
-     * tiene éxito llama a [AuthRepository.deleteAccount]. */
     fun deleteAccount(password: String) {
         if (password.isBlank()) {
             _deleteAccountState.value = DeleteAccountUiState.Error("Introduce tu contraseña para confirmar.")
@@ -49,7 +48,9 @@ class SecurityViewModel @Inject constructor(
         viewModelScope.launch {
             val reauthResult = authRepository.reauthenticate(password)
             if (reauthResult.isFailure) {
-                _deleteAccountState.value = DeleteAccountUiState.Error("Contraseña incorrecta.")
+                _deleteAccountState.value = DeleteAccountUiState.Error(
+                    reauthResult.exceptionOrNull()?.message ?: "No se pudo verificar tu contraseña. Inténtalo de nuevo.",
+                )
                 return@launch
             }
             authRepository.deleteAccount()
@@ -62,7 +63,6 @@ class SecurityViewModel @Inject constructor(
         }
     }
 
-    /** Applies whichever of email/password actually changed; both real Firebase Auth calls. */
     fun saveChanges(email: String, newPassword: String, confirmPassword: String) {
         val emailChanged = email.isNotBlank() && email != currentEmail()
         val passwordProvided = newPassword.isNotBlank() || confirmPassword.isNotBlank()

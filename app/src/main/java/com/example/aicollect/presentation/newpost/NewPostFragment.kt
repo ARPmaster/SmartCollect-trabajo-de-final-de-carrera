@@ -1,3 +1,5 @@
+/* Pantalla de "Nueva Publicación": formulario para dar de alta un ítem, captura o selección de
+fotos, reconocimiento automático opcional y publicación (incluyendo el aviso de posible duplicado).*/
 package com.example.aicollect.presentation.newpost
 
 import android.content.pm.PackageManager
@@ -36,13 +38,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
-/**
- * "Nueva Publicación - Objeto" — single screen with the upload box and the form fields together
- * (2026-08-23 feedback: the form must be visible from the start, not behind a separate capture
- * step). Picking a photo no longer auto-triggers `recognizeItem` — instead it shows a dialog
- * letting the user choose between automatic analysis (opens [NewPostDisambiguationFragment], then
- * pops back here with the fields prefilled) or filling the form manually themselves.
- */
 class NewPostFragment : Fragment() {
 
     private var _binding: FragmentNewPostBinding? = null
@@ -93,7 +88,6 @@ class NewPostFragment : Fragment() {
             insets
         }
 
-        // Dashed strokes (bg_upload_dashed) don't render under hardware acceleration.
         binding.boxUpload.setLayerType(View.LAYER_TYPE_SOFTWARE, null)
 
         binding.btnBack.setOnClickListener { findNavController().popBackStack() }
@@ -122,10 +116,6 @@ class NewPostFragment : Fragment() {
         prefillFromCandidate()
     }
 
-    /** Rebuilds the thumbnail row from scratch — cheap enough for a max of 3 items, and avoids
-     * tracking view/index bookkeeping across add/remove. Re-applied on every entry to this screen
-     * (fresh, or popped back from disambiguation, or after add/remove on a thumbnail) — the same
-     * photos/candidate stay in [NewPostViewModel] across all of those. */
     private fun renderPhotos() {
         val photos = viewModel.photos
         binding.uploadPlaceholder.visibility = if (photos.isEmpty()) View.VISIBLE else View.GONE
@@ -146,7 +136,6 @@ class NewPostFragment : Fragment() {
 
         if (viewModel.canAddMorePhotos) {
             val addTileBinding = ItemNewPostAddPhotoTileBinding.inflate(layoutInflater, binding.photoThumbnailsRow, false)
-            // Dashed strokes (bg_upload_dashed) don't render under hardware acceleration.
             addTileBinding.root.setLayerType(View.LAYER_TYPE_SOFTWARE, null)
             if (photos.isNotEmpty()) applySpacing(addTileBinding.root)
             addTileBinding.root.setOnClickListener { showPhotoSourceMenu(it) }
@@ -159,11 +148,6 @@ class NewPostFragment : Fragment() {
             resources.getDimensionPixelSize(R.dimen.new_post_photo_thumbnail_spacing)
     }
 
-    /** Called from [onViewStateRestored], not [onViewCreated]: `et_name`/`et_description` have
-     * ids, so the Fragment framework auto-saves/restores their text across view recreation (e.g.
-     * popping back from disambiguation). That restore runs right after onViewCreated, so a
-     * setText() there gets silently clobbered by the restored (stale, pre-analysis) empty value —
-     * confirmed on-device via logcat (2026-08-23). onViewStateRestored runs after the restore. */
     private fun prefillFromCandidate() {
         val candidate = viewModel.selectedCandidate ?: return
         if (binding.etName.text.isNullOrBlank()) binding.etName.setText(candidate.nombre)
@@ -213,33 +197,21 @@ class NewPostFragment : Fragment() {
 
     private fun handlePickedImage(uri: Uri) {
         viewLifecycleOwner.lifecycleScope.launch {
-            // Same reasoning as EditProfileFragment.decodeAndCompress: content:// URIs can be
-            // backed by a cloud photo, so decoding must never run on the main thread.
             val imageBytes = withContext(Dispatchers.IO) { decodeAndCompress(uri) }
             if (imageBytes == null) {
                 Snackbar.make(binding.root, R.string.new_post_photo_read_error, Snackbar.LENGTH_LONG).show()
                 return@launch
             }
-            // Whether this is the very first photo determines both the max-photos check (the cap
-            // only matters once there's already at least one) and, below, whether to offer
-            // analysis at all — captured before addPhoto() mutates the list.
             val isFirstPhoto = viewModel.photos.isEmpty()
             if (!viewModel.addPhoto(imageBytes)) {
                 Snackbar.make(binding.root, R.string.new_post_max_photos_reached, Snackbar.LENGTH_SHORT).show()
                 return@launch
             }
             renderPhotos()
-            // Only the first photo ever gets the analysis choice — every photo added after that
-            // is just attached, no dialog, no recognizeItem call (2026-08-23 feedback: "solo se
-            // analiza la primera en subir").
             if (isFirstPhoto) showAnalysisChoiceDialog(imageBytes)
         }
     }
 
-    /** The floating dialog the user asked for (2026-08-23): after a photo is attached, let them
-     * choose between automatic analysis (`recognizeItem` → disambiguation → prefilled form) or
-     * filling the form themselves, instead of always auto-triggering recognition. Dismissing the
-     * dialog (tap outside / back) is equivalent to "manual" — the photo is already attached. */
     private fun showAnalysisChoiceDialog(imageBytes: ByteArray) {
         MaterialAlertDialogBuilder(requireContext())
             .setTitle(R.string.new_post_analysis_dialog_title)
@@ -291,9 +263,6 @@ class NewPostFragment : Fragment() {
 
         when (state) {
             is RecognitionUiState.Success -> {
-                // recognitionState is a StateFlow: acknowledge it now, otherwise popping back
-                // from disambiguation would replay the stale Success value and immediately bounce
-                // forward again before the user ever sees the prefilled form (2026-08-23 feedback).
                 viewModel.acknowledgeRecognitionResult()
                 findNavController().navigate(R.id.newPostDisambiguationFragment)
             }
@@ -349,9 +318,6 @@ class NewPostFragment : Fragment() {
         }
     }
 
-    /** 2026-08-24, pedido explícito: ya existe algo muy parecido en la colección — deja elegir
-     * entre publicar igualmente (puede ser un segundo ejemplar real) o cancelar y volver al
-     * formulario, en vez de crear un duplicado silencioso. */
     private fun showDuplicateWarningDialog(existingItemName: String) {
         MaterialAlertDialogBuilder(requireContext())
             .setTitle(R.string.new_post_duplicate_title)
@@ -362,9 +328,6 @@ class NewPostFragment : Fragment() {
             .show()
     }
 
-    /** El mismo overlay se usa para dos operaciones distintas del flujo (analizar imagen /
-     * publicar) — combina ambos estados en vez de que cada `render*` lo pise por separado, para
-     * que uno no oculte el overlay a mitad del otro si por lo que sea llegan casi a la vez. */
     private fun updateLoadingOverlay() {
         val analyzing = viewModel.recognitionState.value is RecognitionUiState.Loading
         val publishing = viewModel.saveState.value is SaveItemUiState.Loading

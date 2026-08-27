@@ -56,7 +56,6 @@
                 android:paddingTop="20dp"
                 android:paddingBottom="32dp">
 
-                <!-- Título del objeto -->
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -86,7 +85,6 @@
                         android:textSize="15sp" />
                 </FrameLayout>
 
-                <!-- Descripción detallada -->
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -117,7 +115,6 @@
                         android:textSize="15sp" />
                 </FrameLayout>
 
-                <!-- Deporte -->
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -156,7 +153,6 @@
                         android:src="@drawable/ic_chevron_down" />
                 </LinearLayout>
 
-                <!-- Estado -->
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"

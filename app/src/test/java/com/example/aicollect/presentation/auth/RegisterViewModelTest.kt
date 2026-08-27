@@ -1,3 +1,4 @@
+// Test unitario de RegisterViewModel: validaciones de email/usuario/contraseña, registro feliz, error genérico y nombre de usuario ya en uso.
 package com.example.aicollect.presentation.auth
 
 import com.example.aicollect.application.auth.AuthRepository

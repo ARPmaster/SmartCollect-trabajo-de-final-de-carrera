@@ -1,3 +1,4 @@
+// Vista custom que dibuja a mano el donut de distribución proporcional (por deporte o estado) usado en My Vault.
 package com.example.aicollect.presentation.collection
 
 import android.content.Context
@@ -7,15 +8,8 @@ import android.graphics.RectF
 import android.util.AttributeSet
 import android.view.View
 
-/** One slice of the donut chart: [percent] of the whole (0-100) rendered in [color]. */
 data class DonutSegment(val percent: Int, val color: Int)
 
-/**
- * Hand-drawn proportional donut/ring chart for the "Distribución" legend in My Vault
- * (Figma 2014:76). Segments are proportional to [segments], drawn with a small gap between
- * them — simplified vs. the decorative broken-ring artwork in the mock, prioritizing an
- * honest proportional representation over pixel-matching that specific SVG.
- */
 class SportDonutChartView @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,

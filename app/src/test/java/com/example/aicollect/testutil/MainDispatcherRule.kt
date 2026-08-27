@@ -1,3 +1,4 @@
+// Regla JUnit reutilizable en los tests: instala un dispatcher de test como Dispatchers.Main para poder controlar las coroutines de los ViewModels de forma determinista.
 package com.example.aicollect.testutil
 
 import kotlinx.coroutines.Dispatchers
@@ -9,11 +10,6 @@ import kotlinx.coroutines.test.setMain
 import org.junit.rules.TestWatcher
 import org.junit.runner.Description
 
-/**
- * Installs a [StandardTestDispatcher] as `Dispatchers.Main` for the duration of a test, so
- * `viewModelScope.launch` work can be driven deterministically via [dispatcher]'s scheduler
- * instead of needing a real Looper (unavailable in JVM unit tests).
- */
 @OptIn(ExperimentalCoroutinesApi::class)
 class MainDispatcherRule(
     val dispatcher: TestDispatcher = StandardTestDispatcher(),

@@ -21,7 +21,7 @@ android {
         versionCode = 1
         versionName = "1.0"
 
-        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+        testInstrumentationRunner = "com.example.aicollect.CustomTestRunner"
     }
 
     buildTypes {
@@ -58,19 +58,26 @@ dependencies {
     testImplementation(libs.kotlinx.coroutines.test)
     androidTestImplementation(libs.androidx.espresso.core)
     androidTestImplementation(libs.androidx.junit)
-    //google features
+    androidTestImplementation(libs.androidx.test.core)
+    androidTestImplementation(libs.androidx.fragment.testing)
+    androidTestImplementation(libs.androidx.navigation.testing)
+    androidTestImplementation(libs.hilt.android.testing)
+    androidTestImplementation(libs.androidx.appcompat)
+    androidTestImplementation(libs.material)
+    kspAndroidTest(libs.hilt.compiler)
+    // Firebase: autenticación, analítica, almacenamiento de fotos, base de datos y funciones en la nube.
     implementation(platform("com.google.firebase:firebase-bom:34.17.0"))
     implementation("com.google.firebase:firebase-analytics")
     implementation("com.google.firebase:firebase-auth")
     implementation("com.google.firebase:firebase-storage")
     implementation("com.google.firebase:firebase-firestore")
     implementation("com.google.firebase:firebase-functions")
-    //image loading
+    // Carga de imágenes remotas en las vistas.
     implementation("io.coil-kt:coil:2.6.0")
-    //dependency injection
+    // Inyección de dependencias.
     implementation(libs.hilt.android)
     ksp(libs.hilt.compiler)
-    //local persistence (Room — caché local de Item, single source of truth para la UI, 2026-08-24)
+    // Caché local de ítems (base de datos Room).
     implementation("androidx.room:room-runtime:2.7.1")
     implementation("androidx.room:room-ktx:2.7.1")
     ksp("androidx.room:room-compiler:2.7.1")

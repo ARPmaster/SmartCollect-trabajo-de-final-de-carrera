@@ -40,12 +40,7 @@
     <string name="vault_condition_distribution_title">Distribución por Estado</string>
     <string name="vault_total_items_label">Artículos Totales</string>
     <string name="vault_filter_title">Filtrar por Deporte</string>
-    <string name="vault_filter_futbol">Fútbol</string>
-    <string name="vault_filter_basquet">Básquet</string>
-    <string name="vault_filter_beisbol">Béisbol</string>
-    <string name="vault_filter_tenis">Tenis</string>
     <string name="vault_top_items_title">Artículos más Valorados</string>
-    <string name="vault_see_all">Ver todo</string>
     <string name="vault_empty_state">Aún no tienes artículos en tu colección. Pulsa el botón «+» para añadir el primero.</string>
 
     <string name="cd_close_drawer">Cerrar menú</string>
@@ -68,8 +63,6 @@
     <string name="login_forgot_password">¿Olvidaste tu contraseña?</string>
     <string name="login_sign_in_button">Iniciar sesión</string>
     <string name="login_signing_in">Iniciando sesión…</string>
-    <string name="login_google_button">Continuar con Google</string>
-    <string name="login_google_coming_soon">Iniciar sesión con Google llegará próximamente.</string>
     <string name="login_no_account">¿No tienes una cuenta?</string>
     <string name="login_create_account">Crear cuenta</string>
     <string name="cd_toggle_password_visibility">Mostrar u ocultar contraseña</string>
@@ -95,14 +88,15 @@
     <string name="filters_sheet_title">Filtrar Colección</string>
     <string name="cd_close_filters">Cerrar filtros</string>
     <string name="filter_value_range_label">RANGO DE VALOR</string>
-    <string name="filter_value_range_bounds">$0 - $100k</string>
+    <string name="filter_value_range_bounds">$0 - $1.000</string>
     <string name="filter_min_label">MÍN</string>
     <string name="filter_max_label">MÁX</string>
     <string name="filter_currency_symbol">$</string>
     <string name="filter_sport_label">DEPORTE</string>
-    <string name="filter_item_type_label">TIPO DE ARTÍCULO</string>
     <string name="filter_condition_label">ESTADO</string>
+    <string name="filter_sort_label">ORDENAR POR</string>
     <string name="filter_apply_button">Aplicar Filtros</string>
+    <string name="filter_any_condition">Cualquiera</string>
 
     <string-array name="filter_sport_options">
         <item>Todos</item>
@@ -113,18 +107,18 @@
         <item>Otro</item>
     </string-array>
 
-    <string-array name="filter_item_type_options">
-        <item>Cualquiera</item>
-        <item>Camiseta</item>
-        <item>Zapatillas</item>
-        <item>Balón</item>
-        <item>Otro</item>
-    </string-array>
-
     <string-array name="filter_condition_options">
         <item>Nuevo</item>
         <item>Buen estado</item>
         <item>Malas condiciones</item>
+    </string-array>
+
+    <string-array name="filter_sort_options">
+        <item>Predeterminado</item>
+        <item>Alfabético (A-Z)</item>
+        <item>Precio: mayor a menor</item>
+        <item>Precio: menor a mayor</item>
+        <item>Antigüedad</item>
     </string-array>
 
     <string name="cd_back">Volver</string>
@@ -190,8 +184,6 @@
     <string name="about_privacy_answer">Responsable del tratamiento: Adrián Rey Pérez, contacto: adrianforgithub@gmail.com.\n\nQué datos recopilamos: tu correo electrónico, nombre de perfil y nombre de usuario, foto de perfil (si decides subirla), y los datos e imágenes de los artículos que añades a tu colección, incluidas las fotografías que envíes para el reconocimiento automático de objetos.\n\nPara qué los usamos y con qué base legal: gestionar tu cuenta y autenticarte, como parte de la ejecución del servicio que nos solicitas (art. 6.1.b RGPD); generar sugerencias de reconocimiento mediante inteligencia artificial cuando fotografías un objeto, también como ejecución del servicio (art. 6.1.b); y atender tus consultas de soporte, por interés legítimo en responderte (art. 6.1.f).\n\nCon quién compartimos tus datos: con Google, a través de Firebase (Authentication, Firestore, Storage y Cloud Functions) y de las API de Google Cloud Vision y Google Gemini, que actúan como encargados del tratamiento bajo contrato con nosotros. Parte de este procesamiento puede implicar el envío de datos a servidores de Google fuera del Espacio Económico Europeo; estas transferencias están amparadas por las Cláusulas Contractuales Tipo de la Comisión Europea y/o el marco de adecuación EU-U.S. Data Privacy Framework. No vendemos ni cedemos tus datos a terceros con fines publicitarios.\n\nDecisiones automatizadas: los candidatos que sugiere la IA nunca se guardan solos; siempre confirmas o editas tú el resultado antes de que se añada a tu colección, así que no tomamos decisiones totalmente automatizadas que produzcan efectos legales sobre ti.\n\nCuánto tiempo conservamos tus datos: mientras tu cuenta esté activa. Si solicitas la baja, eliminamos tus datos personales y el contenido de tu colección en un plazo razonable, salvo que la ley exija conservarlos más tiempo.\n\nTus derechos: puedes acceder a tus datos, rectificarlos, solicitar su supresión, limitar u oponerte a su tratamiento, y pedir su portabilidad, escribiéndonos a adrianforgithub@gmail.com. También puedes presentar una reclamación ante la Agencia Española de Protección de Datos (www.aepd.es) si consideras que no hemos tratado tus datos correctamente.\n\nMenores de edad: este servicio no está dirigido a menores de 14 años y no recopilamos conscientemente datos de menores de esa edad.\n\nSeguridad: tus datos se almacenan en Firebase protegidos por reglas de acceso que solo permiten leer y escribir tus propios datos.</string>
     <string name="about_footer">Hecho con pasión por el equipo de Collect AI.</string>
 
-    <!-- Nueva Publicación - Objeto: diseño oficial aceptado, capturas del usuario 2026-08-21
-         (una sola pantalla: subir fotos + formulario, ver PROJECT_CONTEXT). -->
     <string name="new_post_title">Nueva Publicación - Objeto</string>
     <string name="new_post_upload_title">Subir imágenes</string>
     <string name="new_post_upload_subtitle">Toca para añadir fotos del objeto (máx. 5)</string>
@@ -228,7 +220,6 @@
     <string name="new_post_duplicate_confirm">Publicar de todas formas</string>
     <string name="new_post_duplicate_cancel">Cancelar</string>
 
-    <!-- Nueva Publicación: desambiguación de candidatos (Figma 2090:9, diseño oficial aceptado 2026-08-21) -->
     <string name="disambiguation_title">Selecciona el objeto correcto</string>
     <string name="disambiguation_subtitle">Toca el que coincide con tu objeto</string>
     <string name="disambiguation_best_match_badge">Mejor coincidencia</string>
@@ -237,6 +228,7 @@
     <string name="disambiguation_empty_state">No se encontraron coincidencias fiables para esta foto. Puedes introducir los datos del objeto manualmente.</string>
 
     <string name="home_empty_state">Aún no tienes artículos en tu colección. Pulsa el botón «+» para añadir el primero.</string>
+    <string name="home_no_filter_results">Ningún artículo coincide con estos filtros.</string>
     <string name="home_load_error">No se pudo cargar tu colección. Inténtalo de nuevo.</string>
 
     <string-array name="sport_options">

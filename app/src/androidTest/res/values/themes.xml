@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Tema mínimo propio para HiltTestActivity — se evita referenciar el tema real de la app
+         (Theme.AIcollect) porque el paquete de recursos de androidTest (com.example.aicollect.test)
+         no lo resuelve de forma fiable en el enlazado de AAPT. Deriva de la misma base
+         (MaterialComponents) que necesitan los diálogos Material usados por los Fragments reales. -->
+    <style name="Theme.HiltTestActivity" parent="Theme.MaterialComponents.DayNight.NoActionBar" />
+</resources>

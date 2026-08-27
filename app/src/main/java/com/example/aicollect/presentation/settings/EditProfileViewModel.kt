@@ -1,3 +1,5 @@
+// ViewModel de "Editar Perfil": expone el nombre y foto actuales, valida y guarda el nuevo
+// nombre (detectando si ya está en uso) y sube la nueva foto de perfil.
 package com.example.aicollect.presentation.settings
 
 import androidx.lifecycle.ViewModel
@@ -16,8 +18,6 @@ sealed interface EditProfileUiState {
     data object Loading : EditProfileUiState
     data object Success : EditProfileUiState
     data class Error(val message: String) : EditProfileUiState
-
-    /** Distinct from [Error] because the Fragment reacts with a timed red border, not just a Snackbar. */
     data class NameTaken(val message: String) : EditProfileUiState
 }
 
@@ -55,9 +55,6 @@ class EditProfileViewModel @Inject constructor(
         }
     }
 
-    /** The name shown across the drawer — persisted on the Firebase Auth user profile itself
-     * (`displayName`), so it survives reinstalls: signing back in on any device pulls the same
-     * value from the account, same as the profile photo. */
     fun saveDisplayName(fullName: String) {
         val trimmedName = fullName.trim()
         when {

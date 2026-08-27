@@ -1,9 +1,11 @@
+/** Implementación de ItemRepository con Firestore como origen de verdad para las escrituras, y
+ * Room como caché local que la UI observa: gestiona el CRUD de ítems, la subida de fotos a
+ * Storage, la sincronización en segundo plano entre Firestore y Room, y la valoración de
+ * mercado mediante las Cloud Functions correspondientes.*/
 package com.example.aicollect.data.items
 
 import com.example.aicollect.application.items.Item
-import com.example.aicollect.application.items.ItemEdits
 import com.example.aicollect.application.items.ItemRepository
-import com.example.aicollect.application.items.NewItem
 import com.example.aicollect.application.items.PricePoint
 import com.example.aicollect.application.items.ValuationResult
 import com.example.aicollect.application.items.ValuationSearch
@@ -17,31 +19,18 @@ import com.google.firebase.firestore.Query
 import com.google.firebase.functions.FirebaseFunctions
 import com.google.firebase.storage.FirebaseStorage
 import javax.inject.Inject
+import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.emitAll
 import kotlinx.coroutines.flow.emptyFlow
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
 
-/**
- * Room ([ItemDao]) is the single source of truth the UI observes — [observeItems] returns a Room
- * query, not the raw Firestore snapshot. Firestore stays the source of truth for writes
- * (create/update/delete) and its snapshot listener is what keeps Room in sync in the background
- * (2026-08-24, requested explicitly to have a local cache, brief-adjacent — the schema itself
- * didn't change, this only adds a local mirror). [getItem] checks Room first and only falls back
- * to a one-shot Firestore fetch (caching the result) for a cold id it hasn't seen yet, e.g. a
- * detail deep-link opened before [observeItems] ever ran.
- *
- * **Simplificación consciente**: el listener de Firestore que alimenta Room nunca se cancela
- * explícitamente (no hay `awaitClose`) — vive tanto como el propio `Singleton`, es decir, tanto
- * como el proceso de la app. Para una app de un único usuario activo a la vez esto es aceptable;
- * si se cierra sesión, la regla de seguridad de Firestore acaba rechazando ese listener (uid ya no
- * coincide) y simplemente deja de actualizar Room, sin crash — no se implementó una baja limpia
- * atada a `observeAuthState()` por alcance/tiempo.
- */
 class FirestoreItemRepository @Inject constructor(
     private val firestore: FirebaseFirestore,
     private val firebaseStorage: FirebaseStorage,
@@ -51,33 +40,36 @@ class FirestoreItemRepository @Inject constructor(
 ) : ItemRepository {
 
     private val repositoryScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
-    private val syncedOwnerIds = mutableSetOf<String>()
 
-    override suspend fun createItem(newItem: NewItem, imageBytes: List<ByteArray>): Result<String> = runCatching {
+    private val firstSyncSignals = mutableMapOf<String, CompletableDeferred<Unit>>()
+
+    override suspend fun createItem(item: Item, imageBytes: List<ByteArray>): Result<String> = runCatching {
         val uid = requireUid()
         val itemRef = itemsCollection(uid).document()
         val imageUrls = uploadImages(uid, itemRef.id, imageBytes)
         val now = System.currentTimeMillis()
-        itemRef.set(newItem.toCreateMap(imageUrls, createdAt = now, updatedAt = now)).await()
+        itemRef.set(item.toCreateMap(imageUrls, createdAt = now, updatedAt = now)).await()
         itemRef.id
     }
 
-    override suspend fun updateItem(itemId: String, edits: ItemEdits): Result<Unit> = runCatching {
+    override suspend fun updateItem(itemId: String, item: Item): Result<Unit> = runCatching {
         val uid = requireUid()
+        val updatedAt = System.currentTimeMillis()
         itemsCollection(uid).document(itemId)
-            .update(edits.toUpdateMap(updatedAt = System.currentTimeMillis()))
+            .update(item.toUpdateMap(updatedAt = updatedAt))
             .await()
+        itemDao.upsertAll(listOf(item.copy(id = itemId, updatedAt = updatedAt).toEntity(uid)))
         Unit
     }
 
     override suspend fun deleteItem(itemId: String): Result<Unit> = runCatching {
         val uid = requireUid()
         val folderRef = firebaseStorage.reference.child("users/$uid/items/$itemId")
-        // Best effort: an item with no photos (or already-orphaned files) shouldn't block deletion.
         runCatching { folderRef.listAll().await() }.getOrNull()?.items?.forEach { file ->
             runCatching { file.delete().await() }
         }
         itemsCollection(uid).document(itemId).delete().await()
+        itemDao.deleteById(itemId)
         Unit
     }
 
@@ -98,11 +90,6 @@ class FirestoreItemRepository @Inject constructor(
             .call(mapOf("itemId" to itemId))
             .await()
 
-        // The Cloud Function already wrote the new valuation fields straight to Firestore — re-read
-        // that document directly (bypassing Room) so we return the canonical fresh state, and push
-        // it into Room ourselves instead of waiting for the snapshot listener to eventually catch
-        // up. Without this, a caller that immediately re-reads via getItem() (Room-first) would see
-        // the stale pre-refresh value.
         val snapshot = itemsCollection(uid).document(itemId).get().await()
         val item = snapshot.toItem() ?: throw IllegalStateException("El artículo ya no existe.")
         itemDao.upsertAll(listOf(item.toEntity(uid)))
@@ -139,23 +126,31 @@ class FirestoreItemRepository @Inject constructor(
 
     override fun observeItems(): Flow<List<Item>> {
         val uid = firebaseAuth.currentUser?.uid ?: return emptyFlow()
-        startFirestoreSync(uid)
-        return itemDao.observeAll(uid).map { entities -> entities.map { it.toDomain() } }
+        val firstSync = startFirestoreSync(uid)
+        return flow {
+            firstSync.await()
+            emitAll(itemDao.observeAll(uid).map { entities -> entities.map { it.toDomain() } })
+        }
     }
 
-    /** Starts (once per [uid]) the Firestore listener that keeps Room in sync — [observeItems]
-     * itself only reads from Room, this is the write side of that cache. */
-    private fun startFirestoreSync(uid: String) {
-        if (!syncedOwnerIds.add(uid)) return
+    private fun startFirestoreSync(uid: String): CompletableDeferred<Unit> {
+        firstSyncSignals[uid]?.let { return it }
+        val signal = CompletableDeferred<Unit>()
+        firstSyncSignals[uid] = signal
         itemsCollection(uid)
             .orderBy("createdAt", Query.Direction.DESCENDING)
             .addSnapshotListener { snapshot, error ->
-                if (error != null) return@addSnapshotListener
+                if (error != null) {
+                    signal.complete(Unit)
+                    return@addSnapshotListener
+                }
                 val items = snapshot?.documents?.mapNotNull { it.toItem() } ?: emptyList()
                 repositoryScope.launch {
                     itemDao.replaceAll(uid, items.map { it.toEntity(uid) })
+                    signal.complete(Unit)
                 }
             }
+        return signal
     }
 
     private suspend fun uploadImages(uid: String, itemId: String, imageBytes: List<ByteArray>): List<String> =
@@ -171,12 +166,10 @@ class FirestoreItemRepository @Inject constructor(
     private fun itemsCollection(uid: String) =
         firestore.collection(USERS_COLLECTION).document(uid).collection(ITEMS_COLLECTION)
 
-    private fun NewItem.toCreateMap(imageUrls: List<String>, createdAt: Long, updatedAt: Long): Map<String, Any?> =
+    private fun Item.toCreateMap(imageUrls: List<String>, createdAt: Long, updatedAt: Long): Map<String, Any?> =
         commonFields(imageUrls) + mapOf(
             "createdAt" to createdAt,
             "updatedAt" to updatedAt,
-            // Seeds the history with the value entered at creation time, same shape refreshValuation
-            // (PROJECT_CONTEXT roadmap item 2) will append to later — no entry at all if left blank.
             "historialPrecios" to if (valoracionActual != null) {
                 listOf(mapOf("fecha" to createdAt, "precio" to valoracionActual))
             } else {
@@ -184,7 +177,7 @@ class FirestoreItemRepository @Inject constructor(
             },
         )
 
-    private fun ItemEdits.toUpdateMap(updatedAt: Long): Map<String, Any?> = mapOf(
+    private fun Item.toUpdateMap(updatedAt: Long): Map<String, Any?> = mapOf(
         "nombre" to nombre,
         "descripcion" to descripcion,
         "deporte" to deporte,
@@ -192,7 +185,7 @@ class FirestoreItemRepository @Inject constructor(
         "updatedAt" to updatedAt,
     )
 
-    private fun NewItem.commonFields(imageUrls: List<String>?): Map<String, Any?> = buildMap {
+    private fun Item.commonFields(imageUrls: List<String>?): Map<String, Any?> = buildMap {
         put("nombre", nombre)
         put("descripcion", descripcion)
         put("marca", marca)

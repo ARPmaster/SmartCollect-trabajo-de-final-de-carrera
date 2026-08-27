@@ -1,3 +1,4 @@
+// Vista custom que dibuja a mano la gráfica de área/línea de evolución de valor (6 meses), ya que el proyecto no usa ninguna librería de gráficos.
 package com.example.aicollect.presentation.collection
 
 import android.content.Context
@@ -11,11 +12,6 @@ import android.view.View
 import androidx.core.content.ContextCompat
 import com.example.aicollect.R
 
-/**
- * Hand-drawn area/line chart for "Evolución (6 meses)" (My Vault, Figma 2014:76), since there's
- * no charting library in the project. Values are plotted evenly spaced along the width,
- * normalized to the view's height.
- */
 class PortfolioLineChartView @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,

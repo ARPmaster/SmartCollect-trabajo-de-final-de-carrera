@@ -185,7 +185,6 @@
                     tools:text="🏀" />
             </LinearLayout>
 
-            <!-- Evolution chart card — same structure/tokens as My Vault (Figma 2014:76) -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"

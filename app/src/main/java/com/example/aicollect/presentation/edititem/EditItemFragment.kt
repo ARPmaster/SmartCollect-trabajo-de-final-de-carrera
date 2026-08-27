@@ -1,3 +1,4 @@
+// Pantalla de edición de un ítem ya publicado: formulario con los campos editables y su comunicación con EditItemViewModel.
 package com.example.aicollect.presentation.edititem
 
 import android.os.Bundle
@@ -22,10 +23,6 @@ import com.example.aicollect.presentation.showSnackbar
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 
-/** Completa el CRUD (roadmap: "Editar" seguía sin construir) — mismo estilo de formulario que
- * "Nueva Publicación" pero solo con los campos editables tras crear el item: nombre, descripción,
- * deporte, estado. Ni marca/modelo/edición ni ningún campo de valoración aparecen aquí, ver
- * [EditItemViewModel] kdoc. */
 @AndroidEntryPoint
 class EditItemFragment : Fragment() {
 

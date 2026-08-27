@@ -1,3 +1,4 @@
+// Operaciones de acceso a la tabla local de ítems (lectura, observación en tiempo real, alta, borrado y reemplazo completo tras sincronizar con Firestore).
 package com.example.aicollect.data.items.local
 
 import androidx.room.Dao
@@ -24,9 +25,6 @@ interface ItemDao {
     @Query("DELETE FROM items WHERE itemId = :itemId")
     suspend fun deleteById(itemId: String)
 
-    /** Firestore's snapshot always carries the *current full list* for the user, not a diff — so
-     * syncing means "this is now the whole truth", not "add these on top of what's there". A
-     * plain upsert would never remove a document deleted server-side. */
     @Transaction
     suspend fun replaceAll(ownerId: String, items: List<ItemEntity>) {
         clearForOwner(ownerId)

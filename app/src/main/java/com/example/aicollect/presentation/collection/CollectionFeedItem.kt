@@ -1,9 +1,8 @@
+// Modelo de presentación de un ítem para una tarjeta del feed de Home, y su conversión desde el modelo de dominio Item.
 package com.example.aicollect.presentation.collection
 
 import com.example.aicollect.application.items.Item
 
-/** UI-shaped view of a real [Item] for the Home feed — not a domain model, just what
- * [CollectionFeedAdapter] needs to render one card. */
 data class CollectionFeedItem(
     val id: String,
     val category: String,

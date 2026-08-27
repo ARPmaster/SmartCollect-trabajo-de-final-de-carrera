@@ -1,3 +1,5 @@
+/** Pantalla de inicio de sesión: recoge correo y contraseña, delega el login en el ViewModel
+ * y navega a Home si ya hay un usuario autenticado o cuando el login tiene éxito.*/
 package com.example.aicollect.presentation.auth
 
 import android.os.Bundle
@@ -21,7 +23,6 @@ import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 
-/** Visual + functional implementation of "Iniciar Sesión" (Figma 81:7 dark / 82:350 light). */
 @AndroidEntryPoint
 class LoginFragment : Fragment() {
 
@@ -71,12 +72,6 @@ class LoginFragment : Fragment() {
 
         binding.tvCreateAccount.setOnClickListener {
             findNavController().navigate(R.id.registerFragment)
-        }
-
-        // Botón visual del Figma sin login de Google real detrás todavía (2026-08-24, pedido
-        // explícito) — un aviso es mejor que dejarlo sin reacción al tocarlo.
-        binding.btnGoogleSignIn.setOnClickListener {
-            Snackbar.make(binding.root, R.string.login_google_coming_soon, Snackbar.LENGTH_SHORT).show()
         }
 
         viewLifecycleOwner.lifecycleScope.launch {

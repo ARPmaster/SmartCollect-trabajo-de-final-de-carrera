@@ -1,21 +1,23 @@
+/** ViewModel compartido del flujo "Nueva Publicación" (captura de fotos, reconocimiento automático,
+* desambiguación y formulario): guarda las fotos y el candidato elegido, valida el formulario,
+* detecta posibles duplicados en la colección y publica el ítem ya con su valoración de mercado.*/
 package com.example.aicollect.presentation.newpost
 
-import android.util.Base64
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.aicollect.application.items.Item
 import com.example.aicollect.application.items.ItemRepository
-import com.example.aicollect.application.items.NewItem
 import com.example.aicollect.application.items.ValuationResult
 import com.example.aicollect.application.recognition.RankedCandidate
 import com.example.aicollect.application.recognition.RecognitionRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
+import java.util.Base64
 import java.util.Locale
 import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.launch
 
 sealed interface RecognitionUiState {
@@ -27,38 +29,19 @@ sealed interface RecognitionUiState {
 
 sealed interface SaveItemUiState {
     data object Idle : SaveItemUiState
-    /** Covers both the market-price lookup and the actual Firestore write — from the user's point
-     * of view it's one action ("Publicar"), 2026-08-24 pedido explícito: antes eran dos pasos
-     * (crear vacío, luego `refreshValuation` en segundo plano) y el precio tardaba en aparecer. */
     data object Loading : SaveItemUiState
     data object Success : SaveItemUiState
     data class Error(val message: String) : SaveItemUiState
-    /** A required field is missing — kept separate from [Error] so the Fragment (which owns
-     * string resources, the ViewModel doesn't have a Context) picks the right localized message
-     * per [field] instead of the ViewModel hardcoding UI text. */
     data class ValidationError(val field: RequiredField) : SaveItemUiState
-    /** 2026-08-24, pedido explícito: ya hay un objeto muy parecido (misma marca+modelo+edición
-     * normalizados) en la colección del usuario — se pausa antes de publicar para que decida
-     * seguir o cancelar, en vez de crear un duplicado silencioso. */
     data class DuplicateWarning(val existingItemName: String) : SaveItemUiState
 }
 
-/** 2026-08-24 MVVM fix: which required field is missing was decided by `NewPostFragment` before
- * (an `if` chain in `onPublishClicked()`); that's a business rule ("this item isn't valid without
- * these fields"), so it now lives here — the Fragment only maps [RequiredField] to a string. */
 enum class RequiredField {
     NAME,
     SPORT,
     CONDITION,
 }
 
-/**
- * Shared state for the whole "Nueva Publicación" flow (Captura → Desambiguación → Formulario).
- * Activity-scoped (`by activityViewModels()`, MainActivity is the single Activity) instead of a
- * nested nav-graph ViewModel, so the flow's state survives the 3 fragment destinations without
- * needing Parcelable models — [reset] is called explicitly from MainActivity's "+" button so a
- * later run of the flow never inherits a previous one's candidates/photo.
- */
 @HiltViewModel
 class NewPostViewModel @Inject constructor(
     private val recognitionRepository: RecognitionRepository,
@@ -73,9 +56,6 @@ class NewPostViewModel @Inject constructor(
 
     private val _photos = mutableListOf<ByteArray>()
 
-    /** Up to [MAX_PHOTOS] compressed JPEGs, in upload order — carried through to the review form
-     * so they can be shown and uploaded, without re-reading the original URIs. Only [photos]`[0]`
-     * is ever sent to `recognizeItem` (2026-08-23 feedback: "solo se analiza la primera en subir"). */
     val photos: List<ByteArray> get() = _photos
 
     val canAddMorePhotos: Boolean get() = _photos.size < MAX_PHOTOS
@@ -83,7 +63,6 @@ class NewPostViewModel @Inject constructor(
     var candidates: List<RankedCandidate> = emptyList()
         private set
 
-    /** The candidate the user tapped in disambiguation; null means "Ninguno de estos" (manual entry). */
     var selectedCandidate: RankedCandidate? = null
 
     fun reset() {
@@ -95,37 +74,24 @@ class NewPostViewModel @Inject constructor(
         _saveState.value = SaveItemUiState.Idle
     }
 
-    /** Must be called right after [RecognitionUiState.Success]/[RecognitionUiState.Error] is
-     * handled (navigated on / shown). Otherwise, since [recognitionState] is a StateFlow, popping
-     * back from disambiguation re-subscribes it and immediately replays the stale Success value,
-     * bouncing straight back to disambiguation before the form ever shows. */
     fun acknowledgeRecognitionResult() {
         _recognitionState.value = RecognitionUiState.Idle
     }
 
-    /** Appends a photo (up to [MAX_PHOTOS]) without calling `recognizeItem` — either the
-     * "Rellenar manualmente" choice, or any photo after the first one, which is never re-analyzed
-     * (2026-08-23 feedback). Returns false if already at the cap, so the caller can tell the user. */
     fun addPhoto(imageBytes: ByteArray): Boolean {
         if (_photos.size >= MAX_PHOTOS) return false
         _photos.add(imageBytes)
         return true
     }
 
-    /** The "-" badge on a photo thumbnail (2026-08-23 feedback). Only removes that photo — a
-     * previously-selected candidate's text is left in the form fields, since the user may have
-     * already edited them and removing a photo shouldn't silently wipe that out. */
     fun removePhotoAt(index: Int) {
         if (index in _photos.indices) _photos.removeAt(index)
     }
 
-    /** Only ever called for the first photo (2026-08-23 feedback: "solo se analiza la primera en
-     * subir") — the choice dialog in [NewPostFragment] only offers automatic analysis when the
-     * photo list was empty before this one was added. */
     fun recognize(imageBytes: ByteArray) {
         _recognitionState.value = RecognitionUiState.Loading
         viewModelScope.launch {
-            val imageBase64 = Base64.encodeToString(imageBytes, Base64.NO_WRAP)
+            val imageBase64 = Base64.getEncoder().encodeToString(imageBytes)
             recognitionRepository.recognizeItem(imageBase64)
                 .onSuccess { result ->
                     candidates = result
@@ -139,9 +105,6 @@ class NewPostViewModel @Inject constructor(
         }
     }
 
-    /** Datos ya validados de una publicación pendiente — se guardan aquí en vez de repasarlos por
-     * parámetro cuando el usuario confirma [confirmPublishDespiteDuplicate] tras el aviso de
-     * duplicado, para no repetir la validación de campos requeridos. */
     private data class PendingPublish(
         val nombre: String,
         val descripcion: String?,
@@ -156,13 +119,6 @@ class NewPostViewModel @Inject constructor(
 
     private var pendingPublish: PendingPublish? = null
 
-    /** Validates and builds the publish request (2026-08-24 MVVM fix: this used to be
-     * `NewPostFragment.onPublishClicked()`'s job — required-field checks and shaping the domain
-     * model are business rules, not view rendering). The Fragment only forwards the raw text/
-     * selections the user typed/picked.
-     *
-     * 2026-08-24, misma sesión: si ya hay algo muy parecido en la colección del usuario, se pausa
-     * en [SaveItemUiState.DuplicateWarning] en vez de publicar directamente. */
     fun saveItem(name: String, description: String?, sport: String?, condition: String?) {
         val trimmedName = name.trim()
         if (trimmedName.isEmpty()) {
@@ -188,9 +144,6 @@ class NewPostViewModel @Inject constructor(
             procedencia = candidate?.procedencia,
             deporte = sport,
             estado = condition,
-            // 2026-08-24, decisión confirmada por el usuario: guarda el score de ranking del
-            // candidato (visión + consenso + confianza combinados), no la confianza cruda de
-            // Gemini — antes era candidate.confianza.
             confianzaIdentificacion = candidate?.score,
         )
 
@@ -205,42 +158,31 @@ class NewPostViewModel @Inject constructor(
         }
     }
 
-    /** El usuario vio [SaveItemUiState.DuplicateWarning] y quiere publicar igualmente (puede ser
-     * un segundo ejemplar real del mismo objeto). */
     fun confirmPublishDespiteDuplicate() {
         val request = pendingPublish ?: return
         pendingPublish = null
         viewModelScope.launch { publish(request) }
     }
 
-    /** El usuario canceló tras ver el aviso de duplicado — vuelve al formulario sin publicar. */
     fun dismissDuplicateWarning() {
         pendingPublish = null
         _saveState.value = SaveItemUiState.Idle
     }
 
-    /** Compara contra la colección ya sincronizada en Room (misma clave que products_cache en el
-     * backend: marca+modelo+edición normalizados, o el nombre si el item se creó a mano) — lectura
-     * local, no gasta ninguna llamada de red. */
     private suspend fun findSimilarExistingItem(request: PendingPublish): Item? {
         val key = productKey(request.marca, request.modelo, request.edicion, request.nombre)
-        return itemRepository.observeItems().first()
-            .firstOrNull { productKey(it.marca, it.modelo, it.edicion, it.nombre) == key }
+        return itemRepository.observeItems().firstOrNull()
+            ?.firstOrNull { productKey(it.marca, it.modelo, it.edicion, it.nombre) == key }
     }
 
     private suspend fun publish(request: PendingPublish) {
         _saveState.value = SaveItemUiState.Loading
 
-        // Búsqueda de precio ANTES de crear el item (2026-08-24, pedido explícito): así se escribe
-        // en Firestore en una sola operación, ya con el precio puesto, en vez de crear vacío y
-        // actualizar después (dejaba un hueco visible en "Sin valorar"). Si la búsqueda falla, no
-        // se bloquea la publicación — el item se guarda sin valorar, igual que si el usuario lo
-        // hubiera creado antes de que existiera esta búsqueda automática.
         val valuation = itemRepository
             .searchValuation(request.nombre, request.marca, request.modelo, request.edicion)
             .getOrElse { ValuationResult(precio = null, min = null, max = null, moneda = DEFAULT_CURRENCY, fuentes = emptyList()) }
 
-        val newItem = NewItem(
+        val newItem = Item(
             nombre = request.nombre,
             descripcion = request.descripcion,
             marca = request.marca,
@@ -273,9 +215,6 @@ class NewPostViewModel @Inject constructor(
         return normalizeKey(structured.ifBlank { nombre })
     }
 
-    /** Misma normalización que `normalizeKey` en refreshValuation.ts (Cloud Function) — palabras
-     * ordenadas alfabéticamente para que "Nike Air Force 1" y "Air Force 1 Nike" sigan contando
-     * como el mismo producto tanto para el precio compartido como para este aviso de duplicado. */
     private fun normalizeKey(text: String): String =
         text.trim().lowercase(Locale.ROOT)
             .replace(Regex("[^a-z0-9\\s]+"), " ")

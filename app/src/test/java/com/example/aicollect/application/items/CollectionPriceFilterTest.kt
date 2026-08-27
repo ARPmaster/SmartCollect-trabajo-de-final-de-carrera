@@ -1,3 +1,4 @@
+// Test unitario de CollectionPriceFilter: comprueba si un precio cae dentro de un rango, incluyendo los límites.
 package com.example.aicollect.application.items
 
 import org.junit.Assert.assertFalse

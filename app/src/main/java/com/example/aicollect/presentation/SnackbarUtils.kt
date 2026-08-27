@@ -1,3 +1,4 @@
+// Funciones de extensión para mostrar Snackbars en cualquier Fragment, ancladas por encima de la barra de navegación inferior cuando esta está visible.
 package com.example.aicollect.presentation
 
 import android.view.View
@@ -7,13 +8,6 @@ import androidx.fragment.app.Fragment
 import com.example.aicollect.R
 import com.google.android.material.snackbar.Snackbar
 
-/**
- * `MainActivity`'s bottom nav bar is a custom `<include>` inside the same `CoordinatorLayout` as
- * the Fragment content — not a `BottomNavigationView`, so it has none of Material's built-in
- * Snackbar-avoidance behavior. A plain `Snackbar.make(...)` renders underneath it, unreadable
- * (2026-08-24 user feedback). Anchoring explicitly above it — when it's actually visible, i.e. on
- * Home/My Vault/Detalle, not the full-screen destinations where it's `GONE` — fixes that.
- */
 fun Fragment.showSnackbar(view: View, message: CharSequence, duration: Int = Snackbar.LENGTH_LONG): Snackbar {
     val snackbar = Snackbar.make(view, message, duration)
     anchorAboveBottomNavIfVisible(snackbar)

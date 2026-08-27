@@ -1,3 +1,4 @@
+// ViewModel de la pantalla de login: valida las credenciales, delega el inicio de sesión en AuthRepository y expone el resultado como estado de UI.
 package com.example.aicollect.presentation.auth
 
 import androidx.lifecycle.ViewModel
@@ -25,7 +26,6 @@ class LoginViewModel @Inject constructor(
     private val _uiState = MutableStateFlow<LoginUiState>(LoginUiState.Idle)
     val uiState: StateFlow<LoginUiState> = _uiState.asStateFlow()
 
-    /** True if there's already a signed-in Firebase user, so Login can skip itself on launch. */
     fun isAlreadySignedIn(): Boolean = authRepository.getCurrentUserId() != null
 
     fun signIn(email: String, password: String) {

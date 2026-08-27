@@ -44,9 +44,6 @@
         android:layout_height="1dp"
         android:background="@color/collect_toolbar_border" />
 
-    <!-- Wraps the scrollable body + the loading overlay, so the overlay dims/blocks only the
-         form area and never the header above — the back button must stay reachable during
-         analysis (2026-08-23 feedback: "back" got stuck feeling blocked mid-analysis before). -->
     <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="0dp"
@@ -135,10 +132,6 @@
                             android:textStyle="bold" />
                     </LinearLayout>
 
-                    <!-- Up to 3 photo thumbnails + an "add" tile, built programmatically in
-                         NewPostFragment.renderPhotos() (2026-08-23 feedback: photos are additive,
-                         not a single replaceable preview, max 3 per item). Shown instead of
-                         upload_placeholder once there's at least one photo. -->
                     <LinearLayout
                         android:id="@+id/photo_thumbnails_row"
                         android:layout_width="wrap_content"
@@ -149,7 +142,6 @@
                         android:visibility="gone" />
                 </FrameLayout>
 
-                <!-- Título del objeto -->
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -180,7 +172,6 @@
                         android:textSize="15sp" />
                 </FrameLayout>
 
-                <!-- Descripción detallada -->
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -211,7 +202,6 @@
                         android:textSize="15sp" />
                 </FrameLayout>
 
-                <!-- Deporte -->
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -250,7 +240,6 @@
                         android:src="@drawable/ic_chevron_down" />
                 </LinearLayout>
 
-                <!-- Estado -->
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -303,9 +292,6 @@
             </LinearLayout>
         </ScrollView>
 
-        <!-- Loading overlay (2026-08-23 feedback: replaces the old inline "Analizando…" row with
-             a dimmed full-body overlay + gold spinner/text). clickable+focusable so it swallows
-             touches to the form underneath while visible. -->
         <FrameLayout
             android:id="@+id/overlay_loading"
             android:layout_width="match_parent"

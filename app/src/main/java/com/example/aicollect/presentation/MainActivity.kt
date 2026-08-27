@@ -1,3 +1,6 @@
+/** Activity única de la app: aloja el NavHostFragment, el drawer lateral, la barra inferior y la
+ * app bar compartidos, y decide para cada destino de navegación si se muestran o si la pantalla
+ * va a pantalla completa.*/
 package com.example.aicollect.presentation
 
 import android.content.res.ColorStateList
@@ -43,14 +46,8 @@ class MainActivity : AppCompatActivity() {
     private var latestBottomInset = 0
     private val bottomBarBaseHeightPx by lazy { (80 * resources.displayMetrics.density).roundToInt() }
 
-    /** Toolbar (65dp) + its bottom border (1dp) — the app bar's own content height, insets aside. */
     private val appBarContentHeightPx by lazy { (66 * resources.displayMetrics.density).roundToInt() }
 
-    /**
-     * Auth screens and drawer detail screens render full-screen, without the shared
-     * drawer/toolbar/bottom-nav chrome (brief Sección 2/7) — each owns its own back-arrow header
-     * instead, matching the Figma mocks for Editar Perfil/Seguridad/Ayuda/Sobre la app.
-     */
     private val fullScreenDestinationIds = setOf(
         R.id.loginFragment,
         R.id.registerFragment,
@@ -58,23 +55,13 @@ class MainActivity : AppCompatActivity() {
         R.id.securityFragment,
         R.id.helpFragment,
         R.id.aboutFragment,
-        // Nueva Publicación (brief Sección 6): captura → desambiguación → formulario is a linear
-        // modal flow, same chrome treatment as Auth/Drawer settings.
         R.id.newPostFragment,
         R.id.newPostDisambiguationFragment,
-        // Editar objeto (roadmap CRUD, 2026-08-24): mismo tratamiento modal que Nueva Publicación.
         R.id.editItemFragment,
     )
 
-    /**
-     * Detalle de objeto/carta (Figma 73:55/74:180) keeps the shared app bar and bottom nav —
-     * it's a regular destination reached from Home/My Vault, not the Drawer's settings flow —
-     * but swaps the toolbar's hamburger icon for a back arrow (brief Sección 2: "El Toolbar
-     * cambia entre icono ☰... y flecha atrás... pantallas de detalle").
-     */
     private val backButtonDestinationIds = setOf(R.id.itemDetailFragment)
 
-    /** The filter icon only makes sense filtering the Home feed — every other screen just keeps the hamburger menu. */
     private val filterVisibleDestinationIds = setOf(R.id.homeFragment)
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -133,8 +120,6 @@ class MainActivity : AppCompatActivity() {
             navController.navigate(R.id.homeFragment)
         }
         bottomBar.findViewById<View>(R.id.btn_nav_add).setOnClickListener {
-            // Discard any leftover state from a previous, possibly-abandoned run of the flow
-            // (candidates, captured photo) before starting a fresh one.
             newPostViewModel.reset()
             navController.navigate(R.id.newPostFragment)
         }
@@ -170,9 +155,6 @@ class MainActivity : AppCompatActivity() {
                 getString(if (isBackButtonMode) R.string.cd_item_detail_back else R.string.cd_open_menu)
             binding.btnOpenFilters.visibility =
                 if (destination.id in filterVisibleDestinationIds) View.VISIBLE else View.GONE
-            // Cheap: local FirebaseAuth reads + a Coil call that hits its memory cache after the
-            // first load, so refreshing on every nav change keeps EditProfile's edits reflected
-            // here without needing an explicit "profile changed" event/callback.
             refreshDrawerProfile()
         }
 
@@ -226,11 +208,6 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    /**
-     * The app targets SDK 36, so Android 15+ enforces edge-to-edge: our own views are
-     * responsible for staying clear of the status bar / camera cutout / gesture nav bar
-     * instead of the system reserving that space for us.
-     */
     private fun setUpInsets() {
         ViewCompat.setOnApplyWindowInsetsListener(binding.root) { _, insets ->
             val topSafeArea = insets.getInsets(

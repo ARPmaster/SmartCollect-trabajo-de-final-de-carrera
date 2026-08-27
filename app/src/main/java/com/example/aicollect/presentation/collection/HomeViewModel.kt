@@ -1,3 +1,5 @@
+/** ViewModel de Home: combina la colección observada con los filtros activos
+ para producir la lista visible y el resumen de valor total. */
 package com.example.aicollect.presentation.collection
 
 import androidx.lifecycle.ViewModel
@@ -5,7 +7,9 @@ import androidx.lifecycle.viewModelScope
 import com.example.aicollect.application.items.CollectionPriceFilter
 import com.example.aicollect.application.items.Item
 import com.example.aicollect.application.items.ItemRepository
+import com.example.aicollect.application.items.ItemSortOption
 import com.example.aicollect.application.items.PortfolioAnalytics
+import com.example.aicollect.application.items.sortedByOption
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -19,35 +23,40 @@ sealed interface HomeUiState {
     data object Loading : HomeUiState
     data class Content(
         val isCollectionEmpty: Boolean,
+        val hasNoFilterResults: Boolean,
         val visibleItems: List<Item>,
         val summary: CollectionSummary,
     ) : HomeUiState
     data class Error(val message: String) : HomeUiState
 }
 
-/**
- * Owns the price-range filter and the resulting visible-items decision (2026-08-24, MVVM fix):
- * this used to live in HomeFragment (`activePriceRange`/`renderCurrentState()`), which meant the
- * View was deciding what to show instead of just rendering what the ViewModel gives it. The
- * Fragment now only forwards the filter-sheet result via [setPriceRange] and renders [uiState].
- */
+private data class ActiveFilters(
+    val priceRange: IntRange? = null,
+    val sport: String? = null,
+    val condition: String? = null,
+    val sort: ItemSortOption = ItemSortOption.DEFAULT,
+)
+
 @HiltViewModel
 class HomeViewModel @Inject constructor(itemRepository: ItemRepository) : ViewModel() {
 
-    /** Null means "no filter active" — matches the Fragment's previous default. */
-    private val _priceRange = MutableStateFlow<IntRange?>(null)
+    private val _filters = MutableStateFlow(ActiveFilters())
 
     val uiState: StateFlow<HomeUiState> = combine(
         itemRepository.observeItems(),
-        _priceRange,
-    ) { items, range ->
-        val visibleItems = if (range != null) {
-            items.filter { CollectionPriceFilter.isWithinRange(it.valoracionActual ?: 0.0, range.first, range.last) }
-        } else {
-            items
-        }
+        _filters,
+    ) { items, filters ->
+        val visibleItems = items.filter { item ->
+            val matchesPrice = filters.priceRange?.let { range ->
+                CollectionPriceFilter.isWithinRange(item.valoracionActual ?: 0.0, range.first, range.last)
+            } ?: true
+            val matchesSport = filters.sport?.let { it == item.deporte } ?: true
+            val matchesCondition = filters.condition?.let { it == item.estado } ?: true
+            matchesPrice && matchesSport && matchesCondition
+        }.sortedByOption(filters.sort)
         val content: HomeUiState = HomeUiState.Content(
             isCollectionEmpty = items.isEmpty(),
+            hasNoFilterResults = items.isNotEmpty() && visibleItems.isEmpty(),
             visibleItems = visibleItems,
             summary = summaryFor(items),
         )
@@ -56,11 +65,8 @@ class HomeViewModel @Inject constructor(itemRepository: ItemRepository) : ViewMo
         .catch { emit(HomeUiState.Error(it.message ?: "No se pudo cargar tu colección.")) }
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(STOP_TIMEOUT_MS), HomeUiState.Loading)
 
-    /** Called from `FilterBottomSheetFragment`'s result, forwarded by `HomeFragment` — a plain
-     * user-input event, not a decision, so this doesn't violate MVVM the way owning the filtered
-     * list in the Fragment did. */
-    fun setPriceRange(minPrice: Int, maxPrice: Int) {
-        _priceRange.value = minPrice..maxPrice
+    fun setFilters(minPrice: Int, maxPrice: Int, sport: String?, condition: String?, sort: ItemSortOption) {
+        _filters.value = ActiveFilters(priceRange = minPrice..maxPrice, sport = sport, condition = condition, sort = sort)
     }
 
     private fun summaryFor(items: List<Item>): CollectionSummary {
@@ -75,8 +81,6 @@ class HomeViewModel @Inject constructor(itemRepository: ItemRepository) : ViewMo
 
     private companion object {
         const val STOP_TIMEOUT_MS = 5_000L
-        // All items are created with EUR today (see NewPostViewModel) — once currency
-        // becomes per-item/configurable, this total needs its own conversion strategy.
         const val CURRENCY = "EUR"
     }
 }

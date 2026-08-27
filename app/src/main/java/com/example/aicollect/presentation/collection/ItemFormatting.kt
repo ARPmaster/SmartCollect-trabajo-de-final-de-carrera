@@ -1,3 +1,4 @@
+// Funciones compartidas de formato de precio y fecha de un ítem, usadas por Home, My Vault y el detalle para que un mismo valor se muestre siempre igual.
 package com.example.aicollect.presentation.collection
 
 import java.time.Instant
@@ -5,14 +6,11 @@ import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 import java.util.Locale
 
-/** Shared display formatting for [com.example.aicollect.application.items.Item], used by
- * Home/My Vault/Detail so a value/date reads the same everywhere. */
 object ItemFormatting {
 
     private val SPANISH = Locale("es", "ES")
     private val DATE_FORMATTER = DateTimeFormatter.ofPattern("dd/MM/yyyy", SPANISH)
 
-    /** "Sin valorar" when null — never a fabricated number (see PortfolioAnalytics kdoc). */
     fun formatValue(value: Double?, currency: String): String {
         if (value == null) return "Sin valorar"
         return "%,.0f%s".format(SPANISH, value, currencySymbol(currency))

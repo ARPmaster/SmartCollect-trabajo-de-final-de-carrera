@@ -1,3 +1,4 @@
+// Test unitario de LoginViewModel: validación de email/contraseña en blanco y el inicio de sesión feliz y con error del repositorio.
 package com.example.aicollect.presentation.auth
 
 import com.example.aicollect.application.auth.AuthRepository

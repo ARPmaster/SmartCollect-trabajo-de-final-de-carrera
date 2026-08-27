@@ -1,3 +1,4 @@
+// Implementación de RecognitionRepository que llama a la Cloud Function de reconocimiento de imágenes y traduce su respuesta a los candidatos del modelo de dominio.
 package com.example.aicollect.data.recognition
 
 import com.example.aicollect.application.recognition.RankedCandidate

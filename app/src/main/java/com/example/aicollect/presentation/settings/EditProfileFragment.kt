@@ -1,3 +1,5 @@
+// Pantalla "Editar Perfil": cambia el nombre mostrado y la foto de perfil del usuario, con
+// bloqueo de navegación mientras se sube una foto y aviso de nombre duplicado.
 package com.example.aicollect.presentation.settings
 
 import android.graphics.Bitmap
@@ -31,7 +33,6 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
-/** "Editar Perfil" screen (Figma 91:136 claro / 91:188 oscuro), opened from the drawer. */
 @AndroidEntryPoint
 class EditProfileFragment : Fragment() {
 
@@ -40,8 +41,6 @@ class EditProfileFragment : Fragment() {
 
     private val viewModel: EditProfileViewModel by viewModels()
 
-    /** Enabled only while a photo upload is in flight, so the user can't navigate away and
-     * cancel it mid-write (popping the Fragment would clear the ViewModel and its coroutine). */
     private val blockNavigationWhileUploadingCallback = object : OnBackPressedCallback(false) {
         override fun handleOnBackPressed() {
             Snackbar.make(binding.root, R.string.edit_profile_photo_uploading_wait, Snackbar.LENGTH_SHORT).show()
@@ -54,8 +53,6 @@ class EditProfileFragment : Fragment() {
         if (uri == null) return@registerForActivityResult
         binding.ivAvatar.load(uri)
         viewLifecycleOwner.lifecycleScope.launch {
-            // Decoding/compressing is real I/O (worse for content:// URIs backed by cloud photos,
-            // which can block on a network fetch) — must never run on the main thread.
             val imageBytes = withContext(Dispatchers.IO) { decodeAndCompress(uri) }
             if (imageBytes != null) {
                 viewModel.uploadProfilePhoto(imageBytes)
@@ -159,7 +156,6 @@ class EditProfileFragment : Fragment() {
         }
     }
 
-    /** Red border on the input's box for [NAME_TAKEN_BORDER_MS], plus a high-visibility red Snackbar. */
     private fun showNameTakenFeedback(message: String) {
         binding.boxFullName.background = ContextCompat.getDrawable(requireContext(), R.drawable.bg_auth_input_error)
         Snackbar.make(binding.root, message, Snackbar.LENGTH_LONG)

@@ -1,3 +1,5 @@
+/** Adaptador de RecyclerView del feed de Home: combina la cabecera de valor total y las tarjetas
+ * de ítems en una sola lista diferenciable, e infla/vincula cada tipo de fila.*/
 package com.example.aicollect.presentation.collection
 
 import android.view.LayoutInflater
@@ -13,17 +15,12 @@ import com.example.aicollect.databinding.ItemTotalValueHeaderBinding
 private const val VIEW_TYPE_HEADER = 0
 private const val VIEW_TYPE_FEED_ITEM = 1
 
-/** Header content for the "TOTAL COLLECTION VALUE" card, computed from real items — see
- * [com.example.aicollect.application.items.PortfolioAnalytics]. */
 data class CollectionSummary(
     val totalValueLabel: String,
     val changeLabel: String?,
     val itemCountLabel: String,
 )
 
-/** One row of the Home feed: the summary header, or a collection item — a single sealed list so
- * [CollectionFeedAdapter] (a [ListAdapter]) can diff the whole feed in one shot instead of the
- * Fragment rebuilding the adapter from scratch on every state emission. */
 sealed interface FeedRow {
     data class Header(val summary: CollectionSummary) : FeedRow
     data class ItemRow(val item: CollectionFeedItem) : FeedRow
@@ -87,6 +84,5 @@ class CollectionFeedAdapter(
     }
 }
 
-/** Builds the flat [FeedRow] list an [CollectionFeedAdapter] diffs against — header always first. */
 fun buildFeedRows(items: List<CollectionFeedItem>, summary: CollectionSummary): List<FeedRow> =
     listOf(FeedRow.Header(summary)) + items.map { FeedRow.ItemRow(it) }

@@ -1,7 +1,6 @@
+// Comprueba si el precio de un ítem cae dentro del rango de precios elegido en el filtro de Home.
 package com.example.aicollect.application.items
 
-/** Whether a real item's `valoracionActual` (0.0 for unvalued items, never fabricated) falls
- * inside the range picked in the Home filter sheet. */
 object CollectionPriceFilter {
 
     fun isWithinRange(price: Double, minPrice: Int, maxPrice: Int): Boolean =

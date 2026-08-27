@@ -1,3 +1,6 @@
+/** ViewModel del detalle de un ítem: carga sus datos, calcula el contenido listo para pintar
+* (evolución de precio, rango de valoración, emoji de deporte), refresca la valoración en
+* segundo plano si está desactualizada, y gestiona su eliminación.*/
 package com.example.aicollect.presentation.collection
 
 import androidx.lifecycle.ViewModel
@@ -8,6 +11,7 @@ import com.example.aicollect.application.items.PortfolioAnalytics
 import dagger.hilt.android.lifecycle.HiltViewModel
 import java.util.Locale
 import javax.inject.Inject
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -24,8 +28,6 @@ sealed interface ItemDetailUiState {
         val sportEmoji: String,
         val evolution: List<Float>,
         val monthLabels: List<String>,
-        /** null oculta la fila del rango en el Fragment — no hay rango hasta que el refresco
-         * automático en segundo plano ([refreshValuationSilently]) encuentra datos fiables. */
         val valuationRangeLabel: String?,
     ) : ItemDetailUiState
     data class Error(val message: String) : ItemDetailUiState
@@ -38,18 +40,6 @@ sealed interface DeleteItemUiState {
     data class Error(val message: String) : DeleteItemUiState
 }
 
-/**
- * 2026-08-24 MVVM fix: `ItemDetailFragment.bind()` llamaba directo a `PortfolioAnalytics`/
- * `ItemFormatting`/el mapeo de emoji de deporte. Ahora [ItemDetailUiState.Content] ya trae todo
- * calculado, el Fragment solo pinta.
- *
- * 2026-08-24, misma sesión: añadida la valoración de mercado (Gemini + grounding en Google
- * Search, sustituye a la idea original de eBay Browse API), calculada en segundo plano al crear
- * el item y refrescada sola si tiene más de 30 días — sin botón manual ni fuentes visibles: los
- * "chips" de fuente resultaron ser enlaces a una búsqueda de Google, no al anuncio real (esta API
- * no expone eso), así que se decidió no mostrarlos y quitar también el botón "Actualizar valor"
- * para no prometer control manual sobre algo que igualmente se recalcula solo.
- */
 @HiltViewModel
 class ItemDetailViewModel @Inject constructor(
     private val itemRepository: ItemRepository,
@@ -63,27 +53,26 @@ class ItemDetailViewModel @Inject constructor(
 
     private var currentItemId: String? = null
 
+    private var loadJob: Job? = null
+
     fun load(itemId: String) {
         currentItemId = itemId
         _uiState.value = ItemDetailUiState.Loading
-        viewModelScope.launch {
+        loadJob?.cancel()
+        loadJob = viewModelScope.launch {
             itemRepository.getItem(itemId)
                 .onSuccess { item ->
+                    if (currentItemId != itemId) return@onSuccess
                     _uiState.value = item.toContent()
-                    // Auto-refresco silencioso (2026-08-24, pedido explícito, sustituye a un
-                    // Cloud Scheduler real por coste/tiempo — ver PROJECT_CONTEXT.md): si nunca se
-                    // valoró o el último precio tiene más de 30 días, se comprueba solo al abrir
-                    // esta pantalla, sin botón ni Snackbar — no hay UI manual para esto.
                     if (item.needsValuationRefresh()) refreshValuationSilently(itemId)
                 }
                 .onFailure {
+                    if (currentItemId != itemId) return@onFailure
                     _uiState.value = ItemDetailUiState.Error(it.message ?: "No se pudo cargar el artículo.")
                 }
         }
     }
 
-    /** Completa el CRUD (roadmap: "Eliminar" seguía sin construir) — el propio [ItemRepository]
-     * ya borraba también las fotos de Storage, solo faltaba una pantalla que lo llamara. */
     fun deleteItem() {
         val itemId = currentItemId ?: return
         _deleteState.value = DeleteItemUiState.Deleting
@@ -101,8 +90,8 @@ class ItemDetailViewModel @Inject constructor(
     private fun refreshValuationSilently(itemId: String) {
         viewModelScope.launch {
             itemRepository.refreshValuation(itemId)
-                .onSuccess { _uiState.value = it.toContent() }
-                .onFailure { /* silencioso a propósito: es un chequeo automático, no una acción del usuario */ }
+                .onSuccess { if (currentItemId == itemId) _uiState.value = it.toContent() }
+                .onFailure { }
         }
     }
 
@@ -138,8 +127,6 @@ class ItemDetailViewModel @Inject constructor(
     }
 
     private companion object {
-        // Mismo umbral que products_cache en refreshValuation.ts (Cloud Function), para que "está
-        // viejo" signifique lo mismo en los dos sitios.
         const val STALE_VALUATION_MS = 30L * 24 * 60 * 60 * 1000
     }
 }

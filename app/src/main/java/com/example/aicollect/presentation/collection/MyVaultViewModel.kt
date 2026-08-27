@@ -1,3 +1,6 @@
+/**ViewModel de My Vault: transforma la colección observada en el contenido ya calculado de la
+*pantalla (evolución, distribución por deporte/estado, artículos más valorados), aplicando el
+* filtro de deporte elegido en los chips.*/
 package com.example.aicollect.presentation.collection
 
 import androidx.lifecycle.ViewModel
@@ -7,10 +10,11 @@ import com.example.aicollect.application.items.ItemRepository
 import com.example.aicollect.application.items.PortfolioAnalytics
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.catch
-import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
 
 data class TopValuedItemUi(
@@ -19,8 +23,6 @@ data class TopValuedItemUi(
     val nombre: String,
     val subtitle: String,
     val valueLabel: String,
-    val changeLabel: String?,
-    val isPositiveChange: Boolean,
 )
 
 sealed interface MyVaultUiState {
@@ -31,62 +33,60 @@ sealed interface MyVaultUiState {
         val changeLabel: String?,
         val evolution: List<Float>,
         val monthLabels: List<String>,
-        /** (nombre del deporte, porcentaje) — ya ordenado por frecuencia, el Fragment solo toma
-         * los 3 primeros huecos que tiene el layout (limitación ya documentada, sin cambios). */
         val sportDistribution: List<Pair<String, Int>>,
-        /** estado (string real del dominio, ej. "Nuevo") → porcentaje. El orden fijo y los
-         * colores por estado siguen siendo del Fragment porque dependen de
-         * `R.array.filter_condition_options` y de colores resueltos — eso sí es una decisión de
-         * vista, no de negocio. */
         val conditionPercentByEstado: Map<String, Int>,
+        val hasItemsForSelectedSport: Boolean,
+        val selectedSport: String?,
         val totalItemsLabel: String,
         val topValuedItems: List<TopValuedItemUi>,
     ) : MyVaultUiState
     data class Error(val message: String) : MyVaultUiState
 }
 
-/**
- * 2026-08-24 MVVM fix: todo el cálculo de "My Vault" (evolución, distribución por deporte/estado,
- * artículos más valorados) vivía en `MyVaultFragment`, llamando directo a `PortfolioAnalytics`/
- * `ItemFormatting`. El ViewModel se limitaba a reexponer `observeItems()` sin transformar nada —
- * la Vista decidía, no el ViewModel. Ahora [uiState] ya trae todo listo para pintar.
- */
 @HiltViewModel
 class MyVaultViewModel @Inject constructor(itemRepository: ItemRepository) : ViewModel() {
 
-    val uiState: StateFlow<MyVaultUiState> = itemRepository.observeItems()
-        .map<List<Item>, MyVaultUiState> { items -> if (items.isEmpty()) MyVaultUiState.Empty else buildContent(items) }
+    private val _selectedSport = MutableStateFlow<String?>(null)
+
+    val uiState: StateFlow<MyVaultUiState> = combine(
+        itemRepository.observeItems(),
+        _selectedSport,
+    ) { items, selectedSport ->
+        if (items.isEmpty()) MyVaultUiState.Empty else buildContent(items, selectedSport)
+    }
         .catch { emit(MyVaultUiState.Error(it.message ?: "No se pudo cargar tu cartera.")) }
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(STOP_TIMEOUT_MS), MyVaultUiState.Loading)
 
-    private fun buildContent(items: List<Item>): MyVaultUiState.Content {
+    fun selectSport(sport: String?) {
+        _selectedSport.value = sport
+    }
+
+    private fun buildContent(items: List<Item>, selectedSport: String?): MyVaultUiState.Content {
         val evolution = PortfolioAnalytics.monthlyEvolution(items)
+        val itemsForSelectedSport = selectedSport?.let { sport -> items.filter { it.deporte == sport } } ?: items
         return MyVaultUiState.Content(
             totalValueLabel = ItemFormatting.formatValue(PortfolioAnalytics.totalValue(items), CURRENCY),
             changeLabel = ItemFormatting.formatChangePercent(PortfolioAnalytics.changePercent(evolution)),
             evolution = evolution,
             monthLabels = PortfolioAnalytics.monthLabels(),
             sportDistribution = PortfolioAnalytics.distributionBy(items) { it.deporte },
-            conditionPercentByEstado = PortfolioAnalytics.distributionBy(items) { it.estado }.toMap(),
+            conditionPercentByEstado = PortfolioAnalytics.distributionBy(itemsForSelectedSport) { it.estado }.toMap(),
+            hasItemsForSelectedSport = itemsForSelectedSport.isNotEmpty(),
+            selectedSport = selectedSport,
             totalItemsLabel = items.size.toString(),
-            topValuedItems = PortfolioAnalytics.topValued(items).map { it.toTopValuedItemUi() },
+            topValuedItems = PortfolioAnalytics.topValued(itemsForSelectedSport).map { it.toTopValuedItemUi() },
         )
     }
 
-    private fun Item.toTopValuedItemUi(): TopValuedItemUi {
-        val changePercent = PortfolioAnalytics.itemChangePercent(this)
-        return TopValuedItemUi(
-            id = id,
-            imageUrl = imageUrls.firstOrNull(),
-            nombre = nombre,
-            subtitle = listOfNotNull(marca.takeIf { it.isNotBlank() }, estado.takeIf { it.isNotBlank() })
-                .joinToString(" • ")
-                .ifEmpty { deporte },
-            valueLabel = ItemFormatting.formatValue(valoracionActual, valoracionMoneda),
-            changeLabel = ItemFormatting.formatChangePercent(changePercent),
-            isPositiveChange = (changePercent ?: 0f) >= 0f,
-        )
-    }
+    private fun Item.toTopValuedItemUi(): TopValuedItemUi = TopValuedItemUi(
+        id = id,
+        imageUrl = imageUrls.firstOrNull(),
+        nombre = nombre,
+        subtitle = listOfNotNull(marca.takeIf { it.isNotBlank() }, estado.takeIf { it.isNotBlank() })
+            .joinToString(" • ")
+            .ifEmpty { deporte },
+        valueLabel = ItemFormatting.formatValue(valoracionActual, valoracionMoneda),
+    )
 
     private companion object {
         const val STOP_TIMEOUT_MS = 5_000L

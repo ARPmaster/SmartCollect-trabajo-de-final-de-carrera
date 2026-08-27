@@ -1,3 +1,4 @@
+// Módulo Hilt que provee la base de datos Room y su DAO de ítems.
 package com.example.aicollect.data.di
 
 import android.content.Context
@@ -19,8 +20,6 @@ object DatabaseModule {
     @Singleton
     fun provideAppDatabase(@ApplicationContext context: Context): AppDatabase =
         Room.databaseBuilder(context, AppDatabase::class.java, "aicollect.db")
-            // Room es solo caché de Firestore, nunca la fuente de verdad — perder el contenido
-            // local en un bump de versión de esquema es seguro, se repuebla solo.
             .fallbackToDestructiveMigration(dropAllTables = true)
             .build()
 

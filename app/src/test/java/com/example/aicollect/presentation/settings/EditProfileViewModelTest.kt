@@ -1,3 +1,4 @@
+// Test unitario de EditProfileViewModel: validación de nombre, guardado feliz/con nombre en uso, subida de foto de perfil y getters delegados en el repositorio.
 package com.example.aicollect.presentation.settings
 
 import com.example.aicollect.application.auth.AuthRepository

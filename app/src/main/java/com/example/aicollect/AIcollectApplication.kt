@@ -1,3 +1,4 @@
+// Punto de arranque de la aplicación: configura el modo claro/oscuro al iniciar y actúa como raíz del grafo de dependencias de Hilt.
 package com.example.aicollect
 
 import android.app.Application

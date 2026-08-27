@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <!-- Dark palette from Figma: Inicio: Mi Colección Refinada (Modo Oscuro), node 2026:42 -->
     <color name="collect_background">#0A0A0A</color>
     <color name="collect_surface_header">#000000</color>
     <color name="collect_surface_card">#1E1E1E</color>
@@ -14,26 +13,20 @@
     <color name="collect_text_secondary_50">#C6C6C9</color>
     <color name="collect_switch_track_off">#3F3F46</color>
 
-    <!-- Drawer: no dark mockup in the brief, derived to match the app's dark palette -->
     <color name="drawer_background">#161616</color>
     <color name="drawer_chevron">#94A3B8</color>
 
-    <!-- Auth tokens (from Figma: Iniciar Sesión, Modo Oscuro 81:7) -->
     <color name="auth_background">#000000</color>
     <color name="auth_heading_text">#FFFFFF</color>
     <color name="auth_field_label">@color/collect_gold</color>
     <color name="auth_input_border">#E5E7EB</color>
     <color name="auth_input_placeholder">#8E8E93</color>
-    <color name="auth_social_button_bg">#0A0A0A</color>
-    <color name="auth_social_button_text">#FFFFFF</color>
     <color name="auth_footer_text">#8E8E93</color>
 
-    <!-- Filter bottom sheet tokens (from Figma: Inicio: Filtros, Modo Oscuro 2027:211) -->
     <color name="filter_input_bg">#0A0A0A</color>
     <color name="filter_input_border">#4D4E4637</color>
     <color name="filter_track_inactive">#4E4637</color>
 
-    <!-- My Vault / Estadísticas tokens (from Figma 2014:76 / 2015:376, dark "glass card" look) -->
     <color name="vault_card_bg">#991C1C1E</color>
     <color name="vault_card_border">#1AE5B543</color>
     <color name="vault_icon_box_bg">#151516</color>
@@ -42,9 +35,6 @@
     <color name="vault_progress_track">#151516</color>
     <color name="vault_negative">#FFB4AB</color>
 
-    <!-- Desambiguación de candidatos: badges pastel del claro se ven lavados sobre fondo oscuro
-         (sin mockup oscuro real, ver values/colors.xml), derivados para mantener el mismo
-         significado semántico (verde = alta confianza, gris = el resto). -->
     <color name="candidate_best_match_badge_text">#E5B543</color>
     <color name="candidate_confidence_high_bg">#16241A</color>
     <color name="candidate_confidence_high_border">#1F7A42</color>

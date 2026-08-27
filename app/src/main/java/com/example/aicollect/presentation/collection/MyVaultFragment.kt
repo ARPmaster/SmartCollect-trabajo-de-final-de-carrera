@@ -1,3 +1,5 @@
+/**Pantalla My Vault (estadísticas de la colección): pinta el resumen de valor total, la
+ *distribución por deporte/estado y los artículos más valorados, y gestiona los chips de filtro por deporte.*/
 package com.example.aicollect.presentation.collection
 
 import android.content.res.ColorStateList
@@ -24,14 +26,6 @@ import com.example.aicollect.presentation.showSnackbar
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 
-/**
- * "My Vault" / Estadísticas (Figma 2014:76 / 2015:376), wired to real Firestore items via
- * [MyVaultViewModel] — sport filter chips stay interactive-but-not-filtering (pre-existing,
- * documented limitation, same as [FilterBottomSheetFragment]'s sport/type/condition selectors).
- * The original item-type donut (Jerseys/Balones/Tarjetas/Otros) is repurposed to show
- * distribution by `estado` (Nuevo/Buen estado/Malas condiciones) — the real Item schema has no
- * "tipo de artículo" field, only deporte/estado (see PROJECT_CONTEXT.md).
- */
 @AndroidEntryPoint
 class MyVaultFragment : Fragment() {
 
@@ -84,19 +78,15 @@ class MyVaultFragment : Fragment() {
         listOf(binding.tvMonth1, binding.tvMonth2, binding.tvMonth3, binding.tvMonth4, binding.tvMonth5, binding.tvMonth6)
             .forEachIndexed { index, view -> view.text = state.monthLabels.getOrNull(index).orEmpty() }
 
+        highlightSelectedChip(state.selectedSport)
         setUpSportDistribution(state.sportDistribution)
-        setUpConditionDistribution(state.conditionPercentByEstado)
+        setUpConditionDistribution(state.conditionPercentByEstado, state.hasItemsForSelectedSport)
 
         binding.tvTotalItemsValue.text = state.totalItemsLabel
 
         setUpTopValuedItems(state.topValuedItems)
     }
 
-    /** Una fila por cada deporte presente (2026-08-24, pedido explícito: antes solo mostraba los
-     * 3 principales por un límite del layout, no una decisión de producto). Reconstruye la lista
-     * entera cada vez, mismo criterio que las miniaturas de foto de Nueva Publicación — son pocos
-     * elementos (un puñado de deportes distintos como mucho), no compensa llevar un registro de
-     * qué cambió. */
     private fun setUpSportDistribution(distribution: List<Pair<String, Int>>) {
         binding.rowsSportDistribution.removeAllViews()
         distribution.forEachIndexed { index, (sport, percent) ->
@@ -115,11 +105,7 @@ class MyVaultFragment : Fragment() {
         }
     }
 
-    /** Unlike [setUpSportDistribution] (dynamic set of sports, sorted by frequency), estado has
-     * exactly 3 fixed values with a meaningful order (Nuevo=gold, Buen estado=green, Malas
-     * condiciones=red) — computed directly instead of through [PortfolioAnalytics.distributionBy]
-     * so the color always matches the same estado, not whichever happens to be most common. */
-    private fun setUpConditionDistribution(percentByEstado: Map<String, Int>) {
+    private fun setUpConditionDistribution(percentByEstado: Map<String, Int>, hasResults: Boolean) {
         val estadoOrder = resources.getStringArray(R.array.filter_condition_options)
         val colors = listOf(R.color.collect_gold, R.color.collect_green, R.color.vault_negative)
         val percents = estadoOrder.map { estado -> percentByEstado[estado] ?: 0 }
@@ -135,39 +121,40 @@ class MyVaultFragment : Fragment() {
             label.text = estadoOrder.getOrNull(index).orEmpty()
             value.text = "${percents.getOrNull(index) ?: 0}%"
         }
-        binding.chartDonut.segments = estadoOrder.indices.map { index ->
-            DonutSegment(percent = percents[index], color = ContextCompat.getColor(requireContext(), colors[index]))
+        binding.chartDonut.segments = if (hasResults) {
+            estadoOrder.indices.map { index ->
+                DonutSegment(percent = percents[index], color = ContextCompat.getColor(requireContext(), colors[index]))
+            }
+        } else {
+            listOf(DonutSegment(percent = 100, color = ContextCompat.getColor(requireContext(), R.color.vault_progress_track)))
         }
     }
 
+    private var sportChips: List<Pair<TextView, String?>> = emptyList()
+
     private fun setUpSportChips() {
-        val chipLabels = listOf(
-            getString(R.string.vault_filter_futbol),
-            getString(R.string.vault_filter_basquet),
-            getString(R.string.vault_filter_beisbol),
-            getString(R.string.vault_filter_tenis),
-        )
-        val chips = chipLabels.map { label ->
-            (layoutInflater.inflate(R.layout.item_vault_sport_chip, binding.rowSportChips, false) as TextView).apply {
+        val chipLabels = resources.getStringArray(R.array.filter_sport_options).toList()
+        val allLabel = chipLabels.first()
+        sportChips = chipLabels.map { label ->
+            val view = (layoutInflater.inflate(R.layout.item_vault_sport_chip, binding.rowSportChips, false) as TextView).apply {
                 text = label
             }
+            view to label.takeUnless { it == allLabel }
         }
-
-        fun select(selected: TextView) {
-            chips.forEach { chip ->
-                val isSelected = chip === selected
-                chip.setTextColor(
-                    ContextCompat.getColor(requireContext(), if (isSelected) R.color.vault_chip_active_text else R.color.vault_text_secondary),
-                )
-                chip.setBackgroundResource(if (isSelected) R.drawable.bg_vault_chip_active else R.drawable.bg_vault_chip_inactive)
-            }
-        }
-
-        chips.forEach { chip ->
+        sportChips.forEach { (chip, sport) ->
             binding.rowSportChips.addView(chip)
-            chip.setOnClickListener { select(chip) }
+            chip.setOnClickListener { viewModel.selectSport(sport) }
         }
-        select(chips.first())
+    }
+
+    private fun highlightSelectedChip(selectedSport: String?) {
+        sportChips.forEach { (chip, sport) ->
+            val isSelected = sport == selectedSport
+            chip.setTextColor(
+                ContextCompat.getColor(requireContext(), if (isSelected) R.color.vault_chip_active_text else R.color.vault_text_secondary),
+            )
+            chip.setBackgroundResource(if (isSelected) R.drawable.bg_vault_chip_active else R.drawable.bg_vault_chip_inactive)
+        }
     }
 
     private fun setUpTopValuedItems(topItems: List<TopValuedItemUi>) {
@@ -178,15 +165,6 @@ class MyVaultFragment : Fragment() {
             itemBinding.tvItemName.text = item.nombre
             itemBinding.tvItemSubtitle.text = item.subtitle
             itemBinding.tvItemValue.text = item.valueLabel
-
-            itemBinding.tvItemChange.text = item.changeLabel.orEmpty()
-            itemBinding.tvItemChange.visibility = if (item.changeLabel != null) View.VISIBLE else View.GONE
-            itemBinding.tvItemChange.setTextColor(
-                ContextCompat.getColor(
-                    requireContext(),
-                    if (item.isPositiveChange) R.color.collect_green else R.color.vault_negative,
-                ),
-            )
 
             if (index != topItems.lastIndex) {
                 (itemBinding.root.layoutParams as ViewGroup.MarginLayoutParams).bottomMargin =

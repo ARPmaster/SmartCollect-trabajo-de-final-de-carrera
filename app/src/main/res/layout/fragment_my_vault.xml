@@ -21,7 +21,6 @@
         android:paddingTop="16dp"
         android:paddingBottom="32dp">
 
-        <!-- Total portfolio value -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -74,7 +73,6 @@
             </LinearLayout>
         </LinearLayout>
 
-        <!-- Evolution chart card -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -126,7 +124,6 @@
             </LinearLayout>
         </LinearLayout>
 
-        <!-- Distribution by sport -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -142,10 +139,6 @@
                 android:textColor="@color/vault_text_primary"
                 android:textSize="16sp" />
 
-            <!-- Una fila por deporte presente en la colección (2026-08-24, pedido explícito: antes
-                 solo mostraba los 3 principales, ahora todos) — construidas programáticamente en
-                 MyVaultFragment.setUpSportDistribution() a partir de item_vault_distribution_row.xml,
-                 mismo patrón que las miniaturas de foto de Nueva Publicación. -->
             <LinearLayout
                 android:id="@+id/rows_sport_distribution"
                 android:layout_width="match_parent"
@@ -154,7 +147,6 @@
                 android:orientation="vertical" />
         </LinearLayout>
 
-        <!-- Quick stat chip -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -195,7 +187,6 @@
                 tools:text="12" />
         </LinearLayout>
 
-        <!-- Sport filter chips -->
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -217,8 +208,6 @@
                 android:orientation="horizontal" />
         </HorizontalScrollView>
 
-        <!-- Distribution by condition (repurposed from the original item-type donut — the real
-             Item schema has no "tipo de artículo" field, only deporte/estado, see PROJECT_CONTEXT) -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -276,33 +265,13 @@
             </LinearLayout>
         </LinearLayout>
 
-        <!-- Top valued items -->
-        <LinearLayout
+        <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="40dp"
-            android:gravity="bottom"
-            android:orientation="horizontal">
-
-            <TextView
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="@string/vault_top_items_title"
-                android:textColor="@color/vault_text_primary"
-                android:textSize="16sp" />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:fontFamily="monospace"
-                android:letterSpacing="0.1"
-                android:text="@string/vault_see_all"
-                android:textAllCaps="true"
-                android:textColor="@color/collect_gold"
-                android:textSize="10sp"
-                android:textStyle="bold" />
-        </LinearLayout>
+            android:text="@string/vault_top_items_title"
+            android:textColor="@color/vault_text_primary"
+            android:textSize="16sp" />
 
         <LinearLayout
             android:id="@+id/list_top_items"

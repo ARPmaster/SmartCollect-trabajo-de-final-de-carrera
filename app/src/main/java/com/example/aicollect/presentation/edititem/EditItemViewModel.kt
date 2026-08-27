@@ -1,9 +1,11 @@
+/** ViewModel de edición de un ítem: carga sus datos, valida el formulario y
+ * guarda solo los campos editables (nombre, descripción, deporte, estado), dejando el resto intacto.*/
 package com.example.aicollect.presentation.edititem
 
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.aicollect.application.items.ItemEdits
+import com.example.aicollect.application.items.Item
 import com.example.aicollect.application.items.ItemRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
@@ -28,13 +30,6 @@ sealed interface SaveEditUiState {
 
 enum class EditRequiredField { NAME, SPORT, CONDITION }
 
-/**
- * 2026-08-24: completa el CRUD (roadmap, "Editar" seguía sin construir) — reutiliza
- * `ItemRepository.updateItem`, que ya existía pero sin pantalla que lo llamara. Deliberadamente
- * NO expone marca/modelo/edición ni ningún campo de valoración: [ItemEdits] los excluye a nivel de
- * tipo, así que ni esta pantalla ni el repositorio pueden tocarlos por accidente (pedido
- * explícito: "lo único no modificable del CRUD es el precio").
- */
 @HiltViewModel
 class EditItemViewModel @Inject constructor(
     private val itemRepository: ItemRepository,
@@ -49,15 +44,18 @@ class EditItemViewModel @Inject constructor(
     private val _saveState = MutableStateFlow<SaveEditUiState>(SaveEditUiState.Idle)
     val saveState: StateFlow<SaveEditUiState> = _saveState.asStateFlow()
 
+    private var loadedItem: Item? = null
+
     init {
         viewModelScope.launch {
             itemRepository.getItem(itemId)
-                .onSuccess {
+                .onSuccess { item ->
+                    loadedItem = item
                     _uiState.value = EditItemUiState.Content(
-                        nombre = it.nombre,
-                        descripcion = it.descripcion,
-                        deporte = it.deporte,
-                        estado = it.estado,
+                        nombre = item.nombre,
+                        descripcion = item.descripcion,
+                        deporte = item.deporte,
+                        estado = item.estado,
                     )
                 }
                 .onFailure {
@@ -81,7 +79,12 @@ class EditItemViewModel @Inject constructor(
             return
         }
 
-        val edits = ItemEdits(
+        val original = loadedItem
+        if (original == null) {
+            _saveState.value = SaveEditUiState.Error("No se pudo guardar: el artículo aún no se ha cargado.")
+            return
+        }
+        val edited = original.copy(
             nombre = trimmedName,
             descripcion = description?.trim()?.takeIf { it.isNotEmpty() },
             deporte = sport,
@@ -90,7 +93,7 @@ class EditItemViewModel @Inject constructor(
 
         _saveState.value = SaveEditUiState.Saving
         viewModelScope.launch {
-            itemRepository.updateItem(itemId, edits)
+            itemRepository.updateItem(itemId, edited)
                 .onSuccess { _saveState.value = SaveEditUiState.Success }
                 .onFailure {
                     _saveState.value = SaveEditUiState.Error(

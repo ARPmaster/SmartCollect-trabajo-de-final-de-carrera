@@ -1,3 +1,4 @@
+// Pantalla "Sobre la aplicación": versión de la app y acordeones de términos/privacidad.
 package com.example.aicollect.presentation.settings
 
 import android.os.Bundle
@@ -13,7 +14,6 @@ import com.example.aicollect.BuildConfig
 import com.example.aicollect.R
 import com.example.aicollect.databinding.FragmentAboutBinding
 
-/** "Sobre la aplicación" screen (Figma 2076:218 claro / 2075:65 oscuro), opened from the drawer. */
 class AboutFragment : Fragment() {
 
     private var _binding: FragmentAboutBinding? = null

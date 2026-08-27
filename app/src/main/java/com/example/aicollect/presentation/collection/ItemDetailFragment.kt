@@ -1,3 +1,4 @@
+// Pantalla de detalle de un ítem: carga sus datos por id, permite navegar a editarlo y borrarlo , y renderiza su evolución de precio.
 package com.example.aicollect.presentation.collection
 
 import android.os.Bundle
@@ -19,12 +20,6 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 
-/**
- * "Detalle de objeto/carta" (Figma 73:55 oscuro / 74:180 claro) — reached from the Home feed or
- * My Vault's top-valued list, both passing the real Firestore [Item.id] as [ARG_ITEM_ID]. Back
- * navigation goes through the shared toolbar (MainActivity swaps its hamburger icon for a back
- * arrow on this destination), not a screen-local button.
- */
 @AndroidEntryPoint
 class ItemDetailFragment : Fragment() {
 
@@ -65,8 +60,6 @@ class ItemDetailFragment : Fragment() {
         }
     }
 
-    /** Pide confirmación antes de borrar (roadmap CRUD, 2026-08-24) — acción irreversible, borra
-     * también las fotos del item en Storage (ver [ItemDetailViewModel.deleteItem]). */
     private fun showDeleteConfirmationDialog() {
         MaterialAlertDialogBuilder(requireContext())
             .setTitle(R.string.item_detail_delete_confirm_title)

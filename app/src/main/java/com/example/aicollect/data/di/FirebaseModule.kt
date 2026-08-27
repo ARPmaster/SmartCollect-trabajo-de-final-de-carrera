@@ -1,3 +1,4 @@
+// Módulo Hilt que provee las instancias singleton de los servicios de Firebase (Auth, Storage, Firestore, Functions) usados por el resto de la app.
 package com.example.aicollect.data.di
 
 import com.google.firebase.auth.FirebaseAuth
@@ -14,8 +15,6 @@ import javax.inject.Singleton
 @InstallIn(SingletonComponent::class)
 object FirebaseModule {
 
-    /** `recognizeItem` is deployed in europe-west1, not the SDK's default `us-central1` — every
-     * callable in this app lives in that same region. */
     private const val FUNCTIONS_REGION = "europe-west1"
 
     @Provides

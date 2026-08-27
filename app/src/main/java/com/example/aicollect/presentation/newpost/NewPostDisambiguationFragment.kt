@@ -1,3 +1,5 @@
+/** Pantalla de desambiguación de "Nueva Publicación": muestra los candidatos devueltos
+*por el reconocimiento de imagen para que el usuario elija el correcto o indique que ninguno coincide.*/
 package com.example.aicollect.presentation.newpost
 
 import android.graphics.BitmapFactory
@@ -18,12 +20,6 @@ import com.example.aicollect.databinding.FragmentNewPostDisambiguationBinding
 import com.example.aicollect.databinding.ItemCandidateCardBinding
 import kotlin.math.roundToInt
 
-/**
- * "Selecciona el objeto correcto" (Figma 2090:9). Candidates arrive already sorted by [RankedCandidate.score]
- * from `recognizeItem` — index 0 is the best match, never recomputed here. Nothing here persists
- * automatically: tapping a card or "Ninguno de estos" only stashes the choice on the shared
- * [NewPostViewModel] and opens the review form, which is where the actual save happens.
- */
 class NewPostDisambiguationFragment : Fragment() {
 
     private var _binding: FragmentNewPostDisambiguationBinding? = null
@@ -49,7 +45,6 @@ class NewPostDisambiguationFragment : Fragment() {
             insets
         }
 
-        // Dashed strokes (bg_candidate_card_none) don't render under hardware acceleration.
         binding.cardNoneOfThese.setLayerType(View.LAYER_TYPE_SOFTWARE, null)
 
         binding.btnBack.setOnClickListener { findNavController().popBackStack() }
@@ -84,9 +79,6 @@ class NewPostDisambiguationFragment : Fragment() {
         )
         binding.tvBadgeBestMatch.visibility = if (isBestMatch) View.VISIBLE else View.GONE
 
-        // recognizeItem doesn't return a per-candidate image, so every card reuses the first photo
-        // (the only one ever analyzed) — already documented in PROJECT_CONTEXT.md as a deliberate
-        // simplification.
         viewModel.photos.firstOrNull()?.let { bytes ->
             binding.ivCandidateThumbnail.setImageBitmap(BitmapFactory.decodeByteArray(bytes, 0, bytes.size))
         }

@@ -1,3 +1,4 @@
+// Módulo Hilt que enlaza cada interfaz de repositorio de la capa de dominio con su implementación concreta.
 package com.example.aicollect.data.di
 
 import com.example.aicollect.application.auth.AuthRepository

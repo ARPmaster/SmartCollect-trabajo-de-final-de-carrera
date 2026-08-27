@@ -1,3 +1,5 @@
+/** Pantalla de registro: recoge correo, usuario y contraseña, delega la creación de cuenta en el
+ * ViewModel y muestra feedback específico si el nombre de usuario ya está en uso.*/
 package com.example.aicollect.presentation.auth
 
 import android.os.Bundle
@@ -23,7 +25,6 @@ import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
-/** "Crear cuenta" screen, wired to Firebase Auth via [AuthRepository.signUp]. */
 @AndroidEntryPoint
 class RegisterFragment : Fragment() {
 
@@ -94,7 +95,6 @@ class RegisterFragment : Fragment() {
         }
     }
 
-    /** Red border on the username box for [USERNAME_TAKEN_BORDER_MS], plus a high-visibility red Snackbar. */
     private fun showUsernameTakenFeedback(message: String) {
         binding.boxUsername.background = ContextCompat.getDrawable(requireContext(), R.drawable.bg_auth_input_error)
         Snackbar.make(binding.root, message, Snackbar.LENGTH_LONG)

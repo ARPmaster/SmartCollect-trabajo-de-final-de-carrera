@@ -1,3 +1,5 @@
+// Pantalla "Ayuda y Soporte": lista de preguntas frecuentes en acordeón y acceso directo
+// para contactar por correo con el soporte.
 package com.example.aicollect.presentation.settings
 
 import android.content.ActivityNotFoundException
@@ -16,7 +18,6 @@ import com.example.aicollect.R
 import com.example.aicollect.databinding.FragmentHelpBinding
 import com.google.android.material.snackbar.Snackbar
 
-/** "Ayuda y Soporte" / FAQ screen (Figma 2074:9 claro / 2076:163 oscuro), opened from the drawer. */
 class HelpFragment : Fragment() {
 
     private var _binding: FragmentHelpBinding? = null

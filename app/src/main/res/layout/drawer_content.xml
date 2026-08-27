@@ -5,7 +5,6 @@
     android:layout_height="match_parent"
     android:background="@color/drawer_background">
 
-    <!-- Header: back arrow only -->
     <FrameLayout
         android:id="@+id/btn_close_drawer"
         android:layout_width="wrap_content"
@@ -33,7 +32,6 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/btn_close_drawer" />
 
-    <!-- Profile section -->
     <com.google.android.material.imageview.ShapeableImageView
         android:id="@+id/iv_drawer_avatar"
         android:layout_width="56dp"
@@ -74,7 +72,6 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/iv_drawer_avatar" />
 
-    <!-- Scrollable menu content -->
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="0dp"
@@ -324,7 +321,6 @@
         </LinearLayout>
     </ScrollView>
 
-    <!-- Logout button -->
     <LinearLayout
         android:id="@+id/btn_logout"
         android:layout_width="0dp"

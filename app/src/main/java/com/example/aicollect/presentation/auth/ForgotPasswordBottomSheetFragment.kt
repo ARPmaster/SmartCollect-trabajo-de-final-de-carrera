@@ -1,3 +1,5 @@
+/** Bottom sheet de "¿Olvidaste tu contraseña?" que se muestra sobre la pantalla de login:
+ * recoge el correo y pide al ViewModel que envíe el email de recuperación.*/
 package com.example.aicollect.presentation.auth
 
 import android.os.Bundle
@@ -15,12 +17,6 @@ import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 
-/**
- * "¿Olvidaste tu contraseña?" as a bottom sheet over LoginFragment, matching the usual UX
- * pattern for password recovery (dialog/sheet over the login screen) instead of a full nav
- * destination. Figma has full-screen mocks (87:7 dark / 87:38 light) that this intentionally
- * does not replicate 1:1.
- */
 @AndroidEntryPoint
 class ForgotPasswordBottomSheetFragment : BottomSheetDialogFragment() {
 

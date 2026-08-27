@@ -1,3 +1,4 @@
+// Guarda y lee la preferencia de modo oscuro/claro del usuario en SharedPreferences.
 package com.example.aicollect.data
 
 import android.content.Context

@@ -1,3 +1,5 @@
+// Pantalla "Seguridad": cambio de email/contraseña y eliminación de cuenta (con confirmación
+// y reautenticación por contraseña antes de borrar).
 package com.example.aicollect.presentation.settings
 
 import android.os.Bundle
@@ -25,7 +27,6 @@ import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 
-/** "Seguridad" screen (Figma 2076:132 claro / 2076:271 oscuro), opened from the drawer. */
 @AndroidEntryPoint
 class SecurityFragment : Fragment() {
 
@@ -90,9 +91,6 @@ class SecurityFragment : Fragment() {
         }
     }
 
-    /** Pide la contraseña actual como confirmación adicional antes de una acción irreversible
-     * (roadmap "Eliminar cuenta y datos", 2026-08-24) — el campo vive en un diálogo aparte, no en
-     * la pantalla, para que no se pueda disparar por error junto al resto del formulario. */
     private fun showDeleteAccountDialog() {
         val dialogBinding = DialogDeleteAccountBinding.inflate(layoutInflater)
         MaterialAlertDialogBuilder(requireContext())
@@ -118,8 +116,6 @@ class SecurityFragment : Fragment() {
 
         when (state) {
             is DeleteAccountUiState.Success -> {
-                // La cuenta ya no existe — vuelve al login limpiando todo el back stack, mismo
-                // patrón que el logout normal de MainActivity.
                 findNavController().navigate(
                     R.id.loginFragment,
                     null,

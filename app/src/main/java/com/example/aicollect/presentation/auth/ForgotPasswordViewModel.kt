@@ -1,3 +1,5 @@
+/** ViewModel del bottom sheet de recuperación de contraseña: valida el correo introducido y pide
+ * a AuthRepository el envío del email de restablecimiento, exponiendo el resultado como estado de UI.*/
 package com.example.aicollect.presentation.auth
 
 import androidx.lifecycle.ViewModel

@@ -1,3 +1,4 @@
+// Entidad Room que refleja localmente los ítems del usuario en Firestore, y las conversiones entre esta entidad y el modelo de dominio Item.
 package com.example.aicollect.data.items.local
 
 import androidx.room.Entity
@@ -6,11 +7,6 @@ import com.example.aicollect.application.items.Item
 import com.example.aicollect.application.items.PricePoint
 import com.example.aicollect.application.items.ValuationSearch
 
-/**
- * Local mirror of `users/{uid}/items/{itemId}` (brief Sección 4). [ownerId] exists purely so the
- * same on-device table can hold a clean slate per account if the user logs out and into a
- * different one on the same device — every query filters by it, never a cross-account leak.
- */
 @Entity(tableName = "items")
 data class ItemEntity(
     @PrimaryKey val itemId: String,
