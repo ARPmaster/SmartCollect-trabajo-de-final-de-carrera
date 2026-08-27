@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="collect_background">#F9F7F2</color>
+    <color name="collect_surface_header">#FFFFFF</color>
+    <color name="collect_surface_card">#FFFFFF</color>
+    <color name="collect_surface_feed_item">#FFFFFF</color>
+    <color name="collect_border">#F3F4F6</color>
+    <color name="collect_text_primary">#0A0A0A</color>
+    <color name="collect_text_secondary">#6B7280</color>
+    <color name="collect_text_date">#6B7280</color>
+    <color name="collect_gold">#E5B543</color>
+    <color name="collect_green">#4ADE80</color>
+    <color name="collect_green_bg">#1A4ADE80</color>
+    <color name="collect_image_background">#111827</color>
+    <color name="collect_menu_icon">#4B5563</color>
+    <color name="collect_toolbar_border">#E5E7EB</color>
+    <color name="collect_text_secondary_50">#800A0A0A</color>
+    <color name="collect_switch_track_off">#D1D5DB</color>
+
+    <color name="drawer_background">#F8F6F6</color>
+    <color name="drawer_text_muted">#94A3B8</color>
+    <color name="drawer_chevron">#64748B</color>
+    <color name="collect_gold_10">#1AE5B543</color>
+    <color name="collect_gold_20">#33E5B543</color>
+    <color name="collect_gold_30">#4DE5B543</color>
+
+    <color name="auth_background">#F8F6F6</color>
+    <color name="auth_divider">#4DE1D9C9</color>
+    <color name="auth_heading_text">#16130C</color>
+    <color name="auth_field_label">#000000</color>
+    <color name="auth_input_bg">#FFFFFF</color>
+    <color name="auth_input_text">#16130C</color>
+    <color name="auth_input_border">#E1D9C9</color>
+    <color name="auth_input_placeholder">#808E8E93</color>
+    <color name="auth_footer_text">#4E4E4E</color>
+    <color name="auth_icon">#8E8E93</color>
+
+    <color name="filter_input_bg">#FFFFFF</color>
+    <color name="filter_input_border">#D1D5DB</color>
+    <color name="filter_track_inactive">#E5E7EB</color>
+
+    <color name="vault_card_bg">#FFFFFF</color>
+    <color name="vault_card_border">#F3F4F6</color>
+    <color name="vault_icon_box_bg">#FFFFFF</color>
+    <color name="vault_text_primary">#0A0A0A</color>
+    <color name="vault_text_secondary">#6B7280</color>
+    <color name="vault_progress_track">#E5E7EB</color>
+    <color name="vault_negative">#DC2626</color>
+    <color name="vault_chip_active_text">#0A0A0A</color>
+
+    <color name="candidate_best_match_border">#B8860B</color>
+    <color name="candidate_best_match_badge_text">#8A6D1F</color>
+    <color name="candidate_confidence_high_bg">#F0FDF4</color>
+    <color name="candidate_confidence_high_border">#BBF7D0</color>
+    <color name="candidate_confidence_high_text">#15803D</color>
+    <color name="candidate_confidence_low_bg">#F9FAFB</color>
+    <color name="candidate_confidence_low_border">#E5E7EB</color>
+    <color name="candidate_confidence_low_text">#4B5563</color>
+
+    <color name="new_post_loading_scrim">#B3000000</color>
+</resources>

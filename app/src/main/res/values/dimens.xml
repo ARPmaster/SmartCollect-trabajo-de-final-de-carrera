@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="vault_top_item_spacing">12dp</dimen>
+    <dimen name="candidate_card_spacing">12dp</dimen>
+    <dimen name="new_post_photo_thumbnail_spacing">10dp</dimen>
+    <dimen name="vault_distribution_row_spacing">12dp</dimen>
+</resources>

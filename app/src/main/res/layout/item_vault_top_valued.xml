@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@drawable/bg_vault_card"
+    android:gravity="center_vertical"
+    android:orientation="horizontal"
+    android:padding="13dp">
+
+    <ImageView
+        android:id="@+id/iv_item_image"
+        android:layout_width="56dp"
+        android:layout_height="56dp"
+        android:background="@drawable/bg_vault_icon_box"
+        android:contentDescription="@null"
+        android:scaleType="centerCrop"
+        tools:src="@drawable/item_signed_jersey" />
+
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_weight="1"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/tv_item_name"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textColor="@color/vault_text_primary"
+            android:textSize="16sp"
+            tools:text="1998 MJ Finals Jersey" />
+
+        <TextView
+            android:id="@+id/tv_item_subtitle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="2dp"
+            android:textColor="@color/vault_text_secondary"
+            android:textSize="14sp"
+            tools:text="Game Worn • NBA Finals" />
+    </LinearLayout>
+
+    <TextView
+        android:id="@+id/tv_item_value"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textColor="@color/collect_gold"
+        android:textSize="16sp"
+        tools:text="$210,000" />
+</LinearLayout>

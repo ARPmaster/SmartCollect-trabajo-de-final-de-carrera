@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/nav_graph"
+    app:startDestination="@id/loginFragment">
+
+    <fragment
+        android:id="@+id/loginFragment"
+        android:name="com.example.aicollect.presentation.auth.LoginFragment"
+        android:label="Login"
+        tools:layout="@layout/fragment_login"
+        xmlns:tools="http://schemas.android.com/tools" />
+
+    <fragment
+        android:id="@+id/registerFragment"
+        android:name="com.example.aicollect.presentation.auth.RegisterFragment"
+        android:label="Register"
+        tools:layout="@layout/fragment_register"
+        xmlns:tools="http://schemas.android.com/tools" />
+
+    <fragment
+        android:id="@+id/homeFragment"
+        android:name="com.example.aicollect.presentation.collection.HomeFragment"
+        android:label="Home"
+        tools:layout="@layout/fragment_home"
+        xmlns:tools="http://schemas.android.com/tools" />
+
+    <fragment
+        android:id="@+id/newPostFragment"
+        android:name="com.example.aicollect.presentation.newpost.NewPostFragment"
+        android:label="NewPost"
+        tools:layout="@layout/fragment_new_post"
+        xmlns:tools="http://schemas.android.com/tools" />
+
+    <fragment
+        android:id="@+id/newPostDisambiguationFragment"
+        android:name="com.example.aicollect.presentation.newpost.NewPostDisambiguationFragment"
+        android:label="NewPostDisambiguation"
+        tools:layout="@layout/fragment_new_post_disambiguation"
+        xmlns:tools="http://schemas.android.com/tools" />
+
+    <fragment
+        android:id="@+id/statsFragment"
+        android:name="com.example.aicollect.presentation.collection.MyVaultFragment"
+        android:label="My Vault"
+        tools:layout="@layout/fragment_my_vault"
+        xmlns:tools="http://schemas.android.com/tools" />
+
+    <fragment
+        android:id="@+id/editProfileFragment"
+        android:name="com.example.aicollect.presentation.settings.EditProfileFragment"
+        android:label="EditProfile"
+        tools:layout="@layout/fragment_edit_profile"
+        xmlns:tools="http://schemas.android.com/tools" />
+
+    <fragment
+        android:id="@+id/securityFragment"
+        android:name="com.example.aicollect.presentation.settings.SecurityFragment"
+        android:label="Security"
+        tools:layout="@layout/fragment_security"
+        xmlns:tools="http://schemas.android.com/tools" />
+
+    <fragment
+        android:id="@+id/helpFragment"
+        android:name="com.example.aicollect.presentation.settings.HelpFragment"
+        android:label="Help"
+        tools:layout="@layout/fragment_help"
+        xmlns:tools="http://schemas.android.com/tools" />
+
+    <fragment
+        android:id="@+id/aboutFragment"
+        android:name="com.example.aicollect.presentation.settings.AboutFragment"
+        android:label="About"
+        tools:layout="@layout/fragment_about"
+        xmlns:tools="http://schemas.android.com/tools" />
+
+    <fragment
+        android:id="@+id/itemDetailFragment"
+        android:name="com.example.aicollect.presentation.collection.ItemDetailFragment"
+        android:label="ItemDetail"
+        tools:layout="@layout/fragment_item_detail"
+        xmlns:tools="http://schemas.android.com/tools">
+        <argument
+            android:name="itemId"
+            app:argType="string" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/editItemFragment"
+        android:name="com.example.aicollect.presentation.edititem.EditItemFragment"
+        android:label="EditItem"
+        tools:layout="@layout/fragment_edit_item"
+        xmlns:tools="http://schemas.android.com/tools">
+        <argument
+            android:name="itemId"
+            app:argType="string" />
+    </fragment>
+</navigation>
