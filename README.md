@@ -4,8 +4,8 @@ SmartCollect es una aplicación Android para coleccionistas de objetos deportivo
 catalogar artículos fotografiándolos —con reconocimiento automático asistido por IA (Google Cloud
 Vision y Google Gemini) para sugerir candidatos— y consultar una valoración de mercado orientativa
 por artículo: la valoración se obtiene mediante Gemini con grounding de búsqueda web (se descartó
-la integración con eBay). El cliente Android (Kotlin, MVVM, Hilt, Room) vive en `app/`; el backend
-serverless (Cloud Functions) vive en `backend/`.
+la integración con eBay). Este repositorio contiene el cliente Android (Kotlin, MVVM, Hilt, Room);
+el backend serverless (Cloud Functions) vive en un repositorio aparte.
 
 ## Requisitos del entorno de desarrollo
 
@@ -14,7 +14,6 @@ serverless (Cloud Functions) vive en `backend/`.
 - JDK 11.
 - SDK de Android con `compileSdk`/`targetSdk` en 36 y `minSdk` en 29 (Android 10).
 - Cuenta de Google con acceso (o permiso para crear) un proyecto de Firebase.
-- Para el backend: Node.js 24, npm y Firebase CLI — ver `backend/README.md`.
 
 ## Instalación del cliente Android
 
@@ -41,8 +40,7 @@ Desde la [consola de Firebase](https://console.firebase.google.com), crea un pro
 - **Cloud Storage**, para las fotografías de las piezas y de perfil.
 
 Las Cloud Functions (`recognizeItem`, `searchValuation`, `refreshValuation`) se despliegan desde
-`backend/` — ver `backend/README.md` para el procedimiento completo, incluida la configuración
-del secreto `GEMINI_API_KEY`.
+el repositorio del backend, con su propio README y la configuración del secreto `GEMINI_API_KEY`.
 
 ## Tests
 
@@ -58,8 +56,6 @@ app/src/main/java/com/example/aicollect/
   application/      # Modelos de dominio y contratos de repositorio
   data/              # Implementaciones: Firestore, Room (caché local), Cloud Functions
   presentation/       # Fragments, ViewModels, vistas custom (MVVM)
-backend/
-  functions/src/     # Cloud Functions (recognizeItem, searchValuation, refreshValuation)
 ```
 
 ## Variables y secretos sensibles no incluidos en el repositorio
