@@ -2,6 +2,7 @@
 package com.example.aicollect.presentation.settings
 
 import com.example.aicollect.application.auth.AuthRepository
+import com.example.aicollect.presentation.UiText
 import com.example.aicollect.testutil.MainDispatcherRule
 import io.mockk.coEvery
 import io.mockk.coVerify
@@ -128,7 +129,7 @@ class SecurityViewModelTest {
 
         val state = viewModel.uiState.value
         assertTrue(state is SecurityUiState.Error)
-        assertEquals("Requiere sesión reciente", (state as SecurityUiState.Error).message)
+        assertEquals(UiText.DynamicString("Requiere sesión reciente"), (state as SecurityUiState.Error).message)
         coVerify(exactly = 0) { authRepository.updatePassword(any()) }
     }
 
@@ -141,7 +142,7 @@ class SecurityViewModelTest {
 
         val state = viewModel.uiState.value
         assertTrue(state is SecurityUiState.Error)
-        assertEquals("Contraseña débil", (state as SecurityUiState.Error).message)
+        assertEquals(UiText.DynamicString("Contraseña débil"), (state as SecurityUiState.Error).message)
     }
 
     @Test
@@ -162,7 +163,7 @@ class SecurityViewModelTest {
 
         val state = viewModel.deleteAccountState.value
         assertTrue(state is DeleteAccountUiState.Error)
-        assertEquals("Sin conexión", (state as DeleteAccountUiState.Error).message)
+        assertEquals(UiText.DynamicString("Sin conexión"), (state as DeleteAccountUiState.Error).message)
         coVerify(exactly = 0) { authRepository.deleteAccount() }
     }
 
@@ -175,7 +176,7 @@ class SecurityViewModelTest {
 
         val state = viewModel.deleteAccountState.value
         assertTrue(state is DeleteAccountUiState.Error)
-        assertEquals("Contraseña incorrecta.", (state as DeleteAccountUiState.Error).message)
+        assertEquals(UiText.DynamicString("Contraseña incorrecta."), (state as DeleteAccountUiState.Error).message)
         coVerify(exactly = 0) { authRepository.deleteAccount() }
     }
 

@@ -29,6 +29,7 @@ import androidx.navigation.fragment.findNavController
 import coil.load
 import com.example.aicollect.R
 import com.example.aicollect.databinding.FragmentEditProfileBinding
+import com.example.aicollect.presentation.asString
 import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
 import java.io.ByteArrayOutputStream
@@ -181,8 +182,8 @@ class EditProfileFragment : Fragment() {
             is EditProfileUiState.Success ->
                 Snackbar.make(binding.root, R.string.edit_profile_success, Snackbar.LENGTH_LONG).show()
             is EditProfileUiState.Error ->
-                Snackbar.make(binding.root, state.message, Snackbar.LENGTH_LONG).show()
-            is EditProfileUiState.NameTaken -> showNameTakenFeedback(state.message)
+                Snackbar.make(binding.root, state.message.asString(requireContext()), Snackbar.LENGTH_LONG).show()
+            is EditProfileUiState.NameTaken -> showNameTakenFeedback(state.message.asString(requireContext()))
             else -> Unit
         }
     }
@@ -209,7 +210,7 @@ class EditProfileFragment : Fragment() {
             is PhotoUploadUiState.Success ->
                 Snackbar.make(binding.root, R.string.edit_profile_success, Snackbar.LENGTH_LONG).show()
             is PhotoUploadUiState.Error ->
-                Snackbar.make(binding.root, state.message, Snackbar.LENGTH_LONG).show()
+                Snackbar.make(binding.root, state.message.asString(requireContext()), Snackbar.LENGTH_LONG).show()
             else -> Unit
         }
     }

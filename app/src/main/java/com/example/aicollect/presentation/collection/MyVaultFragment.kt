@@ -22,6 +22,7 @@ import com.example.aicollect.R
 import com.example.aicollect.databinding.FragmentMyVaultBinding
 import com.example.aicollect.databinding.ItemVaultDistributionRowBinding
 import com.example.aicollect.databinding.ItemVaultTopValuedBinding
+import com.example.aicollect.presentation.asString
 import com.example.aicollect.presentation.showSnackbar
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
@@ -62,7 +63,7 @@ class MyVaultFragment : Fragment() {
                 binding.tvEmptyState.visibility = View.VISIBLE
             }
             is MyVaultUiState.Content -> bind(state)
-            is MyVaultUiState.Error -> showSnackbar(binding.root, state.message).show()
+            is MyVaultUiState.Error -> showSnackbar(binding.root, state.message.asString(requireContext())).show()
         }
     }
 

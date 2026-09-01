@@ -6,6 +6,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.aicollect.application.auth.AuthRepository
 import com.example.aicollect.application.auth.UsernameTakenException
+import com.example.aicollect.R
+import com.example.aicollect.presentation.UiText
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -17,15 +19,15 @@ sealed interface EditProfileUiState {
     data object Idle : EditProfileUiState
     data object Loading : EditProfileUiState
     data object Success : EditProfileUiState
-    data class Error(val message: String) : EditProfileUiState
-    data class NameTaken(val message: String) : EditProfileUiState
+    data class Error(val message: UiText) : EditProfileUiState
+    data class NameTaken(val message: UiText) : EditProfileUiState
 }
 
 sealed interface PhotoUploadUiState {
     data object Idle : PhotoUploadUiState
     data object Loading : PhotoUploadUiState
     data object Success : PhotoUploadUiState
-    data class Error(val message: String) : PhotoUploadUiState
+    data class Error(val message: UiText) : PhotoUploadUiState
 }
 
 @HiltViewModel
@@ -49,8 +51,10 @@ class EditProfileViewModel @Inject constructor(
             authRepository.updateProfilePhoto(imageBytes)
                 .onSuccess { _photoUploadState.value = PhotoUploadUiState.Success }
                 .onFailure {
-                    _photoUploadState.value =
-                        PhotoUploadUiState.Error(it.message ?: "No se pudo actualizar la foto de perfil.")
+                    _photoUploadState.value = PhotoUploadUiState.Error(
+                        it.message?.let(UiText::DynamicString)
+                            ?: UiText.StringResource(R.string.error_edit_profile_photo_generic),
+                    )
                 }
         }
     }
@@ -59,12 +63,12 @@ class EditProfileViewModel @Inject constructor(
         val trimmedName = fullName.trim()
         when {
             trimmedName.isEmpty() -> {
-                _uiState.value = EditProfileUiState.Error("El nombre no puede estar vacío.")
+                _uiState.value = EditProfileUiState.Error(UiText.StringResource(R.string.error_edit_profile_name_blank))
                 return
             }
             trimmedName.length < MIN_NAME_LENGTH || trimmedName.length > MAX_NAME_LENGTH -> {
                 _uiState.value = EditProfileUiState.Error(
-                    "El nombre debe tener entre $MIN_NAME_LENGTH y $MAX_NAME_LENGTH caracteres.",
+                    UiText.StringResource(R.string.error_edit_profile_name_length, listOf(MIN_NAME_LENGTH, MAX_NAME_LENGTH)),
                 )
                 return
             }
@@ -75,9 +79,15 @@ class EditProfileViewModel @Inject constructor(
                 .onSuccess { _uiState.value = EditProfileUiState.Success }
                 .onFailure { error ->
                     _uiState.value = if (error is UsernameTakenException) {
-                        EditProfileUiState.NameTaken(error.message ?: "Ese nombre de usuario ya está en uso.")
+                        EditProfileUiState.NameTaken(
+                            error.message?.let(UiText::DynamicString)
+                                ?: UiText.StringResource(R.string.error_username_taken),
+                        )
                     } else {
-                        EditProfileUiState.Error(error.message ?: "No se pudo actualizar el perfil.")
+                        EditProfileUiState.Error(
+                            error.message?.let(UiText::DynamicString)
+                                ?: UiText.StringResource(R.string.error_edit_profile_generic),
+                        )
                     }
                 }
         }

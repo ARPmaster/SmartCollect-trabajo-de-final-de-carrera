@@ -19,6 +19,7 @@ import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
 import com.example.aicollect.R
 import com.example.aicollect.databinding.FragmentEditItemBinding
+import com.example.aicollect.presentation.asString
 import com.example.aicollect.presentation.showSnackbar
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
@@ -84,7 +85,7 @@ class EditItemFragment : Fragment() {
                 if (selectedCondition == null) selectField(binding.tvConditionValue, state.estado).also { selectedCondition = state.estado }
             }
             is EditItemUiState.Error -> {
-                showSnackbar(binding.root, state.message).show()
+                showSnackbar(binding.root, state.message.asString(requireContext())).show()
                 findNavController().popBackStack()
             }
         }
@@ -105,7 +106,7 @@ class EditItemFragment : Fragment() {
                 showSnackbar(binding.root, R.string.edit_item_success).show()
                 findNavController().popBackStack()
             }
-            is SaveEditUiState.Error -> showSnackbar(binding.root, state.message).show()
+            is SaveEditUiState.Error -> showSnackbar(binding.root, state.message.asString(requireContext())).show()
             is SaveEditUiState.ValidationError -> {
                 val messageRes = when (state.field) {
                     EditRequiredField.NAME -> R.string.edit_item_name_required_error

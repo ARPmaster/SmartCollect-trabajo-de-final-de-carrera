@@ -2,6 +2,7 @@
 package com.example.aicollect.presentation.auth
 
 import com.example.aicollect.application.auth.AuthRepository
+import com.example.aicollect.presentation.UiText
 import com.example.aicollect.testutil.MainDispatcherRule
 import io.mockk.coEvery
 import io.mockk.coVerify
@@ -51,6 +52,6 @@ class ForgotPasswordViewModelTest {
 
         val state = viewModel.uiState.value
         assertTrue(state is ForgotPasswordUiState.Error)
-        assertEquals("No existe esa cuenta", (state as ForgotPasswordUiState.Error).message)
+        assertEquals(UiText.DynamicString("No existe esa cuenta"), (state as ForgotPasswordUiState.Error).message)
     }
 }

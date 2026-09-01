@@ -20,6 +20,7 @@ import androidx.navigation.fragment.findNavController
 import androidx.navigation.navOptions
 import com.example.aicollect.R
 import com.example.aicollect.databinding.FragmentRegisterBinding
+import com.example.aicollect.presentation.asString
 import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.delay
@@ -89,8 +90,9 @@ class RegisterFragment : Fragment() {
 
         when (state) {
             is RegisterUiState.Success -> navigateToHome()
-            is RegisterUiState.Error -> Snackbar.make(binding.root, state.message, Snackbar.LENGTH_LONG).show()
-            is RegisterUiState.UsernameTaken -> showUsernameTakenFeedback(state.message)
+            is RegisterUiState.Error ->
+                Snackbar.make(binding.root, state.message.asString(requireContext()), Snackbar.LENGTH_LONG).show()
+            is RegisterUiState.UsernameTaken -> showUsernameTakenFeedback(state.message.asString(requireContext()))
             else -> Unit
         }
     }

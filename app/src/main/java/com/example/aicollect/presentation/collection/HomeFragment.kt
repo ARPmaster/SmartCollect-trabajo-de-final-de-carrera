@@ -17,6 +17,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.aicollect.R
 import com.example.aicollect.application.items.ItemSortOption
 import com.example.aicollect.databinding.FragmentHomeBinding
+import com.example.aicollect.presentation.asString
 import com.example.aicollect.presentation.showSnackbar
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
@@ -78,7 +79,7 @@ class HomeFragment : Fragment() {
 
                 feedAdapter.submitList(buildFeedRows(state.visibleItems.map { it.toFeedItem() }, state.summary))
             }
-            is HomeUiState.Error -> showSnackbar(binding.root, state.message).show()
+            is HomeUiState.Error -> showSnackbar(binding.root, state.message.asString(requireContext())).show()
         }
     }
 

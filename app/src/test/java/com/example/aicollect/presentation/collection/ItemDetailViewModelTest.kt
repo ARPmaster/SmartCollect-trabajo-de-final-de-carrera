@@ -4,6 +4,7 @@ package com.example.aicollect.presentation.collection
 import com.example.aicollect.application.items.Item
 import com.example.aicollect.application.items.ItemRepository
 import com.example.aicollect.application.items.PricePoint
+import com.example.aicollect.presentation.UiText
 import com.example.aicollect.testutil.MainDispatcherRule
 import io.mockk.coEvery
 import io.mockk.coVerify
@@ -79,7 +80,7 @@ class ItemDetailViewModelTest {
 
         val state = viewModel.uiState.value
         assertTrue(state is ItemDetailUiState.Error)
-        assertEquals("El artículo ya no existe.", (state as ItemDetailUiState.Error).message)
+        assertEquals(UiText.DynamicString("El artículo ya no existe."), (state as ItemDetailUiState.Error).message)
     }
 
     @Test
@@ -181,6 +182,6 @@ class ItemDetailViewModelTest {
 
         val state = viewModel.deleteState.value
         assertTrue(state is DeleteItemUiState.Error)
-        assertEquals("Sin conexión", (state as DeleteItemUiState.Error).message)
+        assertEquals(UiText.DynamicString("Sin conexión"), (state as DeleteItemUiState.Error).message)
     }
 }

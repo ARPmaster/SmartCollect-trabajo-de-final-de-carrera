@@ -15,6 +15,7 @@ import androidx.navigation.fragment.findNavController
 import coil.load
 import com.example.aicollect.R
 import com.example.aicollect.databinding.FragmentItemDetailBinding
+import com.example.aicollect.presentation.asString
 import com.example.aicollect.presentation.showSnackbar
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import dagger.hilt.android.AndroidEntryPoint
@@ -79,7 +80,7 @@ class ItemDetailFragment : Fragment() {
                 showSnackbar(binding.root, R.string.item_detail_deleted_success).show()
                 findNavController().popBackStack()
             }
-            is DeleteItemUiState.Error -> showSnackbar(binding.root, state.message).show()
+            is DeleteItemUiState.Error -> showSnackbar(binding.root, state.message.asString(requireContext())).show()
             else -> Unit
         }
     }
@@ -89,7 +90,7 @@ class ItemDetailFragment : Fragment() {
             is ItemDetailUiState.Loading -> Unit
             is ItemDetailUiState.Content -> bind(state)
             is ItemDetailUiState.Error -> {
-                showSnackbar(binding.root, state.message).show()
+                showSnackbar(binding.root, state.message.asString(requireContext())).show()
                 findNavController().popBackStack()
             }
         }

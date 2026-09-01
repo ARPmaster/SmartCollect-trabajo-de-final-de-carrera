@@ -3,6 +3,7 @@ package com.example.aicollect.presentation.auth
 
 import com.example.aicollect.application.auth.AuthRepository
 import com.example.aicollect.application.auth.UsernameTakenException
+import com.example.aicollect.presentation.UiText
 import com.example.aicollect.testutil.MainDispatcherRule
 import io.mockk.coEvery
 import io.mockk.coVerify
@@ -149,7 +150,7 @@ class RegisterViewModelTest {
 
         val state = viewModel.uiState.value
         assertTrue(state is RegisterUiState.Error)
-        assertEquals("El correo ya está en uso", (state as RegisterUiState.Error).message)
+        assertEquals(UiText.DynamicString("El correo ya está en uso"), (state as RegisterUiState.Error).message)
     }
 
     @Test
@@ -161,6 +162,9 @@ class RegisterViewModelTest {
 
         val state = viewModel.uiState.value
         assertTrue(state is RegisterUiState.UsernameTaken)
-        assertEquals("Ese nombre de usuario ya está en uso.", (state as RegisterUiState.UsernameTaken).message)
+        assertEquals(
+            UiText.DynamicString("Ese nombre de usuario ya está en uso."),
+            (state as RegisterUiState.UsernameTaken).message,
+        )
     }
 }

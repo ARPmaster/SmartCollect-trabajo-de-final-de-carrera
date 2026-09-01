@@ -8,6 +8,8 @@ import androidx.lifecycle.viewModelScope
 import com.example.aicollect.application.items.Item
 import com.example.aicollect.application.items.ItemRepository
 import com.example.aicollect.application.items.PortfolioAnalytics
+import com.example.aicollect.R
+import com.example.aicollect.presentation.UiText
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -40,7 +42,7 @@ sealed interface MyVaultUiState {
         val totalItemsLabel: String,
         val topValuedItems: List<TopValuedItemUi>,
     ) : MyVaultUiState
-    data class Error(val message: String) : MyVaultUiState
+    data class Error(val message: UiText) : MyVaultUiState
 }
 
 @HiltViewModel
@@ -54,7 +56,13 @@ class MyVaultViewModel @Inject constructor(itemRepository: ItemRepository) : Vie
     ) { items, selectedSport ->
         if (items.isEmpty()) MyVaultUiState.Empty else buildContent(items, selectedSport)
     }
-        .catch { emit(MyVaultUiState.Error(it.message ?: "No se pudo cargar tu cartera.")) }
+        .catch {
+            emit(
+                MyVaultUiState.Error(
+                    it.message?.let(UiText::DynamicString) ?: UiText.StringResource(R.string.error_myvault_load_generic),
+                ),
+            )
+        }
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(STOP_TIMEOUT_MS), MyVaultUiState.Loading)
 
     fun selectSport(sport: String?) {

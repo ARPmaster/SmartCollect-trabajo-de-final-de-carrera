@@ -231,6 +231,33 @@
     <string name="home_no_filter_results">Ningún artículo coincide con estos filtros.</string>
     <string name="home_load_error">No se pudo cargar tu colección. Inténtalo de nuevo.</string>
 
+    <!-- Mensajes de error de ViewModel movidos aquí para que los ViewModel no toquen Context
+         (ver UiText.kt): cada uno se resuelve en el Fragment con getString/UiText.asString(). -->
+    <string name="error_forgot_password_empty_email">Introduce tu correo electrónico.</string>
+    <string name="error_forgot_password_generic">No se pudo enviar el correo.</string>
+    <string name="error_login_missing_fields">Completa tu correo y contraseña.</string>
+    <string name="error_login_generic">No se pudo iniciar sesión.</string>
+    <string name="error_passwords_dont_match">Las contraseñas no coinciden.</string>
+    <string name="error_register_username_length">El nombre de usuario debe tener entre %1$d y %2$d caracteres.</string>
+    <string name="error_username_taken">Ese nombre de usuario ya está en uso.</string>
+    <string name="error_register_generic">No se pudo crear la cuenta.</string>
+    <string name="error_item_load_generic">No se pudo cargar el artículo.</string>
+    <string name="error_myvault_load_generic">No se pudo cargar tu cartera.</string>
+    <string name="error_edit_item_not_loaded">No se pudo guardar: el artículo aún no se ha cargado.</string>
+    <string name="error_edit_item_save_generic">No se pudieron guardar los cambios. Inténtalo de nuevo.</string>
+    <string name="error_new_post_analyze_generic">No se pudo analizar la imagen. Inténtalo de nuevo.</string>
+    <string name="error_new_post_save_generic">No se pudo guardar el artículo. Inténtalo de nuevo.</string>
+    <string name="error_edit_profile_photo_generic">No se pudo actualizar la foto de perfil.</string>
+    <string name="error_edit_profile_name_blank">El nombre no puede estar vacío.</string>
+    <string name="error_edit_profile_name_length">El nombre debe tener entre %1$d y %2$d caracteres.</string>
+    <string name="error_edit_profile_generic">No se pudo actualizar el perfil.</string>
+    <string name="error_security_confirm_password_required">Introduce tu contraseña para confirmar.</string>
+    <string name="error_security_reauth_generic">No se pudo verificar tu contraseña. Inténtalo de nuevo.</string>
+    <string name="error_security_delete_account_generic">No se pudo eliminar la cuenta. Inténtalo de nuevo.</string>
+    <string name="error_security_no_changes">No hay cambios que guardar.</string>
+    <string name="error_security_update_email_generic">No se pudo actualizar el correo.</string>
+    <string name="error_security_update_password_generic">No se pudo actualizar la contraseña.</string>
+
     <string-array name="sport_options">
         <item>Baloncesto</item>
         <item>Fútbol Americano</item>

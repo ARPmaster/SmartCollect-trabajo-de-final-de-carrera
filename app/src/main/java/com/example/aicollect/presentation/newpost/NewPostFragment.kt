@@ -30,6 +30,7 @@ import com.example.aicollect.R
 import com.example.aicollect.databinding.FragmentNewPostBinding
 import com.example.aicollect.databinding.ItemNewPostAddPhotoTileBinding
 import com.example.aicollect.databinding.ItemNewPostPhotoThumbnailBinding
+import com.example.aicollect.presentation.asString
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.snackbar.Snackbar
 import java.io.ByteArrayOutputStream
@@ -268,7 +269,7 @@ class NewPostFragment : Fragment() {
             }
             is RecognitionUiState.Error -> {
                 viewModel.acknowledgeRecognitionResult()
-                Snackbar.make(binding.root, state.message, Snackbar.LENGTH_LONG).show()
+                Snackbar.make(binding.root, state.message.asString(requireContext()), Snackbar.LENGTH_LONG).show()
             }
             else -> Unit
         }
@@ -304,7 +305,7 @@ class NewPostFragment : Fragment() {
                 )
             }
             is SaveItemUiState.Error ->
-                Snackbar.make(binding.root, state.message, Snackbar.LENGTH_LONG).show()
+                Snackbar.make(binding.root, state.message.asString(requireContext()), Snackbar.LENGTH_LONG).show()
             is SaveItemUiState.ValidationError -> {
                 val messageRes = when (state.field) {
                     RequiredField.NAME -> R.string.new_post_name_required_error

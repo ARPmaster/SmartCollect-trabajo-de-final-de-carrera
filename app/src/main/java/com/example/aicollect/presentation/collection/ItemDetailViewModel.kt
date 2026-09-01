@@ -8,6 +8,8 @@ import androidx.lifecycle.viewModelScope
 import com.example.aicollect.application.items.Item
 import com.example.aicollect.application.items.ItemRepository
 import com.example.aicollect.application.items.PortfolioAnalytics
+import com.example.aicollect.R
+import com.example.aicollect.presentation.UiText
 import dagger.hilt.android.lifecycle.HiltViewModel
 import java.util.Locale
 import javax.inject.Inject
@@ -30,14 +32,14 @@ sealed interface ItemDetailUiState {
         val monthLabels: List<String>,
         val valuationRangeLabel: String?,
     ) : ItemDetailUiState
-    data class Error(val message: String) : ItemDetailUiState
+    data class Error(val message: UiText) : ItemDetailUiState
 }
 
 sealed interface DeleteItemUiState {
     data object Idle : DeleteItemUiState
     data object Deleting : DeleteItemUiState
     data object Success : DeleteItemUiState
-    data class Error(val message: String) : DeleteItemUiState
+    data class Error(val message: UiText) : DeleteItemUiState
 }
 
 @HiltViewModel
@@ -68,7 +70,9 @@ class ItemDetailViewModel @Inject constructor(
                 }
                 .onFailure {
                     if (currentItemId != itemId) return@onFailure
-                    _uiState.value = ItemDetailUiState.Error(it.message ?: "No se pudo cargar el artículo.")
+                    _uiState.value = ItemDetailUiState.Error(
+                        it.message?.let(UiText::DynamicString) ?: UiText.StringResource(R.string.error_item_load_generic),
+                    )
                 }
         }
     }
@@ -81,7 +85,7 @@ class ItemDetailViewModel @Inject constructor(
                 .onSuccess { _deleteState.value = DeleteItemUiState.Success }
                 .onFailure {
                     _deleteState.value = DeleteItemUiState.Error(
-                        it.message ?: "No se pudo eliminar el artículo. Inténtalo de nuevo.",
+                        it.message?.let(UiText::DynamicString) ?: UiText.StringResource(R.string.item_detail_delete_error),
                     )
                 }
         }

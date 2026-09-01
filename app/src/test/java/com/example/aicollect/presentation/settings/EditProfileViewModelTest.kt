@@ -3,6 +3,7 @@ package com.example.aicollect.presentation.settings
 
 import com.example.aicollect.application.auth.AuthRepository
 import com.example.aicollect.application.auth.UsernameTakenException
+import com.example.aicollect.presentation.UiText
 import com.example.aicollect.testutil.MainDispatcherRule
 import io.mockk.coEvery
 import io.mockk.coVerify
@@ -67,7 +68,10 @@ class EditProfileViewModelTest {
 
         val state = viewModel.uiState.value
         assertTrue(state is EditProfileUiState.NameTaken)
-        assertEquals("Ese nombre de usuario ya está en uso.", (state as EditProfileUiState.NameTaken).message)
+        assertEquals(
+            UiText.DynamicString("Ese nombre de usuario ya está en uso."),
+            (state as EditProfileUiState.NameTaken).message,
+        )
     }
 
     @Test
@@ -79,7 +83,7 @@ class EditProfileViewModelTest {
 
         val state = viewModel.uiState.value
         assertTrue(state is EditProfileUiState.Error)
-        assertEquals("Fallo de red", (state as EditProfileUiState.Error).message)
+        assertEquals(UiText.DynamicString("Fallo de red"), (state as EditProfileUiState.Error).message)
     }
 
     @Test
@@ -105,7 +109,7 @@ class EditProfileViewModelTest {
 
         val state = viewModel.photoUploadState.value
         assertTrue(state is PhotoUploadUiState.Error)
-        assertEquals("No se pudo subir", (state as PhotoUploadUiState.Error).message)
+        assertEquals(UiText.DynamicString("No se pudo subir"), (state as PhotoUploadUiState.Error).message)
     }
 
     @Test

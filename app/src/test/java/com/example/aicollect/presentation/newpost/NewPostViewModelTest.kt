@@ -6,6 +6,7 @@ import com.example.aicollect.application.items.ItemRepository
 import com.example.aicollect.application.items.ValuationResult
 import com.example.aicollect.application.recognition.RankedCandidate
 import com.example.aicollect.application.recognition.RecognitionRepository
+import com.example.aicollect.presentation.UiText
 import com.example.aicollect.testutil.MainDispatcherRule
 import io.mockk.coEvery
 import io.mockk.coVerify
@@ -80,7 +81,7 @@ class NewPostViewModelTest {
 
         val state = viewModel.recognitionState.value
         assertTrue(state is RecognitionUiState.Error)
-        assertEquals("Sin cuota", (state as RecognitionUiState.Error).message)
+        assertEquals(UiText.DynamicString("Sin cuota"), (state as RecognitionUiState.Error).message)
     }
 
     @Test
@@ -224,7 +225,7 @@ class NewPostViewModelTest {
 
         val state = viewModel.saveState.value
         assertTrue(state is SaveItemUiState.Error)
-        assertEquals("Sin conexión", (state as SaveItemUiState.Error).message)
+        assertEquals(UiText.DynamicString("Sin conexión"), (state as SaveItemUiState.Error).message)
     }
 
     @Test

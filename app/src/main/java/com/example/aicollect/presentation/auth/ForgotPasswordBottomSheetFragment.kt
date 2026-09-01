@@ -12,6 +12,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import com.example.aicollect.R
 import com.example.aicollect.databinding.FragmentForgotPasswordSheetBinding
+import com.example.aicollect.presentation.asString
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
@@ -62,7 +63,8 @@ class ForgotPasswordBottomSheetFragment : BottomSheetDialogFragment() {
                 Snackbar.make(binding.root, R.string.forgot_password_success, Snackbar.LENGTH_LONG).show()
                 dismiss()
             }
-            is ForgotPasswordUiState.Error -> Snackbar.make(binding.root, state.message, Snackbar.LENGTH_LONG).show()
+            is ForgotPasswordUiState.Error ->
+                Snackbar.make(binding.root, state.message.asString(requireContext()), Snackbar.LENGTH_LONG).show()
             else -> Unit
         }
     }
