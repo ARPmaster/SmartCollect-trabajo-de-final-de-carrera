@@ -238,6 +238,13 @@
     <string name="error_login_missing_fields">Completa tu correo y contraseña.</string>
     <string name="error_login_generic">No se pudo iniciar sesión.</string>
     <string name="error_passwords_dont_match">Las contraseñas no coinciden.</string>
+    <string name="error_password_too_short">La contraseña debe tener al menos %1$d caracteres.</string>
+    <string name="error_password_missing_uppercase">La contraseña debe incluir al menos una letra mayúscula.</string>
+    <string name="error_password_missing_lowercase">La contraseña debe incluir al menos una letra minúscula.</string>
+    <string name="error_password_missing_digit">La contraseña debe incluir al menos un número.</string>
+    <string name="error_password_missing_symbol">La contraseña debe incluir al menos un signo (por ejemplo: !?#$%%&amp;*).</string>
+    <string name="error_email_invalid_format">Introduce un correo electrónico válido.</string>
+    <string name="label_not_valued">Sin valorar</string>
     <string name="error_register_username_length">El nombre de usuario debe tener entre %1$d y %2$d caracteres.</string>
     <string name="error_username_taken">Ese nombre de usuario ya está en uso.</string>
     <string name="error_register_generic">No se pudo crear la cuenta.</string>
@@ -257,6 +264,8 @@
     <string name="error_security_no_changes">No hay cambios que guardar.</string>
     <string name="error_security_update_email_generic">No se pudo actualizar el correo.</string>
     <string name="error_security_update_password_generic">No se pudo actualizar la contraseña.</string>
+    <string name="error_security_wrong_password">Contraseña incorrecta.</string>
+    <string name="error_security_recent_login_required">Por seguridad, cierra sesión y vuelve a iniciar sesión antes de cambiar estos datos.</string>
 
     <string-array name="sport_options">
         <item>Baloncesto</item>

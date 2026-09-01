@@ -4,10 +4,12 @@ package com.example.aicollect.presentation.settings
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.aicollect.application.auth.AuthError
 import com.example.aicollect.application.auth.AuthRepository
 import com.example.aicollect.application.auth.AuthValidation
 import com.example.aicollect.R
 import com.example.aicollect.presentation.UiText
+import com.example.aicollect.presentation.auth.asUiText
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -52,9 +54,14 @@ class SecurityViewModel @Inject constructor(
         viewModelScope.launch {
             val reauthResult = authRepository.reauthenticate(password)
             if (reauthResult.isFailure) {
+                val error = reauthResult.exceptionOrNull()
                 _deleteAccountState.value = DeleteAccountUiState.Error(
-                    reauthResult.exceptionOrNull()?.message?.let(UiText::DynamicString)
-                        ?: UiText.StringResource(R.string.error_security_reauth_generic),
+                    if (error is AuthError.WrongPassword) {
+                        UiText.StringResource(R.string.error_security_wrong_password)
+                    } else {
+                        error?.message?.let(UiText::DynamicString)
+                            ?: UiText.StringResource(R.string.error_security_reauth_generic)
+                    },
                 )
                 return@launch
             }
@@ -80,14 +87,14 @@ class SecurityViewModel @Inject constructor(
         if (emailChanged) {
             val emailError = AuthValidation.emailError(email)
             if (emailError != null) {
-                _uiState.value = SecurityUiState.Error(UiText.DynamicString(emailError))
+                _uiState.value = SecurityUiState.Error(emailError.asUiText())
                 return
             }
         }
         if (passwordProvided) {
             val passwordError = AuthValidation.passwordError(newPassword)
             if (passwordError != null) {
-                _uiState.value = SecurityUiState.Error(UiText.DynamicString(passwordError))
+                _uiState.value = SecurityUiState.Error(passwordError.asUiText())
                 return
             }
             if (newPassword != confirmPassword) {
@@ -101,9 +108,14 @@ class SecurityViewModel @Inject constructor(
             if (emailChanged) {
                 val result = authRepository.updateEmail(email)
                 if (result.isFailure) {
+                    val error = result.exceptionOrNull()
                     _uiState.value = SecurityUiState.Error(
-                        result.exceptionOrNull()?.message?.let(UiText::DynamicString)
-                            ?: UiText.StringResource(R.string.error_security_update_email_generic),
+                        if (error is AuthError.RecentLoginRequired) {
+                            UiText.StringResource(R.string.error_security_recent_login_required)
+                        } else {
+                            error?.message?.let(UiText::DynamicString)
+                                ?: UiText.StringResource(R.string.error_security_update_email_generic)
+                        },
                     )
                     return@launch
                 }
@@ -111,9 +123,14 @@ class SecurityViewModel @Inject constructor(
             if (passwordProvided) {
                 val result = authRepository.updatePassword(newPassword)
                 if (result.isFailure) {
+                    val error = result.exceptionOrNull()
                     _uiState.value = SecurityUiState.Error(
-                        result.exceptionOrNull()?.message?.let(UiText::DynamicString)
-                            ?: UiText.StringResource(R.string.error_security_update_password_generic),
+                        if (error is AuthError.RecentLoginRequired) {
+                            UiText.StringResource(R.string.error_security_recent_login_required)
+                        } else {
+                            error?.message?.let(UiText::DynamicString)
+                                ?: UiText.StringResource(R.string.error_security_update_password_generic)
+                        },
                     )
                     return@launch
                 }

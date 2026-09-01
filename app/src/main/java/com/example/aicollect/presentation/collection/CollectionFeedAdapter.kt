@@ -11,6 +11,7 @@ import androidx.recyclerview.widget.RecyclerView
 import coil.load
 import com.example.aicollect.databinding.ItemCollectionFeedBinding
 import com.example.aicollect.databinding.ItemTotalValueHeaderBinding
+import com.example.aicollect.presentation.asString
 
 private const val VIEW_TYPE_HEADER = 0
 private const val VIEW_TYPE_FEED_ITEM = 1
@@ -76,7 +77,7 @@ class CollectionFeedAdapter(
         fun bind(item: CollectionFeedItem) {
             binding.tvCategory.text = item.category
             binding.ivItem.load(item.imageUrl)
-            binding.tvPrice.text = item.priceLabel
+            binding.tvPrice.text = item.priceLabel.asString(binding.root.context)
             binding.tvDescription.text = item.description
             binding.tvDate.text = item.dateLabel
             binding.root.setOnClickListener { onItemClick(item) }

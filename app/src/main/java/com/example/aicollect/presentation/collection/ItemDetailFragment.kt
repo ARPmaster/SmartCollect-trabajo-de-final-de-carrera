@@ -99,7 +99,7 @@ class ItemDetailFragment : Fragment() {
     private fun bind(state: ItemDetailUiState.Content) {
         binding.ivItemImage.load(state.imageUrl)
         binding.tvItemTitle.text = state.nombre
-        binding.tvItemPrice.text = state.priceLabel
+        binding.tvItemPrice.text = state.priceLabel.asString(requireContext())
         binding.tvItemCondition.text = state.estado
         binding.tvItemCategory.text = state.deporte
         binding.tvItemSportIcon.text = state.sportEmoji

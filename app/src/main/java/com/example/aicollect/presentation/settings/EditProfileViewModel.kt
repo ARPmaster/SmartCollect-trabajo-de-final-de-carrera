@@ -79,10 +79,7 @@ class EditProfileViewModel @Inject constructor(
                 .onSuccess { _uiState.value = EditProfileUiState.Success }
                 .onFailure { error ->
                     _uiState.value = if (error is UsernameTakenException) {
-                        EditProfileUiState.NameTaken(
-                            error.message?.let(UiText::DynamicString)
-                                ?: UiText.StringResource(R.string.error_username_taken),
-                        )
+                        EditProfileUiState.NameTaken(UiText.StringResource(R.string.error_username_taken))
                     } else {
                         EditProfileUiState.Error(
                             error.message?.let(UiText::DynamicString)

@@ -24,7 +24,7 @@ data class TopValuedItemUi(
     val imageUrl: String?,
     val nombre: String,
     val subtitle: String,
-    val valueLabel: String,
+    val valueLabel: UiText,
 )
 
 sealed interface MyVaultUiState {
@@ -73,7 +73,7 @@ class MyVaultViewModel @Inject constructor(itemRepository: ItemRepository) : Vie
         val evolution = PortfolioAnalytics.monthlyEvolution(items)
         val itemsForSelectedSport = selectedSport?.let { sport -> items.filter { it.deporte == sport } } ?: items
         return MyVaultUiState.Content(
-            totalValueLabel = ItemFormatting.formatValue(PortfolioAnalytics.totalValue(items), CURRENCY),
+            totalValueLabel = ItemFormatting.formatKnownValue(PortfolioAnalytics.totalValue(items), CURRENCY),
             changeLabel = ItemFormatting.formatChangePercent(PortfolioAnalytics.changePercent(evolution)),
             evolution = evolution,
             monthLabels = PortfolioAnalytics.monthLabels(),

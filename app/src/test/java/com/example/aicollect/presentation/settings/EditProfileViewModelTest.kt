@@ -3,6 +3,7 @@ package com.example.aicollect.presentation.settings
 
 import com.example.aicollect.application.auth.AuthRepository
 import com.example.aicollect.application.auth.UsernameTakenException
+import com.example.aicollect.R
 import com.example.aicollect.presentation.UiText
 import com.example.aicollect.testutil.MainDispatcherRule
 import io.mockk.coEvery
@@ -69,7 +70,7 @@ class EditProfileViewModelTest {
         val state = viewModel.uiState.value
         assertTrue(state is EditProfileUiState.NameTaken)
         assertEquals(
-            UiText.DynamicString("Ese nombre de usuario ya está en uso."),
+            UiText.StringResource(R.string.error_username_taken),
             (state as EditProfileUiState.NameTaken).message,
         )
     }

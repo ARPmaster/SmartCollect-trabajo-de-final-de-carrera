@@ -66,7 +66,7 @@ class PortfolioLineChartView @JvmOverloads constructor(
         textAlign = Paint.Align.LEFT
     }
 
-    private fun formatLabel(value: Float): String = ItemFormatting.formatValue(value.toDouble(), "EUR")
+    private fun formatLabel(value: Float): String = ItemFormatting.formatKnownValue(value.toDouble(), "EUR")
 
     override fun onDraw(canvas: Canvas) {
         super.onDraw(canvas)

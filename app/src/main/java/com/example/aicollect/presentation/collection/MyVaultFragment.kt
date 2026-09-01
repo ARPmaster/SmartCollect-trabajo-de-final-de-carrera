@@ -165,7 +165,7 @@ class MyVaultFragment : Fragment() {
             itemBinding.ivItemImage.load(item.imageUrl)
             itemBinding.tvItemName.text = item.nombre
             itemBinding.tvItemSubtitle.text = item.subtitle
-            itemBinding.tvItemValue.text = item.valueLabel
+            itemBinding.tvItemValue.text = item.valueLabel.asString(requireContext())
 
             if (index != topItems.lastIndex) {
                 (itemBinding.root.layoutParams as ViewGroup.MarginLayoutParams).bottomMargin =

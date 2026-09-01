@@ -24,7 +24,7 @@ sealed interface ItemDetailUiState {
     data class Content(
         val imageUrl: String?,
         val nombre: String,
-        val priceLabel: String,
+        val priceLabel: UiText,
         val estado: String,
         val deporte: String,
         val sportEmoji: String,
@@ -119,7 +119,7 @@ class ItemDetailViewModel @Inject constructor(
     private fun Item.valuationRangeLabel(): String? {
         val min = valoracionMin ?: return null
         val max = valoracionMax ?: return null
-        return "${ItemFormatting.formatValue(min, valoracionMoneda)} – ${ItemFormatting.formatValue(max, valoracionMoneda)}"
+        return "${ItemFormatting.formatKnownValue(min, valoracionMoneda)} – ${ItemFormatting.formatKnownValue(max, valoracionMoneda)}"
     }
 
     private fun sportEmoji(deporte: String): String = when (deporte.lowercase(Locale("es", "ES"))) {

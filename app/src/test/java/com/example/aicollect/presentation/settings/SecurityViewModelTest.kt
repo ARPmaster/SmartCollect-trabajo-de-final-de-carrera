@@ -1,7 +1,9 @@
 // Test unitario de SecurityViewModel: cambio de email/contraseña (por separado y combinados, con sus validaciones) y eliminación de cuenta con reautenticación previa.
 package com.example.aicollect.presentation.settings
 
+import com.example.aicollect.application.auth.AuthError
 import com.example.aicollect.application.auth.AuthRepository
+import com.example.aicollect.R
 import com.example.aicollect.presentation.UiText
 import com.example.aicollect.testutil.MainDispatcherRule
 import io.mockk.coEvery
@@ -134,6 +136,36 @@ class SecurityViewModelTest {
     }
 
     @Test
+    fun `updateEmail failing with RecentLoginRequired maps to the recent-login resource`() {
+        coEvery { authRepository.updateEmail(any()) } returns Result.failure(AuthError.RecentLoginRequired())
+
+        viewModel.saveChanges(email = "new@gmail.com", newPassword = "", confirmPassword = "")
+        mainDispatcherRule.dispatcher.scheduler.advanceUntilIdle()
+
+        val state = viewModel.uiState.value
+        assertTrue(state is SecurityUiState.Error)
+        assertEquals(
+            UiText.StringResource(R.string.error_security_recent_login_required),
+            (state as SecurityUiState.Error).message,
+        )
+    }
+
+    @Test
+    fun `updatePassword failing with RecentLoginRequired maps to the recent-login resource`() {
+        coEvery { authRepository.updatePassword(any()) } returns Result.failure(AuthError.RecentLoginRequired())
+
+        viewModel.saveChanges(email = "old@gmail.com", newPassword = validPassword, confirmPassword = validPassword)
+        mainDispatcherRule.dispatcher.scheduler.advanceUntilIdle()
+
+        val state = viewModel.uiState.value
+        assertTrue(state is SecurityUiState.Error)
+        assertEquals(
+            UiText.StringResource(R.string.error_security_recent_login_required),
+            (state as SecurityUiState.Error).message,
+        )
+    }
+
+    @Test
     fun `updatePassword failure surfaces its message`() {
         coEvery { authRepository.updatePassword(any()) } returns Result.failure(Exception("Contraseña débil"))
 
@@ -168,15 +200,18 @@ class SecurityViewModelTest {
     }
 
     @Test
-    fun `deleteAccount stops before calling deleteAccount when reauthenticate fails`() {
-        coEvery { authRepository.reauthenticate(any()) } returns Result.failure(Exception("Contraseña incorrecta."))
+    fun `deleteAccount stops before calling deleteAccount when reauthenticate fails with WrongPassword`() {
+        coEvery { authRepository.reauthenticate(any()) } returns Result.failure(AuthError.WrongPassword())
 
         viewModel.deleteAccount("clave-mala")
         mainDispatcherRule.dispatcher.scheduler.advanceUntilIdle()
 
         val state = viewModel.deleteAccountState.value
         assertTrue(state is DeleteAccountUiState.Error)
-        assertEquals(UiText.DynamicString("Contraseña incorrecta."), (state as DeleteAccountUiState.Error).message)
+        assertEquals(
+            UiText.StringResource(R.string.error_security_wrong_password),
+            (state as DeleteAccountUiState.Error).message,
+        )
         coVerify(exactly = 0) { authRepository.deleteAccount() }
     }
 

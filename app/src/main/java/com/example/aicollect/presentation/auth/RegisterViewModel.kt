@@ -39,7 +39,7 @@ class RegisterViewModel @Inject constructor(
         val passwordError = AuthValidation.passwordError(password)
         when {
             emailError != null -> {
-                _uiState.value = RegisterUiState.Error(UiText.DynamicString(emailError))
+                _uiState.value = RegisterUiState.Error(emailError.asUiText())
                 return
             }
             trimmedUsername.length < MIN_USERNAME_LENGTH || trimmedUsername.length > MAX_USERNAME_LENGTH -> {
@@ -52,7 +52,7 @@ class RegisterViewModel @Inject constructor(
                 return
             }
             passwordError != null -> {
-                _uiState.value = RegisterUiState.Error(UiText.DynamicString(passwordError))
+                _uiState.value = RegisterUiState.Error(passwordError.asUiText())
                 return
             }
             password != confirmPassword -> {
@@ -66,10 +66,7 @@ class RegisterViewModel @Inject constructor(
                 .onSuccess { _uiState.value = RegisterUiState.Success }
                 .onFailure { error ->
                     _uiState.value = if (error is UsernameTakenException) {
-                        RegisterUiState.UsernameTaken(
-                            error.message?.let(UiText::DynamicString)
-                                ?: UiText.StringResource(R.string.error_username_taken),
-                        )
+                        RegisterUiState.UsernameTaken(UiText.StringResource(R.string.error_username_taken))
                     } else {
                         RegisterUiState.Error(
                             error.message?.let(UiText::DynamicString)

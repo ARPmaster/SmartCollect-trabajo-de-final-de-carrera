@@ -68,7 +68,7 @@ class ItemDetailViewModelTest {
         assertEquals("Running", state.deporte)
         assertEquals("Nuevo", state.estado)
         assertEquals("https://example.com/foto.jpg", state.imageUrl)
-        assertEquals("120€", state.priceLabel)
+        assertEquals(UiText.DynamicString("120€"), state.priceLabel)
     }
 
     @Test
