@@ -28,6 +28,7 @@ import androidx.navigation.navOptions
 import coil.load
 import com.example.aicollect.R
 import com.example.aicollect.data.DarkModePreferences
+import com.example.aicollect.data.FilterSessionState
 import com.example.aicollect.databinding.ActivityMainBinding
 import com.example.aicollect.presentation.collection.FilterBottomSheetFragment
 import com.example.aicollect.presentation.newpost.NewPostViewModel
@@ -146,6 +147,9 @@ class MainActivity : AppCompatActivity() {
         }
 
         navController.addOnDestinationChangedListener { _, destination, _ ->
+            if (destination.id !in filterVisibleDestinationIds) {
+                FilterSessionState.reset()
+            }
             applyChromeVisibility(
                 showAppBar = destination.id !in fullScreenDestinationIds,
                 showBottomNav = destination.id !in fullScreenDestinationIds,

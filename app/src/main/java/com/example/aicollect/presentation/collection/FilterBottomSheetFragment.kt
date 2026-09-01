@@ -1,5 +1,6 @@
 /** Bottom sheet de filtros de Home: recoge rango de precio, deporte, estado y orden elegidos
-*por el usuario, los guarda en preferencias locales y devuelve el resultado a HomeFragment.*/
+*por el usuario, los guarda en memoria mientras dure la visita a Home y devuelve el resultado a
+*HomeFragment.*/
 package com.example.aicollect.presentation.collection
 
 import android.os.Bundle
@@ -10,7 +11,7 @@ import android.widget.PopupMenu
 import android.widget.TextView
 import androidx.core.os.bundleOf
 import com.example.aicollect.R
-import com.example.aicollect.data.FilterPreferences
+import com.example.aicollect.data.FilterSessionState
 import com.example.aicollect.databinding.FragmentFiltersSheetBinding
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import kotlin.math.roundToInt
@@ -38,7 +39,7 @@ class FilterBottomSheetFragment : BottomSheetDialogFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        val saved = FilterPreferences.load(requireContext())
+        val saved = FilterSessionState.current
 
         binding.tvFilterSportValue.text = saved.sport ?: sportFilterOptions.first()
         binding.tvFilterConditionValue.text = saved.condition ?: conditionFilterOptions.first()
@@ -62,9 +63,8 @@ class FilterBottomSheetFragment : BottomSheetDialogFragment() {
                 .takeUnless { it == conditionFilterOptions.first() }
             val selectedSortOrdinal = sortOptions.indexOf(binding.tvFilterSortValue.text.toString()).coerceAtLeast(0)
 
-            FilterPreferences.save(
-                requireContext(),
-                FilterPreferences.SavedFilters(
+            FilterSessionState.update(
+                FilterSessionState.SavedFilters(
                     minPrice = minPrice,
                     maxPrice = maxPrice,
                     sport = selectedSport,
@@ -87,7 +87,7 @@ class FilterBottomSheetFragment : BottomSheetDialogFragment() {
         }
     }
 
-    private fun setUpValueRange(saved: FilterPreferences.SavedFilters) {
+    private fun setUpValueRange(saved: FilterSessionState.SavedFilters) {
         val slider = binding.rangeSliderValue
         val min = saved.minPrice.coerceIn(MIN_VALUE, MAX_VALUE).toFloat().roundToStep(slider.stepSize)
         val max = saved.maxPrice.coerceIn(MIN_VALUE, MAX_VALUE).toFloat().roundToStep(slider.stepSize)
@@ -152,7 +152,7 @@ class FilterBottomSheetFragment : BottomSheetDialogFragment() {
         const val KEY_CONDITION = "condition"
         const val KEY_SORT_ORDINAL = "sort_ordinal"
 
-        private const val MIN_VALUE = FilterPreferences.DEFAULT_MIN_PRICE
-        private const val MAX_VALUE = FilterPreferences.DEFAULT_MAX_PRICE
+        private const val MIN_VALUE = FilterSessionState.DEFAULT_MIN_PRICE
+        private const val MAX_VALUE = FilterSessionState.DEFAULT_MAX_PRICE
     }
 }

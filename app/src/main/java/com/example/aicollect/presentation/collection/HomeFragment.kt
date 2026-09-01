@@ -16,7 +16,6 @@ import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.aicollect.R
 import com.example.aicollect.application.items.ItemSortOption
-import com.example.aicollect.data.FilterPreferences
 import com.example.aicollect.databinding.FragmentHomeBinding
 import com.example.aicollect.presentation.showSnackbar
 import dagger.hilt.android.AndroidEntryPoint
@@ -57,11 +56,6 @@ class HomeFragment : Fragment() {
                 condition = bundle.getString(FilterBottomSheetFragment.KEY_CONDITION),
                 sortOrdinal = bundle.getInt(FilterBottomSheetFragment.KEY_SORT_ORDINAL),
             )
-        }
-
-        if (FilterPreferences.hasSavedFilters(requireContext())) {
-            val saved = FilterPreferences.load(requireContext())
-            applyFilters(saved.minPrice, saved.maxPrice, saved.sport, saved.condition, saved.sortOrdinal)
         }
 
         viewLifecycleOwner.lifecycleScope.launch {
