@@ -16,3 +16,7 @@ local.properties
 .kotlin/
 PROJECT_CONTEXT.md
 MEMORIA_TODO.md
+.claude/
+app/google-services.json
+backend/functions/node_modules/
+backend/functions/lib/
