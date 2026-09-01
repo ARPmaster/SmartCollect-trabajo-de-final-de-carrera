@@ -28,32 +28,11 @@ object AuthValidation {
 
     private val EMAIL_FORMAT = Regex("^[A-Za-z0-9._%+-]+@([A-Za-z0-9-]+\\.)+[A-Za-z]{2,}$")
 
-    // Proveedores de correo genéricos reales más habituales. Cualquier otro dominio se rechaza a
-    // propósito (evita altas con dominios inventados, de un solo uso o con erratas), a costa de no
-    // admitir correos corporativos/institucionales propios — es una limitación consciente, no un
-    // descuido.
-    private val ALLOWED_EMAIL_DOMAINS = setOf(
-        "gmail.com", "googlemail.com",
-        "outlook.com", "outlook.es", "hotmail.com", "hotmail.es", "live.com", "msn.com",
-        "yahoo.com", "yahoo.es",
-        "icloud.com", "me.com", "mac.com",
-        "protonmail.com", "proton.me",
-        "zoho.com",
-        "gmx.com", "gmx.es",
-        "aol.com",
-        "yandex.com",
-    )
-
-    /** Devuelve un mensaje de error si el correo no tiene formato válido o su dominio no está en
-     * la lista de proveedores genéricos admitidos, o null si es válido. */
+    /** Devuelve un mensaje de error si el correo no tiene formato válido (RF-02), o null si es
+     * válido. No restringe por dominio: una lista blanca de proveedores rechazaría correos
+     * institucionales/corporativos legítimos (incluidos los del tribunal evaluador). */
     fun emailError(email: String): String? {
         val trimmed = email.trim()
-        if (!EMAIL_FORMAT.matches(trimmed)) return "Introduce un correo electrónico válido."
-        val domain = trimmed.substringAfterLast('@').lowercase()
-        return if (domain !in ALLOWED_EMAIL_DOMAINS) {
-            "Usa un correo de un proveedor habitual (Gmail, Outlook, Yahoo, iCloud...)."
-        } else {
-            null
-        }
+        return if (!EMAIL_FORMAT.matches(trimmed)) "Introduce un correo electrónico válido." else null
     }
 }

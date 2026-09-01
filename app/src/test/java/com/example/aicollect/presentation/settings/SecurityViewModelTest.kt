@@ -38,11 +38,22 @@ class SecurityViewModelTest {
     }
 
     @Test
-    fun `new email with a domain outside the allowed list sets Error without calling the repository`() {
-        viewModel.saveChanges(email = "new@example.com", newPassword = "", confirmPassword = "")
+    fun `malformed new email sets Error without calling the repository`() {
+        viewModel.saveChanges(email = "newgmail.com", newPassword = "", confirmPassword = "")
 
         assertTrue(viewModel.uiState.value is SecurityUiState.Error)
         coVerify(exactly = 0) { authRepository.updateEmail(any()) }
+    }
+
+    @Test
+    fun `new email with an institutional domain calls updateEmail`() {
+        coEvery { authRepository.updateEmail(any()) } returns Result.success(Unit)
+
+        viewModel.saveChanges(email = "new@uvigo.es", newPassword = "", confirmPassword = "")
+        mainDispatcherRule.dispatcher.scheduler.advanceUntilIdle()
+
+        assertEquals(SecurityUiState.Success, viewModel.uiState.value)
+        coVerify(exactly = 1) { authRepository.updateEmail("new@uvigo.es") }
     }
 
     @Test

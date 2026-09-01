@@ -1,4 +1,4 @@
-// Test unitario de RegisterViewModel: validaciones de email/dominio/usuario/contraseña, registro feliz, error genérico y nombre de usuario ya en uso.
+// Test unitario de RegisterViewModel: validaciones de email/usuario/contraseña, registro feliz, error genérico y nombre de usuario ya en uso.
 package com.example.aicollect.presentation.auth
 
 import com.example.aicollect.application.auth.AuthRepository
@@ -31,9 +31,9 @@ class RegisterViewModelTest {
     }
 
     @Test
-    fun `email with a domain outside the allowed list sets Error without calling the repository`() {
+    fun `malformed email sets Error without calling the repository`() {
         viewModel.signUp(
-            email = "user@example.com",
+            email = "usergmail.com",
             username = "collector1",
             password = validPassword,
             confirmPassword = validPassword,
@@ -41,6 +41,22 @@ class RegisterViewModelTest {
 
         assertTrue(viewModel.uiState.value is RegisterUiState.Error)
         coVerify(exactly = 0) { authRepository.signUp(any(), any(), any()) }
+    }
+
+    @Test
+    fun `institutional email domain is accepted, not just generic providers`() {
+        coEvery { authRepository.signUp(any(), any(), any()) } returns Result.success(Unit)
+
+        viewModel.signUp(
+            email = "user@uvigo.es",
+            username = "collector1",
+            password = validPassword,
+            confirmPassword = validPassword,
+        )
+        mainDispatcherRule.dispatcher.scheduler.advanceUntilIdle()
+
+        assertEquals(RegisterUiState.Success, viewModel.uiState.value)
+        coVerify(exactly = 1) { authRepository.signUp("user@uvigo.es", validPassword, "collector1") }
     }
 
     @Test

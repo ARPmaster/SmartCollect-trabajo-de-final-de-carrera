@@ -1,4 +1,4 @@
-// Test unitario de AuthValidation: reglas de complejidad de contraseña y de dominio de correo admitido.
+// Test unitario de AuthValidation: reglas de complejidad de contraseña y de formato de correo (RF-02).
 package com.example.aicollect.application.auth
 
 import org.junit.Assert.assertNotNull
@@ -48,17 +48,22 @@ class AuthValidationTest {
     }
 
     @Test
-    fun `email with a domain outside the allowed list is rejected`() {
-        assertNotNull(AuthValidation.emailError("user@example.com"))
+    fun `email with a well-formed institutional or corporate domain is accepted`() {
+        assertNull(AuthValidation.emailError("user@uvigo.es"))
     }
 
     @Test
-    fun `email with an allowed generic domain is accepted`() {
+    fun `email with a well-known generic domain is accepted`() {
         assertNull(AuthValidation.emailError("user@gmail.com"))
     }
 
     @Test
-    fun `domain check is case-insensitive`() {
+    fun `email format check is case-insensitive on the domain`() {
         assertNull(AuthValidation.emailError("user@GMAIL.COM"))
+    }
+
+    @Test
+    fun `email with a malformed domain is rejected`() {
+        assertNotNull(AuthValidation.emailError("user@notadomain"))
     }
 }
