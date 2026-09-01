@@ -1,6 +1,12 @@
 import * as functions from "firebase-functions/v2/https";
 import * as admin from "firebase-admin";
 import { GoogleGenerativeAI } from "@google/generative-ai";
+import {
+  ValuationResult,
+  buildSearchKey,
+  extractGroundingSources,
+  parseValuationJson,
+} from "./valuation";
 
 // Guardado así (no admin.initializeApp() directo) para que este archivo no dependa de que
 // recognizeItem.ts se cargue primero — admin.initializeApp() lanza si se llama dos veces.
@@ -10,23 +16,6 @@ if (admin.apps.length === 0) {
 const db = admin.firestore();
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY!);
 
-/** Una búsqueda que Gemini ejecutó de verdad para llegar al precio — NO es un enlace directo al
- * anuncio de eBay/Vinted que miró (esta API no expone eso, ver `extractGroundingSources`), es un
- * enlace de búsqueda de Google con la misma query. Sigue siendo verificable (el usuario puede ver
- * resultados comparables), pero no es "aquí está la fuente exacta". */
-interface GroundingSource {
-  label: string;
-  url: string;
-}
-
-interface ValuationResult {
-  precio: number | null;
-  min: number | null;
-  max: number | null;
-  moneda: string;
-  fuentes: GroundingSource[];
-}
-
 interface ProductsCacheDoc extends ValuationResult {
   actualizadoEn: number;
 }
@@ -35,27 +24,6 @@ interface ProductsCacheDoc extends ValuationResult {
 // Cloud Scheduler descartado (PROJECT_CONTEXT.md): la frescura se comprueba al pulsar el botón,
 // no con un cron.
 const CACHE_MAX_AGE_MS = 30 * 24 * 60 * 60 * 1000; // 30 días
-
-/** Misma clave para "el mismo producto" en toda la app: marca+modelo+edición normalizados (cae al
- * nombre libre completo si esos campos están vacíos, caso de un item creado a mano). Usada tanto
- * por [refreshValuation] (item ya guardado) como por [searchValuation] (2026-08-24, antes de que
- * el item exista) — así ambas rutas comparten el mismo `products_cache`, sea cual sea el uid que
- * pregunte. 2026-08-24: encontrado en pruebas reales — la misma zapatilla subida dos veces con el
- * nombre escrito distinto daba precios distintos porque nunca coincidía con la clave anterior. */
-function buildSearchKey(
-  nombre: string,
-  marca?: string | null,
-  modelo?: string | null,
-  edicion?: string | null
-): { searchQuery: string; cacheKey: string } {
-  const searchQuery = [nombre, marca, modelo, edicion]
-    .filter((v) => typeof v === "string" && v.trim().length > 0)
-    .join(" ");
-  const structuredKey = [marca, modelo, edicion]
-    .filter((v) => typeof v === "string" && v.trim().length > 0)
-    .join(" ");
-  return { searchQuery, cacheKey: normalizeKey(structuredKey || nombre) };
-}
 
 /** Mira `products_cache` antes de gastar una llamada a Gemini; si no hay nada fresco, busca y
  * cachea el resultado (best-effort: si falla el caché, no debe tumbar la respuesta al usuario). */
@@ -215,7 +183,7 @@ Devuelve EXCLUSIVAMENTE este JSON, sin texto adicional ni bloques de código:
 
   let parsed: { precio: number | null; min: number | null; max: number | null; moneda: string };
   try {
-    parsed = JSON.parse(stripMarkdownFences(rawText));
+    parsed = parseValuationJson(rawText);
   } catch (err) {
     console.error("refreshValuation: respuesta de Gemini no parseable", err, rawText);
     throw new functions.HttpsError("internal", "Respuesta de Gemini no parseable");
@@ -227,60 +195,7 @@ Devuelve EXCLUSIVAMENTE este JSON, sin texto adicional ni bloques de código:
     precio: parsed.precio,
     min: parsed.min,
     max: parsed.max,
-    moneda: parsed.moneda || "EUR",
+    moneda: parsed.moneda,
     fuentes,
   };
-}
-
-/**
- * 2026-08-24: confirmado con una respuesta real (logs de producción) que esta API/versión del SDK
- * NO devuelve `groundingChunks` (el campo que se había supuesto originalmente, sin verificar) — el
- * único rastro de qué buscó Gemini está en `groundingMetadata.searchEntryPoint.renderedContent`,
- * un bloque HTML con enlaces `<a class="chip" href="https://www.google.com/search?q=...">texto</a>`.
- * Son enlaces de búsqueda de Google con la misma query, NO la URL del anuncio concreto que Gemini
- * leyó — no hay forma de conseguir eso con esta API tal como está expuesta hoy. Se parsean con
- * regex en vez de un DOM parser (no hay ninguno en el proyecto, y es HTML simple y controlado por
- * Google, no contenido arbitrario de usuario).
- */
-function extractGroundingSources(response: unknown): GroundingSource[] {
-  try {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const candidate = (response as any)?.candidates?.[0];
-    const html = candidate?.groundingMetadata?.searchEntryPoint?.renderedContent as string | undefined;
-    if (!html) return [];
-    const matches = [...html.matchAll(/<a class="chip" href="([^"]+)">([^<]*)<\/a>/g)];
-    return matches.map((m) => ({ url: decodeHtmlEntities(m[1]), label: decodeHtmlEntities(m[2]) }));
-  } catch (err) {
-    console.error("refreshValuation: no se pudo extraer groundingMetadata", err);
-    return [];
-  }
-}
-
-function decodeHtmlEntities(text: string): string {
-  return text
-    .replace(/&#39;/g, "'")
-    .replace(/&quot;/g, "\"")
-    .replace(/&amp;/g, "&")
-    .replace(/&lt;/g, "<")
-    .replace(/&gt;/g, ">");
-}
-
-function stripMarkdownFences(text: string): string {
-  return text.trim().replace(/^```json\s*/i, "").replace(/^```\s*/, "").replace(/```\s*$/, "").trim();
-}
-
-/** Ordena las palabras alfabéticamente antes de unirlas — así "Nike Air Jordan 1" y "Air Jordan 1
- * Nike" caen en la misma clave. Sigue sin ser matching semántico: dos descripciones con palabras
- * realmente distintas (sinónimos, datos que faltan en una de las dos) seguirán sin coincidir —
- * eso necesitaría embeddings/búsqueda difusa, fuera de alcance para esta entrega. */
-function normalizeKey(text: string): string {
-  return text
-    .trim()
-    .toLowerCase()
-    .replace(/[^a-z0-9\s]+/g, " ")
-    .split(/\s+/)
-    .filter((token) => token.length > 0)
-    .sort()
-    .join("_")
-    .slice(0, 200);
 }

@@ -2,24 +2,11 @@ import * as functions from "firebase-functions/v2/https";
 import * as admin from "firebase-admin";
 import vision from "@google-cloud/vision";
 import { GoogleGenerativeAI } from "@google/generative-ai";
+import { Candidate, RankedCandidate, rankCandidates } from "./ranking";
 
 admin.initializeApp();
 const visionClient = new vision.ImageAnnotatorClient();
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY!);
-
-interface Candidate {
-  nombre: string;
-  marca: string | null;
-  modelo: string | null;
-  edicion: string | null;
-  procedencia: string | null;
-  confianza: number; // 0.0 a 1.0, reportado por Gemini
-  numeroFuentes: number; // cuántas páginas/entidades recuperadas respaldan este candidato
-}
-
-interface RankedCandidate extends Candidate {
-  score: number; // calculado aquí, no es la confianza bruta de Gemini
-}
 
 export const recognizeItem = functions.onCall(
   // timeoutSeconds subido de 60 (default) a 120 — el log de Cloud Run mostró una invocación real
@@ -170,19 +157,6 @@ candidato fiable, devuelve "candidates": [].
     }
 
     // ---------- Ranking ponderado (calculado aquí, no es la confianza bruta de Gemini) ----------
-    const ranked: RankedCandidate[] = parsed.candidates.map((c) => {
-      const consenso = totalFuentesRecuperadas > 0
-        ? Math.min(c.numeroFuentes / totalFuentesRecuperadas, 1)
-        : 0;
-      const score =
-        0.4 * scoreVisionPromedio +
-        0.35 * consenso +
-        0.25 * (c.confianza ?? 0);
-      return { ...c, score };
-    });
-
-    ranked.sort((a, b) => b.score - a.score);
-
-    return { candidates: ranked.slice(0, 5) };
+    return { candidates: rankCandidates(parsed.candidates, totalFuentesRecuperadas, scoreVisionPromedio) };
   }
 );
