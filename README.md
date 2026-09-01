@@ -1,10 +1,11 @@
-# AICollect
+# SmartCollect
 
-AICollect es una aplicación Android para coleccionistas de objetos deportivos. Permite catalogar
-artículos fotografiándolos —con reconocimiento automático asistido por IA (Google Cloud Vision y
-Google Gemini) para sugerir candidatos— y consultar una valoración de mercado orientativa por
-artículo, calculada a partir de anuncios reales de eBay. El cliente Android (Kotlin, MVVM, Hilt,
-Room) vive en `app/`; el backend serverless (Cloud Functions) vive en `backend/`.
+SmartCollect es una aplicación Android para coleccionistas de objetos deportivos. Permite
+catalogar artículos fotografiándolos —con reconocimiento automático asistido por IA (Google Cloud
+Vision y Google Gemini) para sugerir candidatos— y consultar una valoración de mercado orientativa
+por artículo: la valoración se obtiene mediante Gemini con grounding de búsqueda web (se descartó
+la integración con eBay). El cliente Android (Kotlin, MVVM, Hilt, Room) vive en `app/`; el backend
+serverless (Cloud Functions) vive en `backend/`.
 
 ## Requisitos del entorno de desarrollo
 

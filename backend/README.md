@@ -1,6 +1,6 @@
-# AICollect — Backend (Cloud Functions)
+# SmartCollect — Backend (Cloud Functions)
 
-Backend serverless de [AICollect](..) sobre Firebase Cloud Functions. Se usa solo para dos cosas
+Backend serverless de [SmartCollect](..) sobre Firebase Cloud Functions. Se usa solo para dos cosas
 que el cliente Android no puede resolver por sí solo:
 
 - **`recognizeItem`** — identifica un objeto a partir de una foto (Google Cloud Vision + Google
