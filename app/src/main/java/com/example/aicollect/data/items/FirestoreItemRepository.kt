@@ -11,7 +11,6 @@ import com.example.aicollect.application.items.ValuationResult
 import com.example.aicollect.application.items.ValuationSearch
 import com.example.aicollect.data.items.local.ItemDao
 import com.example.aicollect.data.items.local.toDomain
-import com.example.aicollect.data.items.local.toEntity
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FirebaseFirestore
@@ -58,7 +57,7 @@ class FirestoreItemRepository @Inject constructor(
         itemsCollection(uid).document(itemId)
             .update(item.toUpdateMap(updatedAt = updatedAt))
             .await()
-        itemDao.upsertAll(listOf(item.copy(id = itemId, updatedAt = updatedAt).toEntity(uid)))
+        itemDao.upsertAll(uid, listOf(item.copy(id = itemId, updatedAt = updatedAt)))
         Unit
     }
 
@@ -78,7 +77,7 @@ class FirestoreItemRepository @Inject constructor(
             val uid = requireUid()
             val snapshot = itemsCollection(uid).document(itemId).get().await()
             val item = snapshot.toItem() ?: throw IllegalStateException("El artículo ya no existe.")
-            itemDao.upsertAll(listOf(item.toEntity(uid)))
+            itemDao.upsertAll(uid, listOf(item))
             item
         }
     }
@@ -92,7 +91,7 @@ class FirestoreItemRepository @Inject constructor(
 
         val snapshot = itemsCollection(uid).document(itemId).get().await()
         val item = snapshot.toItem() ?: throw IllegalStateException("El artículo ya no existe.")
-        itemDao.upsertAll(listOf(item.toEntity(uid)))
+        itemDao.upsertAll(uid, listOf(item))
         item
     }
 
@@ -146,7 +145,7 @@ class FirestoreItemRepository @Inject constructor(
                 }
                 val items = snapshot?.documents?.mapNotNull { it.toItem() } ?: emptyList()
                 repositoryScope.launch {
-                    itemDao.replaceAll(uid, items.map { it.toEntity(uid) })
+                    itemDao.replaceAll(uid, items)
                     signal.complete(Unit)
                 }
             }
