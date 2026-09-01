@@ -77,7 +77,7 @@
     <string name="register_title">Crear cuenta</string>
     <string name="register_username_label">Nombre de usuario</string>
     <string name="register_username_hint">Entre 6 y 16 caracteres</string>
-    <string name="register_password_hint">Mínimo 6 caracteres</string>
+    <string name="register_password_hint">Mínimo 8 caracteres, con mayúscula, minúscula, número y signo</string>
     <string name="register_confirm_password_label">Confirmar contraseña</string>
     <string name="register_confirm_password_hint">Repite tu contraseña</string>
     <string name="register_create_account_button">Crear cuenta</string>

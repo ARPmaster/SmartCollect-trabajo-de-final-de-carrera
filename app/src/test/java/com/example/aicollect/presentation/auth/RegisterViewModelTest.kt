@@ -1,4 +1,4 @@
-// Test unitario de RegisterViewModel: validaciones de email/usuario/contraseña, registro feliz, error genérico y nombre de usuario ya en uso.
+// Test unitario de RegisterViewModel: validaciones de email/dominio/usuario/contraseña, registro feliz, error genérico y nombre de usuario ya en uso.
 package com.example.aicollect.presentation.auth
 
 import com.example.aicollect.application.auth.AuthRepository
@@ -20,9 +20,24 @@ class RegisterViewModelTest {
     private val authRepository = mockk<AuthRepository>()
     private val viewModel by lazy { RegisterViewModel(authRepository) }
 
+    private val validPassword = "Secret123!"
+
     @Test
     fun `blank email sets Error without calling the repository`() {
-        viewModel.signUp(email = "", username = "collector1", password = "secret123", confirmPassword = "secret123")
+        viewModel.signUp(email = "", username = "collector1", password = validPassword, confirmPassword = validPassword)
+
+        assertTrue(viewModel.uiState.value is RegisterUiState.Error)
+        coVerify(exactly = 0) { authRepository.signUp(any(), any(), any()) }
+    }
+
+    @Test
+    fun `email with a domain outside the allowed list sets Error without calling the repository`() {
+        viewModel.signUp(
+            email = "user@example.com",
+            username = "collector1",
+            password = validPassword,
+            confirmPassword = validPassword,
+        )
 
         assertTrue(viewModel.uiState.value is RegisterUiState.Error)
         coVerify(exactly = 0) { authRepository.signUp(any(), any(), any()) }
@@ -30,7 +45,7 @@ class RegisterViewModelTest {
 
     @Test
     fun `blank password sets Error without calling the repository`() {
-        viewModel.signUp(email = "user@example.com", username = "collector1", password = "", confirmPassword = "")
+        viewModel.signUp(email = "user@gmail.com", username = "collector1", password = "", confirmPassword = "")
 
         assertTrue(viewModel.uiState.value is RegisterUiState.Error)
         coVerify(exactly = 0) { authRepository.signUp(any(), any(), any()) }
@@ -38,7 +53,7 @@ class RegisterViewModelTest {
 
     @Test
     fun `username shorter than 6 characters sets Error without calling the repository`() {
-        viewModel.signUp(email = "user@example.com", username = "abc", password = "secret123", confirmPassword = "secret123")
+        viewModel.signUp(email = "user@gmail.com", username = "abc", password = validPassword, confirmPassword = validPassword)
 
         assertTrue(viewModel.uiState.value is RegisterUiState.Error)
         coVerify(exactly = 0) { authRepository.signUp(any(), any(), any()) }
@@ -47,10 +62,10 @@ class RegisterViewModelTest {
     @Test
     fun `username longer than 16 characters sets Error without calling the repository`() {
         viewModel.signUp(
-            email = "user@example.com",
+            email = "user@gmail.com",
             username = "a".repeat(17),
-            password = "secret123",
-            confirmPassword = "secret123",
+            password = validPassword,
+            confirmPassword = validPassword,
         )
 
         assertTrue(viewModel.uiState.value is RegisterUiState.Error)
@@ -58,8 +73,24 @@ class RegisterViewModelTest {
     }
 
     @Test
-    fun `password shorter than 6 characters sets Error without calling the repository`() {
-        viewModel.signUp(email = "user@example.com", username = "collector1", password = "abc12", confirmPassword = "abc12")
+    fun `password shorter than 8 characters sets Error without calling the repository`() {
+        viewModel.signUp(email = "user@gmail.com", username = "collector1", password = "Abc12!", confirmPassword = "Abc12!")
+
+        assertTrue(viewModel.uiState.value is RegisterUiState.Error)
+        coVerify(exactly = 0) { authRepository.signUp(any(), any(), any()) }
+    }
+
+    @Test
+    fun `password without an uppercase letter sets Error without calling the repository`() {
+        viewModel.signUp(email = "user@gmail.com", username = "collector1", password = "secret123!", confirmPassword = "secret123!")
+
+        assertTrue(viewModel.uiState.value is RegisterUiState.Error)
+        coVerify(exactly = 0) { authRepository.signUp(any(), any(), any()) }
+    }
+
+    @Test
+    fun `password without a symbol sets Error without calling the repository`() {
+        viewModel.signUp(email = "user@gmail.com", username = "collector1", password = "Secret123", confirmPassword = "Secret123")
 
         assertTrue(viewModel.uiState.value is RegisterUiState.Error)
         coVerify(exactly = 0) { authRepository.signUp(any(), any(), any()) }
@@ -68,10 +99,10 @@ class RegisterViewModelTest {
     @Test
     fun `mismatched passwords set Error without calling the repository`() {
         viewModel.signUp(
-            email = "user@example.com",
+            email = "user@gmail.com",
             username = "collector1",
-            password = "secret123",
-            confirmPassword = "different123",
+            password = validPassword,
+            confirmPassword = "Different123!",
         )
 
         assertTrue(viewModel.uiState.value is RegisterUiState.Error)
@@ -82,20 +113,20 @@ class RegisterViewModelTest {
     fun `successful sign up transitions from Loading to Success`() {
         coEvery { authRepository.signUp(any(), any(), any()) } returns Result.success(Unit)
 
-        viewModel.signUp(email = "user@example.com", username = "collector1", password = "secret123", confirmPassword = "secret123")
+        viewModel.signUp(email = "user@gmail.com", username = "collector1", password = validPassword, confirmPassword = validPassword)
         assertEquals(RegisterUiState.Loading, viewModel.uiState.value)
 
         mainDispatcherRule.dispatcher.scheduler.advanceUntilIdle()
 
         assertEquals(RegisterUiState.Success, viewModel.uiState.value)
-        coVerify(exactly = 1) { authRepository.signUp("user@example.com", "secret123", "collector1") }
+        coVerify(exactly = 1) { authRepository.signUp("user@gmail.com", validPassword, "collector1") }
     }
 
     @Test
     fun `failed sign up transitions from Loading to Error`() {
         coEvery { authRepository.signUp(any(), any(), any()) } returns Result.failure(Exception("El correo ya está en uso"))
 
-        viewModel.signUp(email = "user@example.com", username = "collector1", password = "secret123", confirmPassword = "secret123")
+        viewModel.signUp(email = "user@gmail.com", username = "collector1", password = validPassword, confirmPassword = validPassword)
         assertEquals(RegisterUiState.Loading, viewModel.uiState.value)
 
         mainDispatcherRule.dispatcher.scheduler.advanceUntilIdle()
@@ -109,7 +140,7 @@ class RegisterViewModelTest {
     fun `sign up failing with UsernameTakenException transitions to UsernameTaken, not Error`() {
         coEvery { authRepository.signUp(any(), any(), any()) } returns Result.failure(UsernameTakenException())
 
-        viewModel.signUp(email = "user@example.com", username = "collector1", password = "secret123", confirmPassword = "secret123")
+        viewModel.signUp(email = "user@gmail.com", username = "collector1", password = validPassword, confirmPassword = validPassword)
         mainDispatcherRule.dispatcher.scheduler.advanceUntilIdle()
 
         val state = viewModel.uiState.value

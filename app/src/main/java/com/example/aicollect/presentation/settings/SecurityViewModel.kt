@@ -5,6 +5,7 @@ package com.example.aicollect.presentation.settings
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.aicollect.application.auth.AuthRepository
+import com.example.aicollect.application.auth.AuthValidation
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -71,9 +72,17 @@ class SecurityViewModel @Inject constructor(
             _uiState.value = SecurityUiState.Error("No hay cambios que guardar.")
             return
         }
+        if (emailChanged) {
+            val emailError = AuthValidation.emailError(email)
+            if (emailError != null) {
+                _uiState.value = SecurityUiState.Error(emailError)
+                return
+            }
+        }
         if (passwordProvided) {
-            if (newPassword.length < 6) {
-                _uiState.value = SecurityUiState.Error("La nueva contraseña debe tener al menos 6 caracteres.")
+            val passwordError = AuthValidation.passwordError(newPassword)
+            if (passwordError != null) {
+                _uiState.value = SecurityUiState.Error(passwordError)
                 return
             }
             if (newPassword != confirmPassword) {

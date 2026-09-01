@@ -21,14 +21,16 @@ class SecurityViewModelTest {
     private val authRepository = mockk<AuthRepository>()
     private val viewModel by lazy { SecurityViewModel(authRepository) }
 
+    private val validPassword = "Secret123!"
+
     @Before
     fun setUp() {
-        every { authRepository.getCurrentUserEmail() } returns "old@example.com"
+        every { authRepository.getCurrentUserEmail() } returns "old@gmail.com"
     }
 
     @Test
     fun `no changes sets Error without calling the repository`() {
-        viewModel.saveChanges(email = "old@example.com", newPassword = "", confirmPassword = "")
+        viewModel.saveChanges(email = "old@gmail.com", newPassword = "", confirmPassword = "")
 
         assertTrue(viewModel.uiState.value is SecurityUiState.Error)
         coVerify(exactly = 0) { authRepository.updateEmail(any()) }
@@ -36,8 +38,24 @@ class SecurityViewModelTest {
     }
 
     @Test
-    fun `new password shorter than 6 characters sets Error without calling the repository`() {
-        viewModel.saveChanges(email = "old@example.com", newPassword = "abc12", confirmPassword = "abc12")
+    fun `new email with a domain outside the allowed list sets Error without calling the repository`() {
+        viewModel.saveChanges(email = "new@example.com", newPassword = "", confirmPassword = "")
+
+        assertTrue(viewModel.uiState.value is SecurityUiState.Error)
+        coVerify(exactly = 0) { authRepository.updateEmail(any()) }
+    }
+
+    @Test
+    fun `new password shorter than 8 characters sets Error without calling the repository`() {
+        viewModel.saveChanges(email = "old@gmail.com", newPassword = "Abc12!", confirmPassword = "Abc12!")
+
+        assertTrue(viewModel.uiState.value is SecurityUiState.Error)
+        coVerify(exactly = 0) { authRepository.updatePassword(any()) }
+    }
+
+    @Test
+    fun `new password without a number sets Error without calling the repository`() {
+        viewModel.saveChanges(email = "old@gmail.com", newPassword = "Secretpass!", confirmPassword = "Secretpass!")
 
         assertTrue(viewModel.uiState.value is SecurityUiState.Error)
         coVerify(exactly = 0) { authRepository.updatePassword(any()) }
@@ -45,7 +63,7 @@ class SecurityViewModelTest {
 
     @Test
     fun `mismatched passwords set Error without calling the repository`() {
-        viewModel.saveChanges(email = "old@example.com", newPassword = "secret123", confirmPassword = "different123")
+        viewModel.saveChanges(email = "old@gmail.com", newPassword = validPassword, confirmPassword = "Different123!")
 
         assertTrue(viewModel.uiState.value is SecurityUiState.Error)
         coVerify(exactly = 0) { authRepository.updatePassword(any()) }
@@ -55,13 +73,13 @@ class SecurityViewModelTest {
     fun `email-only change calls updateEmail but not updatePassword`() {
         coEvery { authRepository.updateEmail(any()) } returns Result.success(Unit)
 
-        viewModel.saveChanges(email = "new@example.com", newPassword = "", confirmPassword = "")
+        viewModel.saveChanges(email = "new@gmail.com", newPassword = "", confirmPassword = "")
         assertEquals(SecurityUiState.Loading, viewModel.uiState.value)
 
         mainDispatcherRule.dispatcher.scheduler.advanceUntilIdle()
 
         assertEquals(SecurityUiState.Success, viewModel.uiState.value)
-        coVerify(exactly = 1) { authRepository.updateEmail("new@example.com") }
+        coVerify(exactly = 1) { authRepository.updateEmail("new@gmail.com") }
         coVerify(exactly = 0) { authRepository.updatePassword(any()) }
     }
 
@@ -69,11 +87,11 @@ class SecurityViewModelTest {
     fun `password-only change calls updatePassword but not updateEmail`() {
         coEvery { authRepository.updatePassword(any()) } returns Result.success(Unit)
 
-        viewModel.saveChanges(email = "old@example.com", newPassword = "secret123", confirmPassword = "secret123")
+        viewModel.saveChanges(email = "old@gmail.com", newPassword = validPassword, confirmPassword = validPassword)
         mainDispatcherRule.dispatcher.scheduler.advanceUntilIdle()
 
         assertEquals(SecurityUiState.Success, viewModel.uiState.value)
-        coVerify(exactly = 1) { authRepository.updatePassword("secret123") }
+        coVerify(exactly = 1) { authRepository.updatePassword(validPassword) }
         coVerify(exactly = 0) { authRepository.updateEmail(any()) }
     }
 
@@ -82,19 +100,19 @@ class SecurityViewModelTest {
         coEvery { authRepository.updateEmail(any()) } returns Result.success(Unit)
         coEvery { authRepository.updatePassword(any()) } returns Result.success(Unit)
 
-        viewModel.saveChanges(email = "new@example.com", newPassword = "secret123", confirmPassword = "secret123")
+        viewModel.saveChanges(email = "new@gmail.com", newPassword = validPassword, confirmPassword = validPassword)
         mainDispatcherRule.dispatcher.scheduler.advanceUntilIdle()
 
         assertEquals(SecurityUiState.Success, viewModel.uiState.value)
-        coVerify(exactly = 1) { authRepository.updateEmail("new@example.com") }
-        coVerify(exactly = 1) { authRepository.updatePassword("secret123") }
+        coVerify(exactly = 1) { authRepository.updateEmail("new@gmail.com") }
+        coVerify(exactly = 1) { authRepository.updatePassword(validPassword) }
     }
 
     @Test
     fun `updateEmail failure stops before calling updatePassword`() {
         coEvery { authRepository.updateEmail(any()) } returns Result.failure(Exception("Requiere sesión reciente"))
 
-        viewModel.saveChanges(email = "new@example.com", newPassword = "secret123", confirmPassword = "secret123")
+        viewModel.saveChanges(email = "new@gmail.com", newPassword = validPassword, confirmPassword = validPassword)
         mainDispatcherRule.dispatcher.scheduler.advanceUntilIdle()
 
         val state = viewModel.uiState.value
@@ -107,7 +125,7 @@ class SecurityViewModelTest {
     fun `updatePassword failure surfaces its message`() {
         coEvery { authRepository.updatePassword(any()) } returns Result.failure(Exception("Contraseña débil"))
 
-        viewModel.saveChanges(email = "old@example.com", newPassword = "secret123", confirmPassword = "secret123")
+        viewModel.saveChanges(email = "old@gmail.com", newPassword = validPassword, confirmPassword = validPassword)
         mainDispatcherRule.dispatcher.scheduler.advanceUntilIdle()
 
         val state = viewModel.uiState.value

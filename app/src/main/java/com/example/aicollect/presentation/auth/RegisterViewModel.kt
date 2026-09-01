@@ -5,6 +5,7 @@ package com.example.aicollect.presentation.auth
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.aicollect.application.auth.AuthRepository
+import com.example.aicollect.application.auth.AuthValidation
 import com.example.aicollect.application.auth.UsernameTakenException
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
@@ -32,9 +33,11 @@ class RegisterViewModel @Inject constructor(
 
     fun signUp(email: String, username: String, password: String, confirmPassword: String) {
         val trimmedUsername = username.trim()
+        val emailError = AuthValidation.emailError(email)
+        val passwordError = AuthValidation.passwordError(password)
         when {
-            email.isBlank() || password.isBlank() -> {
-                _uiState.value = RegisterUiState.Error("Completa correo y contraseña.")
+            emailError != null -> {
+                _uiState.value = RegisterUiState.Error(emailError)
                 return
             }
             trimmedUsername.length < MIN_USERNAME_LENGTH || trimmedUsername.length > MAX_USERNAME_LENGTH -> {
@@ -43,8 +46,8 @@ class RegisterViewModel @Inject constructor(
                 )
                 return
             }
-            password.length < 6 -> {
-                _uiState.value = RegisterUiState.Error("La contraseña debe tener al menos 6 caracteres.")
+            passwordError != null -> {
+                _uiState.value = RegisterUiState.Error(passwordError)
                 return
             }
             password != confirmPassword -> {
