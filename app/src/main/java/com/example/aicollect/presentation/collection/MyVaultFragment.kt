@@ -155,6 +155,8 @@ class MyVaultFragment : Fragment() {
                 ContextCompat.getColor(requireContext(), if (isSelected) R.color.vault_chip_active_text else R.color.vault_text_secondary),
             )
             chip.setBackgroundResource(if (isSelected) R.drawable.bg_vault_chip_active else R.drawable.bg_vault_chip_inactive)
+            // El color por sí solo no llega a TalkBack: isSelected es el estado nativo que sí anuncia.
+            chip.isSelected = isSelected
         }
     }
 

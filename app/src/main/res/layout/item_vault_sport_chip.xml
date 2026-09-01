@@ -10,6 +10,6 @@
     android:paddingVertical="9dp"
     android:textAllCaps="true"
     android:textColor="@color/vault_text_secondary"
-    android:textSize="10sp"
+    android:textSize="12sp"
     tools:text="FÚTBOL"
     xmlns:tools="http://schemas.android.com/tools" />

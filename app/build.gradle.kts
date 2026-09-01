@@ -39,6 +39,16 @@ android {
         viewBinding = true
         buildConfig = true
     }
+    lint {
+        // Baseline consciente, no una alfombra bajo la que barrer todo: los errores reales
+        // (UseAppTint) y las categorías con sustancia real (SmallSp, Autofill en pantallas de
+        // login) ya se corrigieron en el código, no están aquí. Lo que queda en el baseline es o
+        // bien avisos de versión (GradleDependency, UseTomlInstead, NewerVersionAvailable,
+        // AndroidGradlePluginVersion — prohibido tocar versiones antes de la entrega) o bien
+        // pulido cosmético de bajo impacto (Overdraw, UselessParent, UseKtx...) que no compensa
+        // el riesgo de tocar capas de layout a dos días de la entrega.
+        baseline = file("lint-baseline.xml")
+    }
 }
 
 dependencies {

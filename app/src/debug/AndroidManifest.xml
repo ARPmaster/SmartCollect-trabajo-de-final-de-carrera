@@ -6,15 +6,13 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
 
     <application>
+        <!-- Sin intent-filter LAUNCHER a propósito: ActivityScenario la arranca por clase
+             (Intent explícito), no por resolución implícita — un intent-filter aquí solo
+             consigue que aparezca como una segunda app en el launcher del usuario final. -->
         <activity
             android:name=".HiltTestActivity"
             android:exported="true"
-            android:theme="@style/Theme.HiltTestActivity">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
-        </activity>
+            android:theme="@style/Theme.HiltTestActivity" />
     </application>
 
 </manifest>

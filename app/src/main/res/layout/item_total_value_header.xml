@@ -33,7 +33,7 @@
                 android:text="@string/total_collection_value_label"
                 android:textAllCaps="true"
                 android:textColor="@color/collect_text_secondary"
-                android:textSize="10sp"
+                android:textSize="12sp"
                 android:textStyle="bold" />
 
             <LinearLayout
@@ -58,7 +58,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginStart="4dp"
                     android:textColor="@color/collect_green"
-                    android:textSize="10sp"
+                    android:textSize="12sp"
                     android:textStyle="bold"
                     tools:text="+5.2%" />
             </LinearLayout>
@@ -90,7 +90,7 @@
             android:letterSpacing="0.05"
             android:textAllCaps="true"
             android:textColor="@color/collect_text_secondary"
-            android:textSize="10sp"
+            android:textSize="12sp"
             tools:text="12 ARTÍCULOS EN TU COLECCIÓN" />
     </LinearLayout>
 </com.google.android.material.card.MaterialCardView>

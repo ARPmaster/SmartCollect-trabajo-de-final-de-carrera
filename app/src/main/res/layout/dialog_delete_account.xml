@@ -16,6 +16,7 @@
             android:id="@+id/et_password"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
+            android:autofillHints="password"
             android:background="@null"
             android:hint="@string/security_delete_account_password_hint"
             android:imeOptions="actionDone"
