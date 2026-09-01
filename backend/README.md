@@ -3,14 +3,49 @@
 Backend serverless de [SmartCollect](..) sobre Firebase Cloud Functions. Se usa solo para dos cosas
 que el cliente Android no puede resolver por sí solo:
 
-- **`recognizeItem`** — identifica un objeto a partir de una foto (Google Cloud Vision + Google
-  Gemini) para autorrellenar una publicación nueva.
+- **`recognizeItem`** — identifica un objeto a partir de una foto para autorrellenar una
+  publicación nueva.
 - **`searchValuation`** / **`refreshValuation`** — calculan una valoración de mercado orientativa
-  a partir de anuncios activos reales en eBay (eBay Browse API), a partir del texto identificado
-  por Gemini.
+  a partir de una búsqueda web real hecha por Gemini (no de una API de terceros como eBay).
 
 El resto de la aplicación (colección, perfil, autenticación) usa directamente los SDK de
 Firebase (Auth/Firestore/Storage) desde el cliente, sin pasar por este backend.
+
+## Cómo funciona cada función
+
+**`recognizeItem`** (Retrieval + Augmented Generation):
+1. Envía la foto a Google Cloud Vision (Web Detection) y recupera entidades y páginas con
+   coincidencia visual — como mucho 8 entidades y 6 páginas.
+2. Si no se recupera ninguna señal, devuelve `candidates: []` directamente (no gasta una llamada
+   a Gemini para nada).
+3. Pasa esas señales a Gemini con un prompt que primero filtra si el objeto es deportivo (fuera
+   de ámbito → `candidates: []`) y luego consolida hasta 5 candidatos con nombre/marca/modelo/
+   confianza/número de fuentes que lo respaldan.
+4. Calcula un ranking propio por candidato (no la confianza bruta de Gemini):
+   `score = 0.4·fiabilidad_media_de_vision + 0.35·consenso_de_fuentes + 0.25·confianza_de_gemini`.
+   Esta fórmula vive en `ranking.ts`, separada de Firebase/Vision/Gemini para poder testearla
+   (ver `ranking.test.ts`).
+
+**`searchValuation`** / **`refreshValuation`** (misma lógica de valoración, dos puntos de
+entrada distintos):
+1. Construyen una clave de caché normalizada a partir de marca+modelo+edición (o el nombre libre
+   si no hay esos campos) — `buildSearchKey`/`normalizeKey` en `valuation.ts`, así "Nike Air
+   Jordan 1" y "Air Jordan 1 Nike" caen en la misma entrada de caché.
+2. Miran `products_cache` en Firestore; si hay algo de menos de 30 días, lo reutilizan sin llamar
+   a Gemini.
+3. Si no, piden a Gemini (con su herramienta de búsqueda web `googleSearch`, sin forzar JSON
+   porque no es compatible con grounding) un precio oficial o, en su defecto, una media de
+   segunda mano, con rango mínimo/máximo. La respuesta se parsea de forma tolerante
+   (`parseValuationJson`, quita fences de markdown si Gemini las añade; precio/min/max ausentes
+   → `null`, moneda ausente → `"EUR"`).
+4. `searchValuation` solo lee/escribe `products_cache` (se llama antes de que el ítem exista).
+   `refreshValuation` además actualiza el ítem en Firestore: `valoracionActual` y añade una
+   entrada a `historialPrecios` (nunca se inventa un número si Gemini no encontró nada fiable).
+
+**Resiliencia y logging**: cada función registra su entrada, éxito y error con
+`logger.info`/`logger.error` de `firebase-functions` (uid, ids relevantes, mensaje de error —
+nunca la imagen ni el contenido íntegro de la respuesta de Gemini salvo cuando ya falló el
+parseo), visible en Cloud Functions → Logs.
 
 ## Requisitos
 
@@ -23,10 +58,27 @@ Firebase (Auth/Firestore/Storage) desde el cliente, sin pasar por este backend.
 ```
 functions/
   src/
-    index.ts            # exporta recognizeItem, searchValuation, refreshValuation
+    index.ts               # exporta recognizeItem, searchValuation, refreshValuation
     recognizeItem.ts
-    refreshValuation.ts  # searchValuation y refreshValuation
+    refreshValuation.ts     # searchValuation y refreshValuation
+    ranking.ts              # lógica pura del ranking de recognizeItem (sin Firebase)
+    ranking.test.ts
+    valuation.ts            # lógica pura de clave de caché y parseo (sin Firebase)
+    valuation.test.ts
 ```
+
+## Tests
+
+```sh
+cd functions
+npm install
+npm test
+```
+
+24 tests (vitest) sobre `ranking.ts` y `valuation.ts`: candidatos vacíos, empates de score,
+consenso acotado a 1, confianza ausente, JSON inválido, precio/moneda por defecto ante campos
+ausentes, HTML de grounding malformado, etc. No cubren `recognizeItem.ts`/`refreshValuation.ts`
+directamente (esos sí inicializan Firebase/Vision/Gemini de verdad) — de ahí la separación.
 
 ## Despliegue
 
@@ -69,6 +121,7 @@ complete!* y permite consultar los registros de ejecución de cada función desd
 | `npm run shell` | Compila y abre el shell interactivo de Firebase Functions. |
 | `npm run deploy` | Compila y despliega todas las funciones. |
 | `npm run logs` | Muestra los logs de ejecución en producción. |
+| `npm test` | Ejecuta los tests unitarios (vitest). |
 
 ## Variables y secretos sensibles no incluidos en el repositorio
 
