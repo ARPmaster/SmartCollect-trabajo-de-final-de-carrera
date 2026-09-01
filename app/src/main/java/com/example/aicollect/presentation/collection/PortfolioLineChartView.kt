@@ -72,21 +72,17 @@ class PortfolioLineChartView @JvmOverloads constructor(
         super.onDraw(canvas)
         if (values.size < 2) return
 
-        val min = values.min()
-        val max = values.max()
         val topPadding = 8f
         val bottomPadding = 8f
         val labelGap = 8f
 
-        if (max - min <= 0f) {
-            // Único valor repetido: no hay eje que trazar, solo una etiqueta centrada.
-            val label = formatLabel(max)
-            val leftPadding = labelPaint.measureText(label) + labelGap
-            val centerY = topPadding + (height - topPadding - bottomPadding) / 2f
-            drawYLabel(canvas, label, centerY)
-            drawChartBody(canvas, leftPadding, topPadding, bottomPadding, min, 1f)
-            return
-        }
+        // Escala realista: el eje Y siempre arranca en 0 y sus marcas son múltiplos de 100
+        // (AXIS_STEP), con un techo de referencia de 10 000 € — el techo real solo crece si
+        // algún valor de la cartera lo supera, para no recortar datos legítimos.
+        val min = 0f
+        val dataMax = values.max()
+        val niceMax = kotlin.math.ceil(dataMax / AXIS_STEP) * AXIS_STEP
+        val max = maxOf(AXIS_DEFAULT_MAX, niceMax)
 
         val range = max - min
         val midValue = min + range / 2f
@@ -150,5 +146,10 @@ class PortfolioLineChartView @JvmOverloads constructor(
         canvas.drawPath(fillPath, fillPaint)
         canvas.drawPath(linePath, linePaint)
         canvas.drawCircle(xAt(values.size - 1), yAt(values.last()), 8f, dotPaint)
+    }
+
+    private companion object {
+        const val AXIS_STEP = 100f
+        const val AXIS_DEFAULT_MAX = 10_000f
     }
 }
