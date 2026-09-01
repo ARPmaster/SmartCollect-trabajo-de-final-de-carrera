@@ -4,8 +4,8 @@ SmartCollect es una aplicación Android para coleccionistas de objetos deportivo
 catalogar artículos fotografiándolos —con reconocimiento automático asistido por IA (Google Cloud
 Vision y Google Gemini) para sugerir candidatos— y consultar una valoración de mercado orientativa
 por artículo: la valoración se obtiene mediante Gemini con grounding de búsqueda web (se descartó
-la integración con eBay). Este repositorio contiene el cliente Android (Kotlin, MVVM, Hilt, Room);
-el backend serverless (Cloud Functions) vive en un repositorio aparte.
+la integración con eBay). Este repositorio contiene el cliente Android (Kotlin, MVVM, Hilt, Room); el backend serverless
+(Cloud Functions) vive en [backend-TFG](https://github.com/ARPmaster/backend-TFG).
 
 ## Requisitos del entorno de desarrollo
 
@@ -40,7 +40,8 @@ Desde la [consola de Firebase](https://console.firebase.google.com), crea un pro
 - **Cloud Storage**, para las fotografías de las piezas y de perfil.
 
 Las Cloud Functions (`recognizeItem`, `searchValuation`, `refreshValuation`) se despliegan desde
-el repositorio del backend, con su propio README y la configuración del secreto `GEMINI_API_KEY`.
+[backend-TFG](https://github.com/ARPmaster/backend-TFG), con su propio README y la configuración
+del secreto `GEMINI_API_KEY`.
 
 ## Tests
 
