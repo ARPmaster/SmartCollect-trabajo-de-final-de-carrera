@@ -3,6 +3,7 @@ package com.example.aicollect.data.recognition
 
 import com.example.aicollect.application.recognition.RankedCandidate
 import com.example.aicollect.application.recognition.RecognitionRepository
+import com.example.aicollect.data.callFunctionWithRetry
 import com.google.firebase.functions.FirebaseFunctions
 import javax.inject.Inject
 import kotlinx.coroutines.tasks.await
@@ -12,10 +13,12 @@ class FirebaseRecognitionRepository @Inject constructor(
 ) : RecognitionRepository {
 
     override suspend fun recognizeItem(imageBase64: String): Result<List<RankedCandidate>> = runCatching {
-        val response = firebaseFunctions
-            .getHttpsCallable(RECOGNIZE_ITEM_FUNCTION)
-            .call(mapOf("imageBase64" to imageBase64))
-            .await()
+        val response = callFunctionWithRetry {
+            firebaseFunctions
+                .getHttpsCallable(RECOGNIZE_ITEM_FUNCTION)
+                .call(mapOf("imageBase64" to imageBase64))
+                .await()
+        }
 
         @Suppress("UNCHECKED_CAST")
         val body = response.data as? Map<String, Any?> ?: emptyMap()

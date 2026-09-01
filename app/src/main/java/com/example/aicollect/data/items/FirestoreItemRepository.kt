@@ -9,6 +9,7 @@ import com.example.aicollect.application.items.ItemRepository
 import com.example.aicollect.application.items.PricePoint
 import com.example.aicollect.application.items.ValuationResult
 import com.example.aicollect.application.items.ValuationSearch
+import com.example.aicollect.data.callFunctionWithRetry
 import com.example.aicollect.data.items.local.ItemDao
 import com.example.aicollect.data.items.local.toDomain
 import com.google.firebase.auth.FirebaseAuth
@@ -84,10 +85,12 @@ class FirestoreItemRepository @Inject constructor(
 
     override suspend fun refreshValuation(itemId: String): Result<Item> = runCatching {
         val uid = requireUid()
-        firebaseFunctions
-            .getHttpsCallable(REFRESH_VALUATION_FUNCTION)
-            .call(mapOf("itemId" to itemId))
-            .await()
+        callFunctionWithRetry {
+            firebaseFunctions
+                .getHttpsCallable(REFRESH_VALUATION_FUNCTION)
+                .call(mapOf("itemId" to itemId))
+                .await()
+        }
 
         val snapshot = itemsCollection(uid).document(itemId).get().await()
         val item = snapshot.toItem() ?: throw IllegalStateException("El artículo ya no existe.")
@@ -101,10 +104,12 @@ class FirestoreItemRepository @Inject constructor(
         modelo: String,
         edicion: String?,
     ): Result<ValuationResult> = runCatching {
-        val response = firebaseFunctions
-            .getHttpsCallable(SEARCH_VALUATION_FUNCTION)
-            .call(mapOf("nombre" to nombre, "marca" to marca, "modelo" to modelo, "edicion" to edicion))
-            .await()
+        val response = callFunctionWithRetry {
+            firebaseFunctions
+                .getHttpsCallable(SEARCH_VALUATION_FUNCTION)
+                .call(mapOf("nombre" to nombre, "marca" to marca, "modelo" to modelo, "edicion" to edicion))
+                .await()
+        }
 
         @Suppress("UNCHECKED_CAST")
         val body = response.data as? Map<String, Any?> ?: emptyMap()

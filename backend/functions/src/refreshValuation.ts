@@ -1,4 +1,5 @@
 import * as functions from "firebase-functions/v2/https";
+import * as logger from "firebase-functions/logger";
 import * as admin from "firebase-admin";
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import {
@@ -38,7 +39,10 @@ async function getOrComputeValuation(cacheKey: string, searchQuery: string): Pro
   try {
     await cacheRef.set({ ...valuation, actualizadoEn: Date.now() } satisfies ProductsCacheDoc);
   } catch (err) {
-    console.error("getOrComputeValuation: no se pudo escribir products_cache", err);
+    logger.error("getOrComputeValuation: no se pudo escribir products_cache", {
+      cacheKey,
+      error: (err as Error).message,
+    });
   }
   return valuation;
 }
@@ -66,7 +70,10 @@ export const searchValuation = functions.onCall(
     if (!searchQuery) {
       throw new functions.HttpsError("invalid-argument", "Faltan datos para buscar el precio");
     }
-    return await getOrComputeValuation(cacheKey, searchQuery);
+    logger.info("searchValuation: entrada", { uid: request.auth.uid, cacheKey });
+    const valuation = await getOrComputeValuation(cacheKey, searchQuery);
+    logger.info("searchValuation: éxito", { uid: request.auth.uid, cacheKey, precio: valuation.precio });
+    return valuation;
   }
 );
 
@@ -86,6 +93,8 @@ export const refreshValuation = functions.onCall(
     if (!itemId) {
       throw new functions.HttpsError("invalid-argument", "Falta itemId");
     }
+
+    logger.info("refreshValuation: entrada", { uid, itemId });
 
     // ---------- 1. Leer el item ya guardado y confirmado por el usuario ----------
     const itemRef = db.collection("users").doc(uid).collection("items").doc(itemId);
@@ -123,6 +132,7 @@ export const refreshValuation = functions.onCall(
     }
     await itemRef.update(updates);
 
+    logger.info("refreshValuation: éxito", { uid, itemId, precio: valuation.precio });
     return valuation;
   }
 );
@@ -173,7 +183,10 @@ Devuelve EXCLUSIVAMENTE este JSON, sin texto adicional ni bloques de código:
   try {
     result = await model.generateContent(prompt);
   } catch (err) {
-    console.error("refreshValuation: Gemini generateContent falló", err);
+    logger.error("searchValuationWithGemini: Gemini generateContent falló", {
+      searchQuery,
+      error: (err as Error).message,
+    });
     throw new functions.HttpsError(
       "internal",
       `Gemini falló: ${(err as Error).message}`,
@@ -185,7 +198,11 @@ Devuelve EXCLUSIVAMENTE este JSON, sin texto adicional ni bloques de código:
   try {
     parsed = parseValuationJson(rawText);
   } catch (err) {
-    console.error("refreshValuation: respuesta de Gemini no parseable", err, rawText);
+    logger.error("searchValuationWithGemini: respuesta de Gemini no parseable", {
+      searchQuery,
+      error: (err as Error).message,
+      respuesta: rawText,
+    });
     throw new functions.HttpsError("internal", "Respuesta de Gemini no parseable");
   }
 

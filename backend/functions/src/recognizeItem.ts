@@ -1,4 +1,5 @@
 import * as functions from "firebase-functions/v2/https";
+import * as logger from "firebase-functions/logger";
 import * as admin from "firebase-admin";
 import vision from "@google-cloud/vision";
 import { GoogleGenerativeAI } from "@google/generative-ai";
@@ -25,6 +26,8 @@ export const recognizeItem = functions.onCall(
       throw new functions.HttpsError("invalid-argument", "Falta la imagen");
     }
 
+    logger.info("recognizeItem: entrada", { uid: request.auth.uid, imageBytes: imageBase64.length });
+
     // ---------- FASE 1 · Retrieval (Vision API Web Detection) ----------
     let visionResult;
     try {
@@ -32,7 +35,7 @@ export const recognizeItem = functions.onCall(
         image: { content: imageBase64 },
       });
     } catch (err) {
-      console.error("recognizeItem: webDetection falló", err);
+      logger.error("recognizeItem: webDetection falló", { uid: request.auth.uid, error: (err as Error).message });
       throw new functions.HttpsError(
         "internal",
         `Vision API falló: ${(err as Error).message}`,
@@ -53,6 +56,7 @@ export const recognizeItem = functions.onCall(
 
     // Sin ninguna señal recuperada, no merece la pena llamar a Gemini
     if (totalFuentesRecuperadas === 0) {
+      logger.info("recognizeItem: éxito, sin fuentes recuperadas", { uid: request.auth.uid, candidatos: 0 });
       return { candidates: [] as RankedCandidate[] };
     }
 
@@ -141,7 +145,7 @@ candidato fiable, devuelve "candidates": [].
         { inlineData: { mimeType: "image/jpeg", data: imageBase64 } },
       ]);
     } catch (err) {
-      console.error("recognizeItem: Gemini generateContent falló", err);
+      logger.error("recognizeItem: Gemini generateContent falló", { uid: request.auth.uid, error: (err as Error).message });
       throw new functions.HttpsError(
         "internal",
         `Gemini falló: ${(err as Error).message}`,
@@ -152,11 +156,17 @@ candidato fiable, devuelve "candidates": [].
     try {
       parsed = JSON.parse(result.response.text());
     } catch (err) {
-      console.error("recognizeItem: respuesta de Gemini no parseable", err, result.response.text());
+      logger.error("recognizeItem: respuesta de Gemini no parseable", {
+        uid: request.auth.uid,
+        error: (err as Error).message,
+        respuesta: result.response.text(),
+      });
       throw new functions.HttpsError("internal", "Respuesta de Gemini no parseable");
     }
 
     // ---------- Ranking ponderado (calculado aquí, no es la confianza bruta de Gemini) ----------
-    return { candidates: rankCandidates(parsed.candidates, totalFuentesRecuperadas, scoreVisionPromedio) };
+    const candidates = rankCandidates(parsed.candidates, totalFuentesRecuperadas, scoreVisionPromedio);
+    logger.info("recognizeItem: éxito", { uid: request.auth.uid, candidatos: candidates.length });
+    return { candidates };
   }
 );
