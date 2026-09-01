@@ -23,6 +23,15 @@ class FakeItemRepository @Inject constructor() : ItemRepository {
     var lastCreatedImageCount: Int? = null
     var createItemCallCount: Int = 0
 
+    var updateItemResult: Result<Unit> = Result.success(Unit)
+    var lastUpdatedItemId: String? = null
+    var lastUpdatedItem: Item? = null
+    var updateItemCallCount: Int = 0
+
+    var deleteItemResult: Result<Unit> = Result.success(Unit)
+    var lastDeletedItemId: String? = null
+    var deleteItemCallCount: Int = 0
+
     override suspend fun createItem(item: Item, imageBytes: List<ByteArray>): Result<String> {
         lastCreatedItem = item
         lastCreatedImageCount = imageBytes.size
@@ -30,9 +39,18 @@ class FakeItemRepository @Inject constructor() : ItemRepository {
         return createItemResult
     }
 
-    override suspend fun updateItem(itemId: String, item: Item): Result<Unit> = Result.success(Unit)
+    override suspend fun updateItem(itemId: String, item: Item): Result<Unit> {
+        lastUpdatedItemId = itemId
+        lastUpdatedItem = item
+        updateItemCallCount++
+        return updateItemResult
+    }
 
-    override suspend fun deleteItem(itemId: String): Result<Unit> = Result.success(Unit)
+    override suspend fun deleteItem(itemId: String): Result<Unit> {
+        lastDeletedItemId = itemId
+        deleteItemCallCount++
+        return deleteItemResult
+    }
 
     override suspend fun getItem(itemId: String): Result<Item> = getItemResult(itemId)
 

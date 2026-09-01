@@ -16,6 +16,7 @@
         android:layout_width="56dp"
         android:layout_height="56dp"
         android:background="@color/vault_icon_box_bg"
+        android:importantForAccessibility="no"
         android:scaleType="centerCrop"
         tools:src="@drawable/item_signed_jersey" />
 
