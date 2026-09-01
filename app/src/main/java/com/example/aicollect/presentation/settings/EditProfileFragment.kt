@@ -1,9 +1,13 @@
 // Pantalla "Editar Perfil": cambia el nombre mostrado y la foto de perfil del usuario, con
-// bloqueo de navegación mientras se sube una foto y aviso de nombre duplicado.
+// bloqueo de navegación mientras se sube una foto y aviso de nombre duplicado. La foto elegida
+// se guarda en memoria (pendingPhotoBytes) y solo se sube al pulsar "Guardar cambios", junto con
+// el nombre: todo el guardado ocurre a través del botón, sin autoguardado parcial.
 package com.example.aicollect.presentation.settings
 
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
+import android.graphics.Matrix
+import android.media.ExifInterface
 import android.net.Uri
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -41,6 +45,8 @@ class EditProfileFragment : Fragment() {
 
     private val viewModel: EditProfileViewModel by viewModels()
 
+    private var pendingPhotoBytes: ByteArray? = null
+
     private val blockNavigationWhileUploadingCallback = object : OnBackPressedCallback(false) {
         override fun handleOnBackPressed() {
             Snackbar.make(binding.root, R.string.edit_profile_photo_uploading_wait, Snackbar.LENGTH_SHORT).show()
@@ -55,7 +61,7 @@ class EditProfileFragment : Fragment() {
         viewLifecycleOwner.lifecycleScope.launch {
             val imageBytes = withContext(Dispatchers.IO) { decodeAndCompress(uri) }
             if (imageBytes != null) {
-                viewModel.uploadProfilePhoto(imageBytes)
+                pendingPhotoBytes = imageBytes
             } else {
                 Snackbar.make(binding.root, R.string.edit_profile_photo_read_error, Snackbar.LENGTH_LONG).show()
             }
@@ -63,19 +69,39 @@ class EditProfileFragment : Fragment() {
     }
 
     private fun decodeAndCompress(uri: Uri): ByteArray? = runCatching {
-        val bitmap = requireContext().contentResolver.openInputStream(uri)?.use { stream ->
+        val resolver = requireContext().contentResolver
+        val bitmap = resolver.openInputStream(uri)?.use { stream ->
             BitmapFactory.decodeStream(stream)
         } ?: return@runCatching null
-        val scale = MAX_PHOTO_DIMENSION_PX.toFloat() / maxOf(bitmap.width, bitmap.height)
+        val rotationDegrees = resolver.openInputStream(uri)?.use { stream ->
+            when (
+                ExifInterface(stream).getAttributeInt(
+                    ExifInterface.TAG_ORIENTATION,
+                    ExifInterface.ORIENTATION_NORMAL,
+                )
+            ) {
+                ExifInterface.ORIENTATION_ROTATE_90 -> 90
+                ExifInterface.ORIENTATION_ROTATE_180 -> 180
+                ExifInterface.ORIENTATION_ROTATE_270 -> 270
+                else -> 0
+            }
+        } ?: 0
+        val uprightBitmap = if (rotationDegrees != 0) {
+            val matrix = Matrix().apply { postRotate(rotationDegrees.toFloat()) }
+            Bitmap.createBitmap(bitmap, 0, 0, bitmap.width, bitmap.height, matrix, true)
+        } else {
+            bitmap
+        }
+        val scale = MAX_PHOTO_DIMENSION_PX.toFloat() / maxOf(uprightBitmap.width, uprightBitmap.height)
         val scaledBitmap = if (scale < 1f) {
             Bitmap.createScaledBitmap(
-                bitmap,
-                (bitmap.width * scale).toInt().coerceAtLeast(1),
-                (bitmap.height * scale).toInt().coerceAtLeast(1),
+                uprightBitmap,
+                (uprightBitmap.width * scale).toInt().coerceAtLeast(1),
+                (uprightBitmap.height * scale).toInt().coerceAtLeast(1),
                 true,
             )
         } else {
-            bitmap
+            uprightBitmap
         }
         ByteArrayOutputStream().use { output ->
             scaledBitmap.compress(Bitmap.CompressFormat.JPEG, PHOTO_JPEG_QUALITY, output)
@@ -128,6 +154,11 @@ class EditProfileFragment : Fragment() {
         }
         binding.btnSaveChanges.setOnClickListener {
             viewModel.saveDisplayName(binding.etFullName.text?.toString().orEmpty())
+            val photoBytes = pendingPhotoBytes
+            if (photoBytes != null && viewModel.uiState.value !is EditProfileUiState.Error) {
+                pendingPhotoBytes = null
+                viewModel.uploadProfilePhoto(photoBytes)
+            }
         }
 
         viewLifecycleOwner.lifecycleScope.launch {
