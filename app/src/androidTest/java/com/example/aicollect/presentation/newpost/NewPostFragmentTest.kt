@@ -5,6 +5,7 @@ import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.action.ViewActions.click
 import androidx.test.espresso.action.ViewActions.closeSoftKeyboard
 import androidx.test.espresso.action.ViewActions.replaceText
+import androidx.test.espresso.action.ViewActions.scrollTo
 import androidx.test.espresso.assertion.ViewAssertions.matches
 import androidx.test.espresso.matcher.RootMatchers.isPlatformPopup
 import androidx.test.espresso.matcher.ViewMatchers.isDisplayed
@@ -42,7 +43,7 @@ class NewPostFragmentTest {
     fun publishingWithoutRequiredFieldsShowsTheValidationMessageAndNeverCallsTheRepository() {
         launchFragmentWithNavController<NewPostFragment>(R.id.newPostFragment)
 
-        onView(withId(R.id.btn_publish)).perform(click())
+        onView(withId(R.id.btn_publish)).perform(scrollTo(), click())
 
         onView(withText(R.string.new_post_name_required_error)).check(matches(isDisplayed()))
         assertEquals(0, fakeItemRepository.createItemCallCount)
@@ -58,7 +59,7 @@ class NewPostFragmentTest {
         onView(withId(R.id.btn_condition)).perform(click())
         onView(withText("Nuevo")).inRoot(isPlatformPopup()).perform(click())
 
-        onView(withId(R.id.btn_publish)).perform(click())
+        onView(withId(R.id.btn_publish)).perform(scrollTo(), click())
 
         assertEquals(1, fakeItemRepository.createItemCallCount)
         assertEquals("Nike Air Force 1", fakeItemRepository.lastCreatedItem?.nombre)

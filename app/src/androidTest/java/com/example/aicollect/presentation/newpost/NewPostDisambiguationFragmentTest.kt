@@ -11,6 +11,7 @@ import androidx.test.espresso.assertion.ViewAssertions.matches
 import androidx.test.espresso.matcher.ViewMatchers.isDisplayed
 import androidx.test.espresso.matcher.ViewMatchers.withId
 import androidx.test.espresso.matcher.ViewMatchers.withText
+import org.hamcrest.Matchers.allOf
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import com.example.aicollect.HiltTestActivity
@@ -103,7 +104,8 @@ class NewPostDisambiguationFragmentTest {
 
         onView(withText("Nike Air Force 1")).check(matches(isDisplayed()))
         onView(withText("Adidas Superstar")).check(matches(isDisplayed()))
-        onView(withText(R.string.disambiguation_best_match_badge)).check(matches(isDisplayed()))
+        onView(allOf(withText(R.string.disambiguation_best_match_badge), isDisplayed()))
+            .check(matches(isDisplayed()))
     }
 
     @Test
