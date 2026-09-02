@@ -1,5 +1,6 @@
 plugins {
     alias(libs.plugins.android.application)
+    alias(libs.plugins.kotlin.android)
 
     id("com.google.gms.google-services")
     alias(libs.plugins.ksp)
@@ -26,9 +27,7 @@ android {
 
     buildTypes {
         release {
-            optimization {
-                enable = false
-            }
+            isMinifyEnabled = false
         }
     }
     compileOptions {
@@ -48,6 +47,12 @@ android {
         // pulido cosmético de bajo impacto (Overdraw, UselessParent, UseKtx...) que no compensa
         // el riesgo de tocar capas de layout a dos días de la entrega.
         baseline = file("lint-baseline.xml")
+    }
+}
+
+kotlin {
+    compilerOptions {
+        jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_11)
     }
 }
 

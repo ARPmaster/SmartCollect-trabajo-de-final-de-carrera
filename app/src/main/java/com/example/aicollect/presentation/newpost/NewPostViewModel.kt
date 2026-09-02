@@ -3,6 +3,7 @@
 * detecta posibles duplicados en la colección y publica el ítem ya con su valoración de mercado.*/
 package com.example.aicollect.presentation.newpost
 
+import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.aicollect.application.items.Item
@@ -12,7 +13,9 @@ import com.example.aicollect.application.recognition.RankedCandidate
 import com.example.aicollect.application.recognition.RecognitionRepository
 import com.example.aicollect.R
 import com.example.aicollect.presentation.UiText
+import com.example.aicollect.presentation.isOnline
 import dagger.hilt.android.lifecycle.HiltViewModel
+import dagger.hilt.android.qualifiers.ApplicationContext
 import java.util.Base64
 import java.util.Locale
 import javax.inject.Inject
@@ -36,6 +39,7 @@ sealed interface SaveItemUiState {
     data class Error(val message: UiText) : SaveItemUiState
     data class ValidationError(val field: RequiredField) : SaveItemUiState
     data class DuplicateWarning(val existingItemName: String) : SaveItemUiState
+    data object NoConnection : SaveItemUiState
 }
 
 enum class RequiredField {
@@ -48,6 +52,7 @@ enum class RequiredField {
 class NewPostViewModel @Inject constructor(
     private val recognitionRepository: RecognitionRepository,
     private val itemRepository: ItemRepository,
+    @ApplicationContext private val appContext: Context,
 ) : ViewModel() {
 
     private val _recognitionState = MutableStateFlow<RecognitionUiState>(RecognitionUiState.Idle)
@@ -136,6 +141,10 @@ class NewPostViewModel @Inject constructor(
             _saveState.value = SaveItemUiState.ValidationError(RequiredField.CONDITION)
             return
         }
+        if (!appContext.isOnline()) {
+            _saveState.value = SaveItemUiState.NoConnection
+            return
+        }
 
         val candidate = selectedCandidate
         val request = PendingPublish(
@@ -164,6 +173,10 @@ class NewPostViewModel @Inject constructor(
     fun confirmPublishDespiteDuplicate() {
         val request = pendingPublish ?: return
         pendingPublish = null
+        if (!appContext.isOnline()) {
+            _saveState.value = SaveItemUiState.NoConnection
+            return
+        }
         viewModelScope.launch { publish(request) }
     }
 

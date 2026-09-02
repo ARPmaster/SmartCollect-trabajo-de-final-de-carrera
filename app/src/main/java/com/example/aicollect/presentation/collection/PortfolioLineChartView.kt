@@ -72,7 +72,9 @@ class PortfolioLineChartView @JvmOverloads constructor(
         super.onDraw(canvas)
         if (values.size < 2) return
 
-        val topPadding = 8f
+        // La etiqueta superior del eje Y se centra sobre esta línea; sin margen suficiente sus
+        // píxeles más altos quedan por encima de y=0 y se recortan contra el borde de la vista.
+        val topPadding = labelTextSizePx / 2f + 4f
         val bottomPadding = 8f
         val labelGap = 8f
 
