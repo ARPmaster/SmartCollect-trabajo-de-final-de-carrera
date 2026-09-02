@@ -32,6 +32,7 @@ import com.example.aicollect.data.FilterSessionState
 import com.example.aicollect.databinding.ActivityMainBinding
 import com.example.aicollect.presentation.collection.FilterBottomSheetFragment
 import com.example.aicollect.presentation.newpost.NewPostViewModel
+import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
 import kotlin.math.roundToInt
 import kotlinx.coroutines.launch
@@ -123,8 +124,14 @@ class MainActivity : AppCompatActivity() {
             navController.navigate(R.id.homeFragment)
         }
         bottomBar.findViewById<View>(R.id.btn_nav_add).setOnClickListener {
-            newPostViewModel.reset()
-            navController.navigate(R.id.newPostFragment)
+            if (isOnline()) {
+                newPostViewModel.reset()
+                navController.navigate(R.id.newPostFragment)
+            } else {
+                Snackbar.make(binding.root, R.string.new_post_no_internet_error, Snackbar.LENGTH_LONG)
+                    .apply { anchorView = bottomBar }
+                    .show()
+            }
         }
         bottomBar.findViewById<View>(R.id.btn_nav_stats).setOnClickListener {
             navController.navigate(R.id.statsFragment)

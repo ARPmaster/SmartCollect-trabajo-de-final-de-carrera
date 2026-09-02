@@ -210,6 +210,7 @@
     <string name="new_post_publishing">Publicando…</string>
     <string name="new_post_publishing_valuation">Buscando el valor de mercado…</string>
     <string name="new_post_success">Artículo guardado en tu colección.</string>
+    <string name="new_post_no_internet_error">Necesitas conexión a internet para añadir una publicación.</string>
     <string name="new_post_name_required_error">El título no puede estar vacío.</string>
     <string name="new_post_sport_required_error">Selecciona un deporte.</string>
     <string name="new_post_condition_required_error">Selecciona un estado.</string>
