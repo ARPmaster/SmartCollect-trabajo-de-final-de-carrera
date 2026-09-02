@@ -78,11 +78,9 @@ class HomeViewModel @Inject constructor(itemRepository: ItemRepository) : ViewMo
     }
 
     private fun summaryFor(items: List<Item>): CollectionSummary {
-        val evolution = PortfolioAnalytics.monthlyEvolution(items)
         val itemCount = items.size
         return CollectionSummary(
             totalValueLabel = ItemFormatting.formatKnownValue(PortfolioAnalytics.totalValue(items), CURRENCY),
-            changeLabel = ItemFormatting.formatChangePercent(PortfolioAnalytics.changePercent(evolution)),
             itemCountLabel = if (itemCount == 1) "1 artículo en tu colección" else "$itemCount artículos en tu colección",
         )
     }

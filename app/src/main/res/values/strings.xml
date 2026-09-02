@@ -47,7 +47,6 @@
     <string name="drawer_section_general">General</string>
     <string name="drawer_dark_mode">Modo oscuro</string>
     <string name="drawer_section_account">Ajustes de cuenta</string>
-    <string name="drawer_edit_profile">Editar Perfil</string>
     <string name="drawer_security">Contraseña y Seguridad</string>
     <string name="drawer_section_support">Soporte</string>
     <string name="drawer_help">Ayuda y Soporte</string>
@@ -124,15 +123,9 @@
 
     <string name="cd_back">Volver</string>
 
-    <string name="edit_profile_header_title">Editar Perfil</string>
-    <string name="edit_profile_change_photo">Cambiar foto</string>
-    <string name="edit_profile_full_name_label">Nombre</string>
-    <string name="edit_profile_save_button">Guardar Cambios</string>
-    <string name="edit_profile_saving">Guardando…</string>
-    <string name="edit_profile_success">Perfil actualizado correctamente.</string>
-    <string name="edit_profile_photo_read_error">No se pudo leer la imagen seleccionada.</string>
-    <string name="edit_profile_photo_uploading_wait">Espera a que termine de subirse la foto…</string>
     <string name="cd_change_photo">Cambiar foto de perfil</string>
+    <string name="drawer_photo_update_success">Foto de perfil actualizada.</string>
+    <string name="drawer_photo_read_error">No se pudo leer la imagen seleccionada.</string>
 
     <string name="security_header_title">Seguridad</string>
     <string name="security_change_email_label">Cambiar correo</string>
@@ -254,10 +247,7 @@
     <string name="error_edit_item_save_generic">No se pudieron guardar los cambios. Inténtalo de nuevo.</string>
     <string name="error_new_post_analyze_generic">No se pudo analizar la imagen. Inténtalo de nuevo.</string>
     <string name="error_new_post_save_generic">No se pudo guardar el artículo. Inténtalo de nuevo.</string>
-    <string name="error_edit_profile_photo_generic">No se pudo actualizar la foto de perfil.</string>
-    <string name="error_edit_profile_name_blank">El nombre no puede estar vacío.</string>
-    <string name="error_edit_profile_name_length">El nombre debe tener entre %1$d y %2$d caracteres.</string>
-    <string name="error_edit_profile_generic">No se pudo actualizar el perfil.</string>
+    <string name="error_drawer_photo_generic">No se pudo actualizar la foto de perfil.</string>
     <string name="error_security_confirm_password_required">Introduce tu contraseña para confirmar.</string>
     <string name="error_security_reauth_generic">No se pudo verificar tu contraseña. Inténtalo de nuevo.</string>
     <string name="error_security_delete_account_generic">No se pudo eliminar la cuenta. Inténtalo de nuevo.</string>

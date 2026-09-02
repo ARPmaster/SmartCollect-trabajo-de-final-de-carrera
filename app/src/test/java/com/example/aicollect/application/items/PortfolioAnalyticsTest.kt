@@ -1,10 +1,9 @@
-// Test unitario de PortfolioAnalytics: cálculos agregados sobre la colección (valor total, evolución mensual, etiquetas de mes, variación porcentual, distribución por categoría y top valorados).
+// Test unitario de PortfolioAnalytics: cálculos agregados sobre la colección (valor total, evolución mensual, etiquetas de mes, distribución por categoría y top valorados).
 package com.example.aicollect.application.items
 
 import java.time.ZoneId
 import java.time.ZonedDateTime
 import org.junit.Assert.assertEquals
-import org.junit.Assert.assertNull
 import org.junit.Test
 
 class PortfolioAnalyticsTest {
@@ -94,22 +93,6 @@ class PortfolioAnalyticsTest {
         val now = millisAt(2026, 1, 10)
         val labels = PortfolioAnalytics.monthLabels(monthCount = 2, nowMillis = now)
         assertEquals(listOf("DIC", "ENE"), labels)
-    }
-
-    @Test
-    fun `changePercent is null when there is no earlier non-zero month`() {
-        assertNull(PortfolioAnalytics.changePercent(listOf(0f, 0f, 100f)))
-    }
-
-    @Test
-    fun `changePercent is null for an empty evolution`() {
-        assertNull(PortfolioAnalytics.changePercent(emptyList()))
-    }
-
-    @Test
-    fun `changePercent computes change from the first non-zero month to the last`() {
-        val percent = PortfolioAnalytics.changePercent(listOf(0f, 100f, 150f))
-        assertEquals(50f, percent!!, 0.01f)
     }
 
     @Test

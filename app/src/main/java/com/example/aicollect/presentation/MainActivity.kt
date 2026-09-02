@@ -4,10 +4,17 @@
 package com.example.aicollect.presentation
 
 import android.content.res.ColorStateList
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
+import android.graphics.Matrix
+import android.media.ExifInterface
+import android.net.Uri
 import android.os.Bundle
 import android.view.View
 import android.widget.ImageView
 import android.widget.TextView
+import androidx.activity.result.PickVisualMediaRequest
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.content.ContextCompat
@@ -21,7 +28,9 @@ import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.activity.viewModels
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.NavController
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.navOptions
@@ -34,14 +43,35 @@ import com.example.aicollect.presentation.collection.FilterBottomSheetFragment
 import com.example.aicollect.presentation.newpost.NewPostViewModel
 import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
+import java.io.ByteArrayOutputStream
 import kotlin.math.roundToInt
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 @AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
 
     private val mainViewModel: MainViewModel by viewModels()
     private val newPostViewModel: NewPostViewModel by viewModels()
+
+    // Se sube en segundo plano en cuanto se elige la foto, sin bloquear el resto de la app: el
+    // avatar del drawer se actualiza al momento (optimista) y el resultado real de la subida
+    // solo se comunica con un Snackbar, sin impedir cerrar el drawer ni navegar mientras tanto.
+    private val pickProfilePhotoLauncher = registerForActivityResult(
+        ActivityResultContracts.PickVisualMedia(),
+    ) { uri ->
+        if (uri == null) return@registerForActivityResult
+        binding.navView.ivDrawerAvatar.load(uri)
+        lifecycleScope.launch {
+            val imageBytes = withContext(Dispatchers.IO) { decodeAndCompressProfilePhoto(uri) }
+            if (imageBytes != null) {
+                mainViewModel.uploadProfilePhoto(imageBytes)
+            } else {
+                Snackbar.make(binding.root, R.string.drawer_photo_read_error, Snackbar.LENGTH_LONG).show()
+            }
+        }
+    }
 
     private lateinit var binding: ActivityMainBinding
     private lateinit var navController: NavController
@@ -54,7 +84,6 @@ class MainActivity : AppCompatActivity() {
     private val fullScreenDestinationIds = setOf(
         R.id.loginFragment,
         R.id.registerFragment,
-        R.id.editProfileFragment,
         R.id.securityFragment,
         R.id.helpFragment,
         R.id.aboutFragment,
@@ -95,8 +124,12 @@ class MainActivity : AppCompatActivity() {
         binding.navView.btnCloseDrawer.setOnClickListener {
             binding.drawerLayout.closeDrawer(GravityCompat.START)
         }
+        binding.navView.ivDrawerAvatar.setOnClickListener {
+            pickProfilePhotoLauncher.launch(
+                PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly),
+            )
+        }
         listOf(
-            binding.navView.rowEditProfile to R.id.editProfileFragment,
             binding.navView.rowSecurity to R.id.securityFragment,
             binding.navView.rowHelp to R.id.helpFragment,
             binding.navView.rowAbout to R.id.aboutFragment,
@@ -172,7 +205,66 @@ class MainActivity : AppCompatActivity() {
         }
 
         setUpDarkModeToggle()
+
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                mainViewModel.photoUploadState.collect { state -> renderPhotoUploadState(state) }
+            }
+        }
     }
+
+    private fun renderPhotoUploadState(state: PhotoUploadUiState) {
+        when (state) {
+            is PhotoUploadUiState.Success -> {
+                Snackbar.make(binding.root, R.string.drawer_photo_update_success, Snackbar.LENGTH_LONG).show()
+                refreshDrawerProfile()
+            }
+            is PhotoUploadUiState.Error ->
+                Snackbar.make(binding.root, state.message.asString(this), Snackbar.LENGTH_LONG).show()
+            else -> Unit
+        }
+    }
+
+    private fun decodeAndCompressProfilePhoto(uri: Uri): ByteArray? = runCatching {
+        val resolver = contentResolver
+        val bitmap = resolver.openInputStream(uri)?.use { stream ->
+            BitmapFactory.decodeStream(stream)
+        } ?: return@runCatching null
+        val rotationDegrees = resolver.openInputStream(uri)?.use { stream ->
+            when (
+                ExifInterface(stream).getAttributeInt(
+                    ExifInterface.TAG_ORIENTATION,
+                    ExifInterface.ORIENTATION_NORMAL,
+                )
+            ) {
+                ExifInterface.ORIENTATION_ROTATE_90 -> 90
+                ExifInterface.ORIENTATION_ROTATE_180 -> 180
+                ExifInterface.ORIENTATION_ROTATE_270 -> 270
+                else -> 0
+            }
+        } ?: 0
+        val uprightBitmap = if (rotationDegrees != 0) {
+            val matrix = Matrix().apply { postRotate(rotationDegrees.toFloat()) }
+            Bitmap.createBitmap(bitmap, 0, 0, bitmap.width, bitmap.height, matrix, true)
+        } else {
+            bitmap
+        }
+        val scale = PROFILE_PHOTO_MAX_DIMENSION_PX.toFloat() / maxOf(uprightBitmap.width, uprightBitmap.height)
+        val scaledBitmap = if (scale < 1f) {
+            Bitmap.createScaledBitmap(
+                uprightBitmap,
+                (uprightBitmap.width * scale).toInt().coerceAtLeast(1),
+                (uprightBitmap.height * scale).toInt().coerceAtLeast(1),
+                true,
+            )
+        } else {
+            uprightBitmap
+        }
+        ByteArrayOutputStream().use { output ->
+            scaledBitmap.compress(Bitmap.CompressFormat.JPEG, PROFILE_PHOTO_JPEG_QUALITY, output)
+            output.toByteArray()
+        }
+    }.getOrNull()
 
     private fun refreshDrawerProfile() {
         val profile = mainViewModel.drawerProfile()
@@ -245,5 +337,10 @@ class MainActivity : AppCompatActivity() {
 
             insets
         }
+    }
+
+    private companion object {
+        const val PROFILE_PHOTO_MAX_DIMENSION_PX = 512
+        const val PROFILE_PHOTO_JPEG_QUALITY = 85
     }
 }

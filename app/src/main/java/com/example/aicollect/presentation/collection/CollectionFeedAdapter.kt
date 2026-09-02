@@ -3,7 +3,6 @@
 package com.example.aicollect.presentation.collection
 
 import android.view.LayoutInflater
-import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
@@ -18,7 +17,6 @@ private const val VIEW_TYPE_FEED_ITEM = 1
 
 data class CollectionSummary(
     val totalValueLabel: String,
-    val changeLabel: String?,
     val itemCountLabel: String,
 )
 
@@ -65,8 +63,6 @@ class CollectionFeedAdapter(
         fun bind(summary: CollectionSummary) {
             binding.tvTotalValueAmount.text = summary.totalValueLabel
             binding.tvTotalValueItemCount.text = summary.itemCountLabel
-            binding.rowTotalValueChange.visibility = if (summary.changeLabel != null) View.VISIBLE else View.GONE
-            binding.tvTotalValueChange.text = summary.changeLabel.orEmpty()
         }
     }
 

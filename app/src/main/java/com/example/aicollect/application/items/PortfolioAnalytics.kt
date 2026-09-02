@@ -47,12 +47,6 @@ object PortfolioAnalytics {
         }
     }
 
-    fun changePercent(evolution: List<Float>): Float? {
-        val first = evolution.dropLast(1).firstOrNull { it > 0f } ?: return null
-        val last = evolution.lastOrNull() ?: return null
-        return ((last - first) / first) * 100f
-    }
-
     fun distributionBy(items: List<Item>, keySelector: (Item) -> String): List<Pair<String, Int>> {
         if (items.isEmpty()) return emptyList()
         val total = items.size

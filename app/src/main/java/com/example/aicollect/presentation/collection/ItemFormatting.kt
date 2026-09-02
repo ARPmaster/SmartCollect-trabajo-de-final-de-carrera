@@ -28,9 +28,6 @@ object ItemFormatting {
     fun formatDate(epochMillis: Long): String =
         Instant.ofEpochMilli(epochMillis).atZone(ZoneId.systemDefault()).toLocalDate().format(DATE_FORMATTER)
 
-    fun formatChangePercent(percent: Float?): String? =
-        percent?.let { "%+.1f%%".format(SPANISH, it) }
-
     private fun currencySymbol(currency: String): String = when (currency.uppercase(SPANISH)) {
         "EUR" -> "€"
         "USD" -> "$"

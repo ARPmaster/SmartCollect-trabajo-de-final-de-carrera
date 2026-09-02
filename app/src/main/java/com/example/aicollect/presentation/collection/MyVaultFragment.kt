@@ -72,8 +72,6 @@ class MyVaultFragment : Fragment() {
         binding.tvEmptyState.visibility = View.GONE
 
         binding.tvVaultAmount.text = state.totalValueLabel
-        binding.rowVaultChange.visibility = if (state.changeLabel != null) View.VISIBLE else View.GONE
-        binding.tvVaultChange.text = state.changeLabel.orEmpty()
         binding.chartPortfolio.values = state.evolution
 
         listOf(binding.tvMonth1, binding.tvMonth2, binding.tvMonth3, binding.tvMonth4, binding.tvMonth5, binding.tvMonth6)

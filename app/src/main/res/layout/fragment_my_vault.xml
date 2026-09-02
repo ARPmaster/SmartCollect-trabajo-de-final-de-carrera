@@ -47,30 +47,6 @@
                 android:textColor="@color/collect_gold"
                 android:textSize="30sp"
                 tools:text="1.248.500€" />
-
-            <LinearLayout
-                android:id="@+id/row_vault_change"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="6dp"
-                android:gravity="center_vertical"
-                android:orientation="horizontal">
-
-                <ImageView
-                    android:layout_width="12dp"
-                    android:layout_height="12dp"
-                    android:contentDescription="@null"
-                    android:src="@drawable/ic_trend_up" />
-
-                <TextView
-                    android:id="@+id/tv_vault_change"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="6dp"
-                    android:textColor="@color/collect_green"
-                    android:textSize="14sp"
-                    tools:text="+12.4%" />
-            </LinearLayout>
         </LinearLayout>
 
         <LinearLayout

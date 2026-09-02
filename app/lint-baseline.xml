@@ -7,7 +7,7 @@
         errorLine1="import android.media.ExifInterface"
         errorLine2="       ~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
-            file="src/main/java/com/example/aicollect/presentation/settings/EditProfileFragment.kt"
+            file="src/main/java/com/example/aicollect/presentation/MainActivity.kt"
             line="10"
             column="8"/>
     </issue>
@@ -18,8 +18,8 @@
         errorLine1="                ExifInterface(stream).getAttributeInt("
         errorLine2="                ^">
         <location
-            file="src/main/java/com/example/aicollect/presentation/settings/EditProfileFragment.kt"
-            line="79"
+            file="src/main/java/com/example/aicollect/presentation/MainActivity.kt"
+            line="235"
             column="17"/>
     </issue>
 
@@ -349,7 +349,7 @@
         errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/strings.xml"
-            line="241"
+            line="234"
             column="5"/>
     </issue>
 
@@ -360,18 +360,7 @@
         errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/strings.xml"
-            line="248"
-            column="5"/>
-    </issue>
-
-    <issue
-        id="PluralsCandidate"
-        message="Formatting %d followed by words (&quot;caracteres&quot;): This should probably be a plural rather than a string"
-        errorLine1="    &lt;string name=&quot;error_edit_profile_name_length&quot;>El nombre debe tener entre %1$d y %2$d caracteres.&lt;/string>"
-        errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/res/values/strings.xml"
-            line="259"
+            line="241"
             column="5"/>
     </issue>
 
@@ -384,17 +373,6 @@
             file="src/main/java/com/example/aicollect/presentation/collection/SportDonutChartView.kt"
             line="39"
             column="20"/>
-    </issue>
-
-    <issue
-        id="UseCompoundDrawables"
-        message="This tag and its children can be replaced by one `&lt;TextView/>` and a compound drawable"
-        errorLine1="            &lt;LinearLayout"
-        errorLine2="             ~~~~~~~~~~~~">
-        <location
-            file="src/main/res/layout/fragment_my_vault.xml"
-            line="51"
-            column="14"/>
     </issue>
 
     <issue
@@ -438,17 +416,6 @@
         <location
             file="src/main/res/layout/fragment_about.xml"
             line="5"
-            column="5"/>
-    </issue>
-
-    <issue
-        id="Overdraw"
-        message="Possible overdraw: Root element paints background `@color/auth_background` with a theme that also paints a background (inferred theme is `@style/Theme.AIcollect`)"
-        errorLine1="    android:background=&quot;@color/auth_background&quot;"
-        errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/res/layout/fragment_edit_profile.xml"
-            line="6"
             column="5"/>
     </issue>
 
@@ -780,17 +747,6 @@
     <issue
         id="Autofill"
         message="Missing `autofillHints` attribute"
-        errorLine1="                &lt;EditText"
-        errorLine2="                 ~~~~~~~~">
-        <location
-            file="src/main/res/layout/fragment_edit_profile.xml"
-            line="118"
-            column="18"/>
-    </issue>
-
-    <issue
-        id="Autofill"
-        message="Missing `autofillHints` attribute"
         errorLine1="                            &lt;EditText"
         errorLine2="                             ~~~~~~~~">
         <location
@@ -845,17 +801,6 @@
 
     <issue
         id="UseKtx"
-        message="Use the KTX extension function `Bitmap.scale` instead?"
-        errorLine1="            Bitmap.createScaledBitmap("
-        errorLine2="            ^">
-        <location
-            file="src/main/java/com/example/aicollect/presentation/settings/EditProfileFragment.kt"
-            line="98"
-            column="13"/>
-    </issue>
-
-    <issue
-        id="UseKtx"
         message="Use the KTX extension property `View.isVisible` instead?"
         errorLine1="        val expanded = tvAnswer.visibility == View.VISIBLE"
         errorLine2="                       ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
@@ -893,8 +838,19 @@
         errorLine1="            Bitmap.createScaledBitmap("
         errorLine2="            ^">
         <location
+            file="src/main/java/com/example/aicollect/presentation/MainActivity.kt"
+            line="254"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="UseKtx"
+        message="Use the KTX extension function `Bitmap.scale` instead?"
+        errorLine1="            Bitmap.createScaledBitmap("
+        errorLine2="            ^">
+        <location
             file="src/main/java/com/example/aicollect/presentation/newpost/NewPostFragment.kt"
-            line="231"
+            line="232"
             column="13"/>
     </issue>
 
@@ -1011,17 +967,6 @@
     <issue
         id="LabelFor"
         message="Missing accessibility label: provide either a view with an `android:labelFor` that references this view or provide an `android:hint`"
-        errorLine1="                &lt;EditText"
-        errorLine2="                 ~~~~~~~~">
-        <location
-            file="src/main/res/layout/fragment_edit_profile.xml"
-            line="118"
-            column="18"/>
-    </issue>
-
-    <issue
-        id="LabelFor"
-        message="Missing accessibility label: provide either a view with an `android:labelFor` that references this view or provide an `android:hint`"
         errorLine1="                            &lt;EditText"
         errorLine2="                             ~~~~~~~~">
         <location
@@ -1125,7 +1070,7 @@
         errorLine2="                                                  ~~~~~~~~~~~">
         <location
             file="src/main/java/com/example/aicollect/presentation/collection/MyVaultFragment.kt"
-            line="96"
+            line="94"
             column="51"/>
     </issue>
 
@@ -1136,7 +1081,7 @@
         errorLine2="                         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/java/com/example/aicollect/presentation/collection/MyVaultFragment.kt"
-            line="123"
+            line="121"
             column="26"/>
     </issue>
 

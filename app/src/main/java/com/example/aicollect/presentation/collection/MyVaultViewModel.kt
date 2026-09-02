@@ -32,7 +32,6 @@ sealed interface MyVaultUiState {
     data object Empty : MyVaultUiState
     data class Content(
         val totalValueLabel: String,
-        val changeLabel: String?,
         val evolution: List<Float>,
         val monthLabels: List<String>,
         val sportDistribution: List<Pair<String, Int>>,
@@ -74,7 +73,6 @@ class MyVaultViewModel @Inject constructor(itemRepository: ItemRepository) : Vie
         val itemsForSelectedSport = selectedSport?.let { sport -> items.filter { it.deporte == sport } } ?: items
         return MyVaultUiState.Content(
             totalValueLabel = ItemFormatting.formatKnownValue(PortfolioAnalytics.totalValue(items), CURRENCY),
-            changeLabel = ItemFormatting.formatChangePercent(PortfolioAnalytics.changePercent(evolution)),
             evolution = evolution,
             monthLabels = PortfolioAnalytics.monthLabels(),
             sportDistribution = PortfolioAnalytics.distributionBy(items) { it.deporte },
