@@ -2,12 +2,13 @@
 package com.example.aicollect.presentation.collection
 
 import com.example.aicollect.application.items.Item
+import com.example.aicollect.presentation.UiText
 
 data class CollectionFeedItem(
     val id: String,
     val category: String,
     val imageUrl: String?,
-    val priceLabel: String,
+    val priceLabel: UiText,
     val priceValue: Double,
     val description: String,
     val dateLabel: String,

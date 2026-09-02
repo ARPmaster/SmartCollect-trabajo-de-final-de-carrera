@@ -1,9 +1,8 @@
 <resources>
-    <string name="app_name">AIcollect</string>
-    <string name="app_logo_text">COLLECT AI</string>
+    <string name="app_name">SmartCollect</string>
+    <string name="app_logo_text">SmartCollect</string>
     <string name="cd_open_menu">Menú</string>
     <string name="cd_open_filters">Filtros</string>
-    <string name="filters_title">Filtros (por implementar)</string>
     <string name="nav_home">Inicio</string>
     <string name="nav_stats">My Vault</string>
     <string name="cd_add_item">Nueva publicación</string>
@@ -48,7 +47,6 @@
     <string name="drawer_section_general">General</string>
     <string name="drawer_dark_mode">Modo oscuro</string>
     <string name="drawer_section_account">Ajustes de cuenta</string>
-    <string name="drawer_edit_profile">Editar Perfil</string>
     <string name="drawer_security">Contraseña y Seguridad</string>
     <string name="drawer_section_support">Soporte</string>
     <string name="drawer_help">Ayuda y Soporte</string>
@@ -77,7 +75,7 @@
     <string name="register_title">Crear cuenta</string>
     <string name="register_username_label">Nombre de usuario</string>
     <string name="register_username_hint">Entre 6 y 16 caracteres</string>
-    <string name="register_password_hint">Mínimo 6 caracteres</string>
+    <string name="register_password_hint">Mínimo 8 caracteres, con mayúscula, minúscula, número y signo</string>
     <string name="register_confirm_password_label">Confirmar contraseña</string>
     <string name="register_confirm_password_hint">Repite tu contraseña</string>
     <string name="register_create_account_button">Crear cuenta</string>
@@ -101,7 +99,9 @@
     <string-array name="filter_sport_options">
         <item>Todos</item>
         <item>Baloncesto</item>
-        <item>Fútbol Americano</item>
+        <item>Tenis</item>
+        <item>Running</item>
+        <item>Rugby</item>
         <item>Fútbol</item>
         <item>Béisbol</item>
         <item>Otro</item>
@@ -123,15 +123,9 @@
 
     <string name="cd_back">Volver</string>
 
-    <string name="edit_profile_header_title">Editar Perfil</string>
-    <string name="edit_profile_change_photo">Cambiar foto</string>
-    <string name="edit_profile_full_name_label">Nombre</string>
-    <string name="edit_profile_save_button">Guardar Cambios</string>
-    <string name="edit_profile_saving">Guardando…</string>
-    <string name="edit_profile_success">Perfil actualizado correctamente.</string>
-    <string name="edit_profile_photo_read_error">No se pudo leer la imagen seleccionada.</string>
-    <string name="edit_profile_photo_uploading_wait">Espera a que termine de subirse la foto…</string>
     <string name="cd_change_photo">Cambiar foto de perfil</string>
+    <string name="drawer_photo_update_success">Foto de perfil actualizada.</string>
+    <string name="drawer_photo_read_error">No se pudo leer la imagen seleccionada.</string>
 
     <string name="security_header_title">Seguridad</string>
     <string name="security_change_email_label">Cambiar correo</string>
@@ -150,14 +144,12 @@
     <string name="security_delete_account_confirm_button">Eliminar definitivamente</string>
     <string name="security_delete_account_cancel_button">Cancelar</string>
     <string name="security_delete_account_deleting">Eliminando cuenta…</string>
-    <string name="security_delete_account_wrong_password">Contraseña incorrecta.</string>
-    <string name="security_delete_account_password_required">Introduce tu contraseña para confirmar.</string>
 
     <string name="help_header_title">Ayuda y Soporte</string>
     <string name="help_section_title">Preguntas Frecuentes</string>
     <string name="help_contact_button">Contactar por Correo</string>
     <string name="help_support_email">adrianforgithub@gmail.com</string>
-    <string name="help_support_email_subject">Ayuda con Collect AI</string>
+    <string name="help_support_email_subject">Ayuda con SmartCollect</string>
     <string name="help_no_email_app_error">No se encontró ninguna app de correo instalada.</string>
 
     <string name="help_question_1">¿Cómo añado un ítem a mi colección?</string>
@@ -174,15 +166,15 @@
     <string name="help_answer_6">En la pantalla de inicio de sesión, pulsa «¿Olvidaste tu contraseña?» e introduce tu correo; te enviaremos un enlace para restablecerla.</string>
 
     <string name="about_header_title">Sobre la aplicación</string>
-    <string name="about_app_name">COLLECT AI</string>
+    <string name="about_app_name">SmartCollect</string>
     <string name="about_version_format">Versión %1$s</string>
     <string name="about_mission_title">Nuestra misión</string>
-    <string name="about_mission_body">Collect AI es la plataforma definitiva para coleccionistas en la que cualquiera puede controlar su inventario deportivo.</string>
+    <string name="about_mission_body">SmartCollect es la plataforma definitiva para coleccionistas en la que cualquiera puede controlar su inventario deportivo.</string>
     <string name="about_terms">Términos y Condiciones</string>
-    <string name="about_terms_answer">Estos términos regulan el uso de Collect AI, aplicación gestionada por Adrián Rey Pérez (contacto: adrianforgithub@gmail.com).\n\nQué es el servicio: Collect AI es una herramienta de gestión de colecciones personales. Te ayuda a catalogar tus objetos y a consultar una valoración de mercado orientativa, generada a partir de los datos disponibles y, cuando uses el reconocimiento automático, con ayuda de inteligencia artificial (Google Cloud Vision y Google Gemini). Estas valoraciones son orientativas: no constituyen una tasación oficial ni garantizan un precio de venta.\n\nReconocimiento automático: al fotografiar un objeto, la app puede sugerirte varios candidatos generados por IA. Ningún artículo se guarda en tu colección de forma automática: siempre debes confirmar uno de los candidatos o introducir los datos manualmente antes de que se añada.\n\nTu cuenta: eres responsable de la veracidad de los datos que introduces, de mantener segura tu contraseña y de la actividad de tu cuenta. El nombre de usuario que elijas debe ser único y no puede suplantar a terceros. Nos reservamos el derecho de suspender cuentas que hagan un uso indebido del servicio (contenido ilícito, intentos de vulnerar la seguridad, suplantación de identidad).\n\nPropiedad del contenido: las fotografías y los datos que subes siguen siendo tuyos; nos concedes únicamente la licencia necesaria para almacenarlos y mostrártelos dentro de la app.\n\nCambios y jurisdicción: si modificamos estos términos de forma relevante, te lo notificaremos en la app; el uso continuado del servicio tras el cambio implica su aceptación. Estos términos se rigen por la legislación española y de la Unión Europea.</string>
+    <string name="about_terms_answer">Estos términos regulan el uso de SmartCollect, aplicación gestionada por Adrián Rey Pérez (contacto: adrianforgithub@gmail.com).\n\nQué es el servicio: SmartCollect es una herramienta de gestión de colecciones personales. Te ayuda a catalogar tus objetos y a consultar una valoración de mercado orientativa, generada a partir de los datos disponibles y, cuando uses el reconocimiento automático, con ayuda de inteligencia artificial (Google Cloud Vision y Google Gemini). Estas valoraciones son orientativas: no constituyen una tasación oficial ni garantizan un precio de venta.\n\nReconocimiento automático: al fotografiar un objeto, la app puede sugerirte varios candidatos generados por IA. Ningún artículo se guarda en tu colección de forma automática: siempre debes confirmar uno de los candidatos o introducir los datos manualmente antes de que se añada.\n\nTu cuenta: eres responsable de la veracidad de los datos que introduces, de mantener segura tu contraseña y de la actividad de tu cuenta. El nombre de usuario que elijas debe ser único y no puede suplantar a terceros. Nos reservamos el derecho de suspender cuentas que hagan un uso indebido del servicio (contenido ilícito, intentos de vulnerar la seguridad, suplantación de identidad).\n\nPropiedad del contenido: las fotografías y los datos que subes siguen siendo tuyos; nos concedes únicamente la licencia necesaria para almacenarlos y mostrártelos dentro de la app.\n\nCambios y jurisdicción: si modificamos estos términos de forma relevante, te lo notificaremos en la app; el uso continuado del servicio tras el cambio implica su aceptación. Estos términos se rigen por la legislación española y de la Unión Europea.</string>
     <string name="about_privacy">Política de Privacidad</string>
     <string name="about_privacy_answer">Responsable del tratamiento: Adrián Rey Pérez, contacto: adrianforgithub@gmail.com.\n\nQué datos recopilamos: tu correo electrónico, nombre de perfil y nombre de usuario, foto de perfil (si decides subirla), y los datos e imágenes de los artículos que añades a tu colección, incluidas las fotografías que envíes para el reconocimiento automático de objetos.\n\nPara qué los usamos y con qué base legal: gestionar tu cuenta y autenticarte, como parte de la ejecución del servicio que nos solicitas (art. 6.1.b RGPD); generar sugerencias de reconocimiento mediante inteligencia artificial cuando fotografías un objeto, también como ejecución del servicio (art. 6.1.b); y atender tus consultas de soporte, por interés legítimo en responderte (art. 6.1.f).\n\nCon quién compartimos tus datos: con Google, a través de Firebase (Authentication, Firestore, Storage y Cloud Functions) y de las API de Google Cloud Vision y Google Gemini, que actúan como encargados del tratamiento bajo contrato con nosotros. Parte de este procesamiento puede implicar el envío de datos a servidores de Google fuera del Espacio Económico Europeo; estas transferencias están amparadas por las Cláusulas Contractuales Tipo de la Comisión Europea y/o el marco de adecuación EU-U.S. Data Privacy Framework. No vendemos ni cedemos tus datos a terceros con fines publicitarios.\n\nDecisiones automatizadas: los candidatos que sugiere la IA nunca se guardan solos; siempre confirmas o editas tú el resultado antes de que se añada a tu colección, así que no tomamos decisiones totalmente automatizadas que produzcan efectos legales sobre ti.\n\nCuánto tiempo conservamos tus datos: mientras tu cuenta esté activa. Si solicitas la baja, eliminamos tus datos personales y el contenido de tu colección en un plazo razonable, salvo que la ley exija conservarlos más tiempo.\n\nTus derechos: puedes acceder a tus datos, rectificarlos, solicitar su supresión, limitar u oponerte a su tratamiento, y pedir su portabilidad, escribiéndonos a adrianforgithub@gmail.com. También puedes presentar una reclamación ante la Agencia Española de Protección de Datos (www.aepd.es) si consideras que no hemos tratado tus datos correctamente.\n\nMenores de edad: este servicio no está dirigido a menores de 14 años y no recopilamos conscientemente datos de menores de esa edad.\n\nSeguridad: tus datos se almacenan en Firebase protegidos por reglas de acceso que solo permiten leer y escribir tus propios datos.</string>
-    <string name="about_footer">Hecho con pasión por el equipo de Collect AI.</string>
+    <string name="about_footer">Hecho con pasión por el equipo de SmartCollect.</string>
 
     <string name="new_post_title">Nueva Publicación - Objeto</string>
     <string name="new_post_upload_title">Subir imágenes</string>
@@ -208,6 +200,7 @@
     <string name="new_post_publishing">Publicando…</string>
     <string name="new_post_publishing_valuation">Buscando el valor de mercado…</string>
     <string name="new_post_success">Artículo guardado en tu colección.</string>
+    <string name="new_post_no_internet_error">Necesitas conexión a internet para añadir una publicación.</string>
     <string name="new_post_name_required_error">El título no puede estar vacío.</string>
     <string name="new_post_sport_required_error">Selecciona un deporte.</string>
     <string name="new_post_condition_required_error">Selecciona un estado.</string>
@@ -231,9 +224,44 @@
     <string name="home_no_filter_results">Ningún artículo coincide con estos filtros.</string>
     <string name="home_load_error">No se pudo cargar tu colección. Inténtalo de nuevo.</string>
 
+    <!-- Mensajes de error de ViewModel movidos aquí para que los ViewModel no toquen Context
+         (ver UiText.kt): cada uno se resuelve en el Fragment con getString/UiText.asString(). -->
+    <string name="error_forgot_password_empty_email">Introduce tu correo electrónico.</string>
+    <string name="error_forgot_password_generic">No se pudo enviar el correo.</string>
+    <string name="error_login_missing_fields">Completa tu correo y contraseña.</string>
+    <string name="error_login_generic">No se pudo iniciar sesión.</string>
+    <string name="error_passwords_dont_match">Las contraseñas no coinciden.</string>
+    <string name="error_password_too_short">La contraseña debe tener al menos %1$d caracteres.</string>
+    <string name="error_password_missing_uppercase">La contraseña debe incluir al menos una letra mayúscula.</string>
+    <string name="error_password_missing_lowercase">La contraseña debe incluir al menos una letra minúscula.</string>
+    <string name="error_password_missing_digit">La contraseña debe incluir al menos un número.</string>
+    <string name="error_password_missing_symbol">La contraseña debe incluir al menos un signo (por ejemplo: !?#$%%&amp;*).</string>
+    <string name="error_email_invalid_format">Introduce un correo electrónico válido.</string>
+    <string name="label_not_valued">Sin valorar</string>
+    <string name="error_register_username_length">El nombre de usuario debe tener entre %1$d y %2$d caracteres.</string>
+    <string name="error_username_taken">Ese nombre de usuario ya está en uso.</string>
+    <string name="error_register_generic">No se pudo crear la cuenta.</string>
+    <string name="error_item_load_generic">No se pudo cargar el artículo.</string>
+    <string name="error_myvault_load_generic">No se pudo cargar tu cartera.</string>
+    <string name="error_edit_item_not_loaded">No se pudo guardar: el artículo aún no se ha cargado.</string>
+    <string name="error_edit_item_save_generic">No se pudieron guardar los cambios. Inténtalo de nuevo.</string>
+    <string name="error_new_post_analyze_generic">No se pudo analizar la imagen. Inténtalo de nuevo.</string>
+    <string name="error_new_post_save_generic">No se pudo guardar el artículo. Inténtalo de nuevo.</string>
+    <string name="error_drawer_photo_generic">No se pudo actualizar la foto de perfil.</string>
+    <string name="error_security_confirm_password_required">Introduce tu contraseña para confirmar.</string>
+    <string name="error_security_reauth_generic">No se pudo verificar tu contraseña. Inténtalo de nuevo.</string>
+    <string name="error_security_delete_account_generic">No se pudo eliminar la cuenta. Inténtalo de nuevo.</string>
+    <string name="error_security_no_changes">No hay cambios que guardar.</string>
+    <string name="error_security_update_email_generic">No se pudo actualizar el correo.</string>
+    <string name="error_security_update_password_generic">No se pudo actualizar la contraseña.</string>
+    <string name="error_security_wrong_password">Contraseña incorrecta.</string>
+    <string name="error_security_recent_login_required">Por seguridad, cierra sesión y vuelve a iniciar sesión antes de cambiar estos datos.</string>
+
     <string-array name="sport_options">
         <item>Baloncesto</item>
-        <item>Fútbol Americano</item>
+        <item>Tenis</item>
+        <item>Running</item>
+        <item>Rugby</item>
         <item>Fútbol</item>
         <item>Béisbol</item>
         <item>Otro</item>

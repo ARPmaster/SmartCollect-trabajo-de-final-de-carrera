@@ -42,7 +42,7 @@
                 android:fontFamily="sans-serif-medium"
                 android:text="@string/nav_home"
                 android:textColor="@color/collect_gold"
-                android:textSize="10sp" />
+                android:textSize="12sp" />
         </LinearLayout>
 
         <FrameLayout
@@ -97,7 +97,7 @@
                 android:fontFamily="sans-serif-medium"
                 android:text="@string/nav_stats"
                 android:textColor="@color/collect_text_secondary_50"
-                android:textSize="10sp" />
+                android:textSize="12sp" />
         </LinearLayout>
     </androidx.constraintlayout.widget.ConstraintLayout>
 </FrameLayout>

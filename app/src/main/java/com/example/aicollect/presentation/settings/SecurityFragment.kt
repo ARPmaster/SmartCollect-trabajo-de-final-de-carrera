@@ -22,6 +22,7 @@ import androidx.navigation.navOptions
 import com.example.aicollect.R
 import com.example.aicollect.databinding.DialogDeleteAccountBinding
 import com.example.aicollect.databinding.FragmentSecurityBinding
+import com.example.aicollect.presentation.asString
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
@@ -123,7 +124,7 @@ class SecurityFragment : Fragment() {
                 )
             }
             is DeleteAccountUiState.Error ->
-                Snackbar.make(binding.root, state.message, Snackbar.LENGTH_LONG).show()
+                Snackbar.make(binding.root, state.message.asString(requireContext()), Snackbar.LENGTH_LONG).show()
             else -> Unit
         }
     }
@@ -144,7 +145,8 @@ class SecurityFragment : Fragment() {
                 binding.etConfirmPassword.text?.clear()
                 Snackbar.make(binding.root, R.string.security_success, Snackbar.LENGTH_LONG).show()
             }
-            is SecurityUiState.Error -> Snackbar.make(binding.root, state.message, Snackbar.LENGTH_LONG).show()
+            is SecurityUiState.Error ->
+                Snackbar.make(binding.root, state.message.asString(requireContext()), Snackbar.LENGTH_LONG).show()
             else -> Unit
         }
     }

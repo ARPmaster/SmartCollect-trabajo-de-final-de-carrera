@@ -3,7 +3,9 @@ package com.example.aicollect.presentation.auth
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.aicollect.R
 import com.example.aicollect.application.auth.AuthRepository
+import com.example.aicollect.presentation.UiText
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -15,7 +17,7 @@ sealed interface LoginUiState {
     data object Idle : LoginUiState
     data object Loading : LoginUiState
     data object Success : LoginUiState
-    data class Error(val message: String) : LoginUiState
+    data class Error(val message: UiText) : LoginUiState
 }
 
 @HiltViewModel
@@ -30,14 +32,18 @@ class LoginViewModel @Inject constructor(
 
     fun signIn(email: String, password: String) {
         if (email.isBlank() || password.isBlank()) {
-            _uiState.value = LoginUiState.Error("Completa tu correo y contraseña.")
+            _uiState.value = LoginUiState.Error(UiText.StringResource(R.string.error_login_missing_fields))
             return
         }
         _uiState.value = LoginUiState.Loading
         viewModelScope.launch {
             authRepository.signIn(email, password)
                 .onSuccess { _uiState.value = LoginUiState.Success }
-                .onFailure { _uiState.value = LoginUiState.Error(it.message ?: "No se pudo iniciar sesión.") }
+                .onFailure {
+                    _uiState.value = LoginUiState.Error(
+                        it.message?.let(UiText::DynamicString) ?: UiText.StringResource(R.string.error_login_generic),
+                    )
+                }
         }
     }
 }

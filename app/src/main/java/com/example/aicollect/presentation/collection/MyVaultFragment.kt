@@ -22,6 +22,7 @@ import com.example.aicollect.R
 import com.example.aicollect.databinding.FragmentMyVaultBinding
 import com.example.aicollect.databinding.ItemVaultDistributionRowBinding
 import com.example.aicollect.databinding.ItemVaultTopValuedBinding
+import com.example.aicollect.presentation.asString
 import com.example.aicollect.presentation.showSnackbar
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
@@ -62,7 +63,7 @@ class MyVaultFragment : Fragment() {
                 binding.tvEmptyState.visibility = View.VISIBLE
             }
             is MyVaultUiState.Content -> bind(state)
-            is MyVaultUiState.Error -> showSnackbar(binding.root, state.message).show()
+            is MyVaultUiState.Error -> showSnackbar(binding.root, state.message.asString(requireContext())).show()
         }
     }
 
@@ -71,8 +72,6 @@ class MyVaultFragment : Fragment() {
         binding.tvEmptyState.visibility = View.GONE
 
         binding.tvVaultAmount.text = state.totalValueLabel
-        binding.rowVaultChange.visibility = if (state.changeLabel != null) View.VISIBLE else View.GONE
-        binding.tvVaultChange.text = state.changeLabel.orEmpty()
         binding.chartPortfolio.values = state.evolution
 
         listOf(binding.tvMonth1, binding.tvMonth2, binding.tvMonth3, binding.tvMonth4, binding.tvMonth5, binding.tvMonth6)
@@ -154,6 +153,8 @@ class MyVaultFragment : Fragment() {
                 ContextCompat.getColor(requireContext(), if (isSelected) R.color.vault_chip_active_text else R.color.vault_text_secondary),
             )
             chip.setBackgroundResource(if (isSelected) R.drawable.bg_vault_chip_active else R.drawable.bg_vault_chip_inactive)
+            // El color por sí solo no llega a TalkBack: isSelected es el estado nativo que sí anuncia.
+            chip.isSelected = isSelected
         }
     }
 
@@ -164,7 +165,7 @@ class MyVaultFragment : Fragment() {
             itemBinding.ivItemImage.load(item.imageUrl)
             itemBinding.tvItemName.text = item.nombre
             itemBinding.tvItemSubtitle.text = item.subtitle
-            itemBinding.tvItemValue.text = item.valueLabel
+            itemBinding.tvItemValue.text = item.valueLabel.asString(requireContext())
 
             if (index != topItems.lastIndex) {
                 (itemBinding.root.layoutParams as ViewGroup.MarginLayoutParams).bottomMargin =

@@ -19,6 +19,7 @@ import androidx.navigation.fragment.findNavController
 import androidx.navigation.navOptions
 import com.example.aicollect.R
 import com.example.aicollect.databinding.FragmentLoginBinding
+import com.example.aicollect.presentation.asString
 import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
@@ -92,7 +93,8 @@ class LoginFragment : Fragment() {
 
         when (state) {
             is LoginUiState.Success -> navigateToHome()
-            is LoginUiState.Error -> Snackbar.make(binding.root, state.message, Snackbar.LENGTH_LONG).show()
+            is LoginUiState.Error ->
+                Snackbar.make(binding.root, state.message.asString(requireContext()), Snackbar.LENGTH_LONG).show()
             else -> Unit
         }
     }

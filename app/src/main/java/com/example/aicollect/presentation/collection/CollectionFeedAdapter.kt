@@ -3,7 +3,6 @@
 package com.example.aicollect.presentation.collection
 
 import android.view.LayoutInflater
-import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
@@ -11,13 +10,13 @@ import androidx.recyclerview.widget.RecyclerView
 import coil.load
 import com.example.aicollect.databinding.ItemCollectionFeedBinding
 import com.example.aicollect.databinding.ItemTotalValueHeaderBinding
+import com.example.aicollect.presentation.asString
 
 private const val VIEW_TYPE_HEADER = 0
 private const val VIEW_TYPE_FEED_ITEM = 1
 
 data class CollectionSummary(
     val totalValueLabel: String,
-    val changeLabel: String?,
     val itemCountLabel: String,
 )
 
@@ -64,8 +63,6 @@ class CollectionFeedAdapter(
         fun bind(summary: CollectionSummary) {
             binding.tvTotalValueAmount.text = summary.totalValueLabel
             binding.tvTotalValueItemCount.text = summary.itemCountLabel
-            binding.rowTotalValueChange.visibility = if (summary.changeLabel != null) View.VISIBLE else View.GONE
-            binding.tvTotalValueChange.text = summary.changeLabel.orEmpty()
         }
     }
 
@@ -76,7 +73,7 @@ class CollectionFeedAdapter(
         fun bind(item: CollectionFeedItem) {
             binding.tvCategory.text = item.category
             binding.ivItem.load(item.imageUrl)
-            binding.tvPrice.text = item.priceLabel
+            binding.tvPrice.text = item.priceLabel.asString(binding.root.context)
             binding.tvDescription.text = item.description
             binding.tvDate.text = item.dateLabel
             binding.root.setOnClickListener { onItemClick(item) }

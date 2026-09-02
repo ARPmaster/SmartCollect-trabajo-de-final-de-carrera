@@ -10,7 +10,6 @@
     <color name="collect_text_date">#6B7280</color>
     <color name="collect_gold">#E5B543</color>
     <color name="collect_green">#4ADE80</color>
-    <color name="collect_green_bg">#1A4ADE80</color>
     <color name="collect_image_background">#111827</color>
     <color name="collect_menu_icon">#4B5563</color>
     <color name="collect_toolbar_border">#E5E7EB</color>
@@ -19,13 +18,11 @@
 
     <color name="drawer_background">#F8F6F6</color>
     <color name="drawer_text_muted">#94A3B8</color>
-    <color name="drawer_chevron">#64748B</color>
     <color name="collect_gold_10">#1AE5B543</color>
     <color name="collect_gold_20">#33E5B543</color>
     <color name="collect_gold_30">#4DE5B543</color>
 
     <color name="auth_background">#F8F6F6</color>
-    <color name="auth_divider">#4DE1D9C9</color>
     <color name="auth_heading_text">#16130C</color>
     <color name="auth_field_label">#000000</color>
     <color name="auth_input_bg">#FFFFFF</color>

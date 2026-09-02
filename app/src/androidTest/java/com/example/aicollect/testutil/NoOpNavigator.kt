@@ -6,6 +6,7 @@ import androidx.navigation.NavDestination
 import androidx.navigation.NavOptions
 import androidx.navigation.Navigator
 
+@Navigator.Name("fragment")
 class NoOpNavigator : Navigator<NavDestination>() {
 
     override fun createDestination(): NavDestination = NavDestination(this)

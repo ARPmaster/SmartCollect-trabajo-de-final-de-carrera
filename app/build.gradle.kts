@@ -1,5 +1,6 @@
 plugins {
     alias(libs.plugins.android.application)
+    alias(libs.plugins.kotlin.android)
 
     id("com.google.gms.google-services")
     alias(libs.plugins.ksp)
@@ -16,7 +17,7 @@ android {
 
     defaultConfig {
         applicationId = "com.example.aicollect"
-        minSdk = 33
+        minSdk = 29
         targetSdk = 36
         versionCode = 1
         versionName = "1.0"
@@ -26,9 +27,7 @@ android {
 
     buildTypes {
         release {
-            optimization {
-                enable = false
-            }
+            isMinifyEnabled = false
         }
     }
     compileOptions {
@@ -39,10 +38,27 @@ android {
         viewBinding = true
         buildConfig = true
     }
+    lint {
+        // Baseline consciente, no una alfombra bajo la que barrer todo: los errores reales
+        // (UseAppTint) y las categorías con sustancia real (SmallSp, Autofill en pantallas de
+        // login) ya se corrigieron en el código, no están aquí. Lo que queda en el baseline es o
+        // bien avisos de versión (GradleDependency, UseTomlInstead, NewerVersionAvailable,
+        // AndroidGradlePluginVersion — prohibido tocar versiones antes de la entrega) o bien
+        // pulido cosmético de bajo impacto (Overdraw, UselessParent, UseKtx...) que no compensa
+        // el riesgo de tocar capas de layout a dos días de la entrega.
+        baseline = file("lint-baseline.xml")
+    }
+}
+
+kotlin {
+    compilerOptions {
+        jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_11)
+    }
 }
 
 dependencies {
     implementation(libs.androidx.core.ktx)
+    implementation(libs.androidx.core.splashscreen)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.appcompat)
     implementation(libs.material)

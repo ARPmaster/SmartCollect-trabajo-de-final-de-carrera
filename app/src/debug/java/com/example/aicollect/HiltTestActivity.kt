@@ -1,4 +1,8 @@
 // Activity vacía usada solo como anfitriona de los Fragments en las pruebas de instrumentación, no se usa en la app real.
+// Vive en el source set "debug" (no en "androidTest") para que se empaquete en el mismo proceso
+// que la app bajo test: Instrumentation.startActivitySync() exige que la activity arrancada esté
+// en el mismo proceso que la instrumentación, y esta corre en el proceso de la app, no en el del
+// APK de test.
 package com.example.aicollect
 
 import android.os.Bundle

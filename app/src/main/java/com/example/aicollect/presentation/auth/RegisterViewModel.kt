@@ -4,8 +4,11 @@ package com.example.aicollect.presentation.auth
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.aicollect.R
 import com.example.aicollect.application.auth.AuthRepository
+import com.example.aicollect.application.auth.AuthValidation
 import com.example.aicollect.application.auth.UsernameTakenException
+import com.example.aicollect.presentation.UiText
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -17,9 +20,9 @@ sealed interface RegisterUiState {
     data object Idle : RegisterUiState
     data object Loading : RegisterUiState
     data object Success : RegisterUiState
-    data class Error(val message: String) : RegisterUiState
+    data class Error(val message: UiText) : RegisterUiState
 
-    data class UsernameTaken(val message: String) : RegisterUiState
+    data class UsernameTaken(val message: UiText) : RegisterUiState
 }
 
 @HiltViewModel
@@ -32,23 +35,28 @@ class RegisterViewModel @Inject constructor(
 
     fun signUp(email: String, username: String, password: String, confirmPassword: String) {
         val trimmedUsername = username.trim()
+        val emailError = AuthValidation.emailError(email)
+        val passwordError = AuthValidation.passwordError(password)
         when {
-            email.isBlank() || password.isBlank() -> {
-                _uiState.value = RegisterUiState.Error("Completa correo y contraseña.")
+            emailError != null -> {
+                _uiState.value = RegisterUiState.Error(emailError.asUiText())
                 return
             }
             trimmedUsername.length < MIN_USERNAME_LENGTH || trimmedUsername.length > MAX_USERNAME_LENGTH -> {
                 _uiState.value = RegisterUiState.Error(
-                    "El nombre de usuario debe tener entre $MIN_USERNAME_LENGTH y $MAX_USERNAME_LENGTH caracteres.",
+                    UiText.StringResource(
+                        R.string.error_register_username_length,
+                        listOf(MIN_USERNAME_LENGTH, MAX_USERNAME_LENGTH),
+                    ),
                 )
                 return
             }
-            password.length < 6 -> {
-                _uiState.value = RegisterUiState.Error("La contraseña debe tener al menos 6 caracteres.")
+            passwordError != null -> {
+                _uiState.value = RegisterUiState.Error(passwordError.asUiText())
                 return
             }
             password != confirmPassword -> {
-                _uiState.value = RegisterUiState.Error("Las contraseñas no coinciden.")
+                _uiState.value = RegisterUiState.Error(UiText.StringResource(R.string.error_passwords_dont_match))
                 return
             }
         }
@@ -58,9 +66,12 @@ class RegisterViewModel @Inject constructor(
                 .onSuccess { _uiState.value = RegisterUiState.Success }
                 .onFailure { error ->
                     _uiState.value = if (error is UsernameTakenException) {
-                        RegisterUiState.UsernameTaken(error.message ?: "Ese nombre de usuario ya está en uso.")
+                        RegisterUiState.UsernameTaken(UiText.StringResource(R.string.error_username_taken))
                     } else {
-                        RegisterUiState.Error(error.message ?: "No se pudo crear la cuenta.")
+                        RegisterUiState.Error(
+                            error.message?.let(UiText::DynamicString)
+                                ?: UiText.StringResource(R.string.error_register_generic),
+                        )
                     }
                 }
         }

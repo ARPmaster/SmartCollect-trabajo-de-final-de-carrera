@@ -1,11 +1,4 @@
 <?xml version="1.0" encoding="utf-8"?>
-<manifest xmlns:android="http://schemas.android.com/apk/res/android">
-
-    <application>
-        <activity
-            android:name=".HiltTestActivity"
-            android:exported="false"
-            android:theme="@style/Theme.HiltTestActivity" />
-    </application>
-
-</manifest>
+<!-- HiltTestActivity se declara en src/debug/AndroidManifest.xml, no aquí: ver ese fichero
+     para el motivo. -->
+<manifest xmlns:android="http://schemas.android.com/apk/res/android" />

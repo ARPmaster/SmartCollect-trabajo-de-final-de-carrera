@@ -3,6 +3,7 @@
 * detecta posibles duplicados en la colección y publica el ítem ya con su valoración de mercado.*/
 package com.example.aicollect.presentation.newpost
 
+import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.aicollect.application.items.Item
@@ -10,7 +11,11 @@ import com.example.aicollect.application.items.ItemRepository
 import com.example.aicollect.application.items.ValuationResult
 import com.example.aicollect.application.recognition.RankedCandidate
 import com.example.aicollect.application.recognition.RecognitionRepository
+import com.example.aicollect.R
+import com.example.aicollect.presentation.UiText
+import com.example.aicollect.presentation.isOnline
 import dagger.hilt.android.lifecycle.HiltViewModel
+import dagger.hilt.android.qualifiers.ApplicationContext
 import java.util.Base64
 import java.util.Locale
 import javax.inject.Inject
@@ -24,16 +29,17 @@ sealed interface RecognitionUiState {
     data object Idle : RecognitionUiState
     data object Loading : RecognitionUiState
     data class Success(val candidates: List<RankedCandidate>) : RecognitionUiState
-    data class Error(val message: String) : RecognitionUiState
+    data class Error(val message: UiText) : RecognitionUiState
 }
 
 sealed interface SaveItemUiState {
     data object Idle : SaveItemUiState
     data object Loading : SaveItemUiState
     data object Success : SaveItemUiState
-    data class Error(val message: String) : SaveItemUiState
+    data class Error(val message: UiText) : SaveItemUiState
     data class ValidationError(val field: RequiredField) : SaveItemUiState
     data class DuplicateWarning(val existingItemName: String) : SaveItemUiState
+    data object NoConnection : SaveItemUiState
 }
 
 enum class RequiredField {
@@ -46,6 +52,7 @@ enum class RequiredField {
 class NewPostViewModel @Inject constructor(
     private val recognitionRepository: RecognitionRepository,
     private val itemRepository: ItemRepository,
+    @ApplicationContext private val appContext: Context,
 ) : ViewModel() {
 
     private val _recognitionState = MutableStateFlow<RecognitionUiState>(RecognitionUiState.Idle)
@@ -99,7 +106,8 @@ class NewPostViewModel @Inject constructor(
                 }
                 .onFailure {
                     _recognitionState.value = RecognitionUiState.Error(
-                        it.message ?: "No se pudo analizar la imagen. Inténtalo de nuevo.",
+                        it.message?.let(UiText::DynamicString)
+                            ?: UiText.StringResource(R.string.error_new_post_analyze_generic),
                     )
                 }
         }
@@ -133,6 +141,10 @@ class NewPostViewModel @Inject constructor(
             _saveState.value = SaveItemUiState.ValidationError(RequiredField.CONDITION)
             return
         }
+        if (!appContext.isOnline()) {
+            _saveState.value = SaveItemUiState.NoConnection
+            return
+        }
 
         val candidate = selectedCandidate
         val request = PendingPublish(
@@ -161,6 +173,10 @@ class NewPostViewModel @Inject constructor(
     fun confirmPublishDespiteDuplicate() {
         val request = pendingPublish ?: return
         pendingPublish = null
+        if (!appContext.isOnline()) {
+            _saveState.value = SaveItemUiState.NoConnection
+            return
+        }
         viewModelScope.launch { publish(request) }
     }
 
@@ -205,7 +221,8 @@ class NewPostViewModel @Inject constructor(
             .onSuccess { _saveState.value = SaveItemUiState.Success }
             .onFailure {
                 _saveState.value = SaveItemUiState.Error(
-                    it.message ?: "No se pudo guardar el artículo. Inténtalo de nuevo.",
+                    it.message?.let(UiText::DynamicString)
+                        ?: UiText.StringResource(R.string.error_new_post_save_generic),
                 )
             }
     }

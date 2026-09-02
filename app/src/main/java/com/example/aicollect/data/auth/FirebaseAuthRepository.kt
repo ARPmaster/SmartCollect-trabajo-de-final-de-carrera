@@ -3,6 +3,7 @@
  * usuario único en Firestore.*/
 package com.example.aicollect.data.auth
 
+import com.example.aicollect.application.auth.AuthError
 import com.example.aicollect.application.auth.AuthRepository
 import com.example.aicollect.application.auth.UsernameTakenException
 import com.google.firebase.auth.EmailAuthProvider
@@ -32,7 +33,7 @@ class FirebaseAuthRepository @Inject constructor(
     override suspend fun signUp(email: String, password: String, username: String): Result<Unit> = runCatching {
         val trimmedUsername = username.trim()
         firebaseAuth.createUserWithEmailAndPassword(email, password).await()
-        val user = firebaseAuth.currentUser ?: throw IllegalStateException("No se pudo crear la cuenta.")
+        val user = firebaseAuth.currentUser ?: throw AuthError.AccountCreationFailed
 
         try {
             claimUsername(user.uid, trimmedUsername.lowercase(), previousNormalized = null)
@@ -62,7 +63,7 @@ class FirebaseAuthRepository @Inject constructor(
     }
 
     override suspend fun updateDisplayName(displayName: String): Result<Unit> = runCatching {
-        val user = firebaseAuth.currentUser ?: throw IllegalStateException("No hay sesión activa.")
+        val user = firebaseAuth.currentUser ?: throw AuthError.NoActiveSession
         val trimmedName = displayName.trim()
         val normalizedNew = trimmedName.lowercase()
         val normalizedOld = user.displayName?.trim()?.lowercase()
@@ -111,39 +112,39 @@ class FirebaseAuthRepository @Inject constructor(
     }
 
     override suspend fun updateEmail(newEmail: String): Result<Unit> = runCatching {
-        val user = firebaseAuth.currentUser ?: throw IllegalStateException("No hay sesión activa.")
+        val user = firebaseAuth.currentUser ?: throw AuthError.NoActiveSession
         try {
             user.updateEmail(newEmail).await()
         } catch (e: FirebaseAuthRecentLoginRequiredException) {
-            throw IllegalStateException(RECENT_LOGIN_MESSAGE, e)
+            throw AuthError.RecentLoginRequired(e)
         }
         Unit
     }
 
     override suspend fun updatePassword(newPassword: String): Result<Unit> = runCatching {
-        val user = firebaseAuth.currentUser ?: throw IllegalStateException("No hay sesión activa.")
+        val user = firebaseAuth.currentUser ?: throw AuthError.NoActiveSession
         try {
             user.updatePassword(newPassword).await()
         } catch (e: FirebaseAuthRecentLoginRequiredException) {
-            throw IllegalStateException(RECENT_LOGIN_MESSAGE, e)
+            throw AuthError.RecentLoginRequired(e)
         }
         Unit
     }
 
     override suspend fun reauthenticate(password: String): Result<Unit> = runCatching {
-        val user = firebaseAuth.currentUser ?: throw IllegalStateException("No hay sesión activa.")
-        val email = user.email ?: throw IllegalStateException("No hay sesión activa.")
+        val user = firebaseAuth.currentUser ?: throw AuthError.NoActiveSession
+        val email = user.email ?: throw AuthError.NoActiveSession
         val credential = EmailAuthProvider.getCredential(email, password)
         try {
             user.reauthenticate(credential).await()
         } catch (e: FirebaseAuthInvalidCredentialsException) {
-            throw IllegalStateException("Contraseña incorrecta.", e)
+            throw AuthError.WrongPassword(e)
         }
         Unit
     }
 
     override suspend fun deleteAccount(): Result<Unit> = runCatching {
-        val user = firebaseAuth.currentUser ?: throw IllegalStateException("No hay sesión activa.")
+        val user = firebaseAuth.currentUser ?: throw AuthError.NoActiveSession
         val uid = user.uid
 
         val itemsRef = firestore.collection(USERS_COLLECTION).document(uid).collection(ITEMS_COLLECTION)
@@ -167,7 +168,7 @@ class FirebaseAuthRepository @Inject constructor(
     }
 
     override suspend fun updateProfilePhoto(imageBytes: ByteArray): Result<String> = runCatching {
-        val user = firebaseAuth.currentUser ?: throw IllegalStateException("No hay sesión activa.")
+        val user = firebaseAuth.currentUser ?: throw AuthError.NoActiveSession
         val photoRef = firebaseStorage.reference.child("users/${user.uid}/profile.jpg")
         photoRef.putBytes(imageBytes).await()
         val downloadUrl = photoRef.downloadUrl.await()
@@ -193,8 +194,6 @@ class FirebaseAuthRepository @Inject constructor(
     override fun getCurrentUserPhotoUrl(): String? = firebaseAuth.currentUser?.photoUrl?.toString()
 
     private companion object {
-        const val RECENT_LOGIN_MESSAGE =
-            "Por seguridad, cierra sesión y vuelve a iniciar sesión antes de cambiar estos datos."
         const val USERNAMES_COLLECTION = "usernames"
         const val USERNAME_OWNER_FIELD = "uid"
         const val USERS_COLLECTION = "users"

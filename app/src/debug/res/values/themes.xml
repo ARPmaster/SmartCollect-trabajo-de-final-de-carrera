@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Tema mínimo propio para HiltTestActivity (solo usada en pruebas de instrumentación),
+         derivado de la misma base (MaterialComponents) que necesitan los diálogos Material
+         usados por los Fragments reales. -->
+    <style name="Theme.HiltTestActivity" parent="Theme.MaterialComponents.DayNight.NoActionBar" />
+</resources>

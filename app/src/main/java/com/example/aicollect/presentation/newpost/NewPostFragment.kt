@@ -30,6 +30,8 @@ import com.example.aicollect.R
 import com.example.aicollect.databinding.FragmentNewPostBinding
 import com.example.aicollect.databinding.ItemNewPostAddPhotoTileBinding
 import com.example.aicollect.databinding.ItemNewPostPhotoThumbnailBinding
+import com.example.aicollect.presentation.asString
+import com.example.aicollect.presentation.showSnackbar
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.snackbar.Snackbar
 import java.io.ByteArrayOutputStream
@@ -268,7 +270,7 @@ class NewPostFragment : Fragment() {
             }
             is RecognitionUiState.Error -> {
                 viewModel.acknowledgeRecognitionResult()
-                Snackbar.make(binding.root, state.message, Snackbar.LENGTH_LONG).show()
+                Snackbar.make(binding.root, state.message.asString(requireContext()), Snackbar.LENGTH_LONG).show()
             }
             else -> Unit
         }
@@ -293,7 +295,7 @@ class NewPostFragment : Fragment() {
 
         when (state) {
             is SaveItemUiState.Success -> {
-                Snackbar.make(binding.root, R.string.new_post_success, Snackbar.LENGTH_LONG).show()
+                showSnackbar(binding.root, R.string.new_post_success).show()
                 findNavController().navigate(
                     R.id.homeFragment,
                     null,
@@ -304,7 +306,18 @@ class NewPostFragment : Fragment() {
                 )
             }
             is SaveItemUiState.Error ->
-                Snackbar.make(binding.root, state.message, Snackbar.LENGTH_LONG).show()
+                Snackbar.make(binding.root, state.message.asString(requireContext()), Snackbar.LENGTH_LONG).show()
+            is SaveItemUiState.NoConnection -> {
+                showSnackbar(binding.root, R.string.new_post_no_internet_error).show()
+                findNavController().navigate(
+                    R.id.homeFragment,
+                    null,
+                    navOptions {
+                        popUpTo(R.id.homeFragment) { inclusive = false }
+                        launchSingleTop = true
+                    },
+                )
+            }
             is SaveItemUiState.ValidationError -> {
                 val messageRes = when (state.field) {
                     RequiredField.NAME -> R.string.new_post_name_required_error

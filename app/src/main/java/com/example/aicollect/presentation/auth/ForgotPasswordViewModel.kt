@@ -4,7 +4,9 @@ package com.example.aicollect.presentation.auth
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.aicollect.R
 import com.example.aicollect.application.auth.AuthRepository
+import com.example.aicollect.presentation.UiText
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -16,7 +18,7 @@ sealed interface ForgotPasswordUiState {
     data object Idle : ForgotPasswordUiState
     data object Loading : ForgotPasswordUiState
     data object Success : ForgotPasswordUiState
-    data class Error(val message: String) : ForgotPasswordUiState
+    data class Error(val message: UiText) : ForgotPasswordUiState
 }
 
 @HiltViewModel
@@ -29,7 +31,7 @@ class ForgotPasswordViewModel @Inject constructor(
 
     fun sendResetEmail(email: String) {
         if (email.isBlank()) {
-            _uiState.value = ForgotPasswordUiState.Error("Introduce tu correo electrónico.")
+            _uiState.value = ForgotPasswordUiState.Error(UiText.StringResource(R.string.error_forgot_password_empty_email))
             return
         }
         _uiState.value = ForgotPasswordUiState.Loading
@@ -37,7 +39,10 @@ class ForgotPasswordViewModel @Inject constructor(
             authRepository.sendPasswordResetEmail(email)
                 .onSuccess { _uiState.value = ForgotPasswordUiState.Success }
                 .onFailure {
-                    _uiState.value = ForgotPasswordUiState.Error(it.message ?: "No se pudo enviar el correo.")
+                    _uiState.value = ForgotPasswordUiState.Error(
+                        it.message?.let(UiText::DynamicString)
+                            ?: UiText.StringResource(R.string.error_forgot_password_generic),
+                    )
                 }
         }
     }

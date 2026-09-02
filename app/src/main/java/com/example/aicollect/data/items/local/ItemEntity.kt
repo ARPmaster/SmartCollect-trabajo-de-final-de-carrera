@@ -1,11 +1,10 @@
-// Entidad Room que refleja localmente los ítems del usuario en Firestore, y las conversiones entre esta entidad y el modelo de dominio Item.
+// Entidad Room que refleja localmente los datos escalares de un ítem de Firestore. Las
+// colecciones (fotos, búsquedas de valoración, histórico de precios) viven en tablas propias
+// (ItemPhotoEntity, ValuationSearchEntity, PricePointEntity) relacionadas por clave foránea.
 package com.example.aicollect.data.items.local
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
-import com.example.aicollect.application.items.Item
-import com.example.aicollect.application.items.PricePoint
-import com.example.aicollect.application.items.ValuationSearch
 
 @Entity(tableName = "items")
 data class ItemEntity(
@@ -19,62 +18,12 @@ data class ItemEntity(
     val procedencia: String?,
     val deporte: String,
     val estado: String,
-    val imageUrls: List<String>,
     val valoracionActual: Double?,
     val valoracionMin: Double?,
     val valoracionMax: Double?,
     val valoracionMoneda: String,
     val fuenteValoracion: String?,
-    val valoracionBusquedas: List<ValuationSearch>,
-    val historialPrecios: List<PricePoint>,
     val confianzaIdentificacion: Double?,
     val createdAt: Long,
     val updatedAt: Long,
-)
-
-fun ItemEntity.toDomain() = Item(
-    id = itemId,
-    nombre = nombre,
-    descripcion = descripcion,
-    marca = marca,
-    modelo = modelo,
-    edicion = edicion,
-    procedencia = procedencia,
-    deporte = deporte,
-    estado = estado,
-    imageUrls = imageUrls,
-    valoracionActual = valoracionActual,
-    valoracionMin = valoracionMin,
-    valoracionMax = valoracionMax,
-    valoracionMoneda = valoracionMoneda,
-    fuenteValoracion = fuenteValoracion,
-    valoracionBusquedas = valoracionBusquedas,
-    historialPrecios = historialPrecios,
-    confianzaIdentificacion = confianzaIdentificacion,
-    createdAt = createdAt,
-    updatedAt = updatedAt,
-)
-
-fun Item.toEntity(ownerId: String) = ItemEntity(
-    itemId = id,
-    ownerId = ownerId,
-    nombre = nombre,
-    descripcion = descripcion,
-    marca = marca,
-    modelo = modelo,
-    edicion = edicion,
-    procedencia = procedencia,
-    deporte = deporte,
-    estado = estado,
-    imageUrls = imageUrls,
-    valoracionActual = valoracionActual,
-    valoracionMin = valoracionMin,
-    valoracionMax = valoracionMax,
-    valoracionMoneda = valoracionMoneda,
-    fuenteValoracion = fuenteValoracion,
-    valoracionBusquedas = valoracionBusquedas,
-    historialPrecios = historialPrecios,
-    confianzaIdentificacion = confianzaIdentificacion,
-    createdAt = createdAt,
-    updatedAt = updatedAt,
 )

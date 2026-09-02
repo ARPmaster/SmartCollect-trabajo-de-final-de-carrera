@@ -16,8 +16,8 @@ import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.aicollect.R
 import com.example.aicollect.application.items.ItemSortOption
-import com.example.aicollect.data.FilterPreferences
 import com.example.aicollect.databinding.FragmentHomeBinding
+import com.example.aicollect.presentation.asString
 import com.example.aicollect.presentation.showSnackbar
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
@@ -59,11 +59,6 @@ class HomeFragment : Fragment() {
             )
         }
 
-        if (FilterPreferences.hasSavedFilters(requireContext())) {
-            val saved = FilterPreferences.load(requireContext())
-            applyFilters(saved.minPrice, saved.maxPrice, saved.sport, saved.condition, saved.sortOrdinal)
-        }
-
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
                 viewModel.uiState.collect { render(it) }
@@ -84,7 +79,7 @@ class HomeFragment : Fragment() {
 
                 feedAdapter.submitList(buildFeedRows(state.visibleItems.map { it.toFeedItem() }, state.summary))
             }
-            is HomeUiState.Error -> showSnackbar(binding.root, state.message).show()
+            is HomeUiState.Error -> showSnackbar(binding.root, state.message.asString(requireContext())).show()
         }
     }
 

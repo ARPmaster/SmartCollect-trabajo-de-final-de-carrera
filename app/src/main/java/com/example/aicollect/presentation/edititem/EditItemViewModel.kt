@@ -7,6 +7,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.aicollect.application.items.Item
 import com.example.aicollect.application.items.ItemRepository
+import com.example.aicollect.R
+import com.example.aicollect.presentation.UiText
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -17,14 +19,14 @@ import kotlinx.coroutines.launch
 sealed interface EditItemUiState {
     data object Loading : EditItemUiState
     data class Content(val nombre: String, val descripcion: String?, val deporte: String, val estado: String) : EditItemUiState
-    data class Error(val message: String) : EditItemUiState
+    data class Error(val message: UiText) : EditItemUiState
 }
 
 sealed interface SaveEditUiState {
     data object Idle : SaveEditUiState
     data object Saving : SaveEditUiState
     data object Success : SaveEditUiState
-    data class Error(val message: String) : SaveEditUiState
+    data class Error(val message: UiText) : SaveEditUiState
     data class ValidationError(val field: EditRequiredField) : SaveEditUiState
 }
 
@@ -59,7 +61,9 @@ class EditItemViewModel @Inject constructor(
                     )
                 }
                 .onFailure {
-                    _uiState.value = EditItemUiState.Error(it.message ?: "No se pudo cargar el artículo.")
+                    _uiState.value = EditItemUiState.Error(
+                        it.message?.let(UiText::DynamicString) ?: UiText.StringResource(R.string.error_item_load_generic),
+                    )
                 }
         }
     }
@@ -81,7 +85,7 @@ class EditItemViewModel @Inject constructor(
 
         val original = loadedItem
         if (original == null) {
-            _saveState.value = SaveEditUiState.Error("No se pudo guardar: el artículo aún no se ha cargado.")
+            _saveState.value = SaveEditUiState.Error(UiText.StringResource(R.string.error_edit_item_not_loaded))
             return
         }
         val edited = original.copy(
@@ -97,7 +101,8 @@ class EditItemViewModel @Inject constructor(
                 .onSuccess { _saveState.value = SaveEditUiState.Success }
                 .onFailure {
                     _saveState.value = SaveEditUiState.Error(
-                        it.message ?: "No se pudieron guardar los cambios. Inténtalo de nuevo.",
+                        it.message?.let(UiText::DynamicString)
+                            ?: UiText.StringResource(R.string.error_edit_item_save_generic),
                     )
                 }
         }

@@ -4,7 +4,12 @@ package com.example.aicollect.presentation.settings
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.aicollect.application.auth.AuthError
 import com.example.aicollect.application.auth.AuthRepository
+import com.example.aicollect.application.auth.AuthValidation
+import com.example.aicollect.R
+import com.example.aicollect.presentation.UiText
+import com.example.aicollect.presentation.auth.asUiText
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -16,14 +21,14 @@ sealed interface SecurityUiState {
     data object Idle : SecurityUiState
     data object Loading : SecurityUiState
     data object Success : SecurityUiState
-    data class Error(val message: String) : SecurityUiState
+    data class Error(val message: UiText) : SecurityUiState
 }
 
 sealed interface DeleteAccountUiState {
     data object Idle : DeleteAccountUiState
     data object Deleting : DeleteAccountUiState
     data object Success : DeleteAccountUiState
-    data class Error(val message: String) : DeleteAccountUiState
+    data class Error(val message: UiText) : DeleteAccountUiState
 }
 
 @HiltViewModel
@@ -41,15 +46,22 @@ class SecurityViewModel @Inject constructor(
 
     fun deleteAccount(password: String) {
         if (password.isBlank()) {
-            _deleteAccountState.value = DeleteAccountUiState.Error("Introduce tu contraseña para confirmar.")
+            _deleteAccountState.value =
+                DeleteAccountUiState.Error(UiText.StringResource(R.string.error_security_confirm_password_required))
             return
         }
         _deleteAccountState.value = DeleteAccountUiState.Deleting
         viewModelScope.launch {
             val reauthResult = authRepository.reauthenticate(password)
             if (reauthResult.isFailure) {
+                val error = reauthResult.exceptionOrNull()
                 _deleteAccountState.value = DeleteAccountUiState.Error(
-                    reauthResult.exceptionOrNull()?.message ?: "No se pudo verificar tu contraseña. Inténtalo de nuevo.",
+                    if (error is AuthError.WrongPassword) {
+                        UiText.StringResource(R.string.error_security_wrong_password)
+                    } else {
+                        error?.message?.let(UiText::DynamicString)
+                            ?: UiText.StringResource(R.string.error_security_reauth_generic)
+                    },
                 )
                 return@launch
             }
@@ -57,7 +69,8 @@ class SecurityViewModel @Inject constructor(
                 .onSuccess { _deleteAccountState.value = DeleteAccountUiState.Success }
                 .onFailure {
                     _deleteAccountState.value = DeleteAccountUiState.Error(
-                        it.message ?: "No se pudo eliminar la cuenta. Inténtalo de nuevo.",
+                        it.message?.let(UiText::DynamicString)
+                            ?: UiText.StringResource(R.string.error_security_delete_account_generic),
                     )
                 }
         }
@@ -68,16 +81,24 @@ class SecurityViewModel @Inject constructor(
         val passwordProvided = newPassword.isNotBlank() || confirmPassword.isNotBlank()
 
         if (!emailChanged && !passwordProvided) {
-            _uiState.value = SecurityUiState.Error("No hay cambios que guardar.")
+            _uiState.value = SecurityUiState.Error(UiText.StringResource(R.string.error_security_no_changes))
             return
         }
+        if (emailChanged) {
+            val emailError = AuthValidation.emailError(email)
+            if (emailError != null) {
+                _uiState.value = SecurityUiState.Error(emailError.asUiText())
+                return
+            }
+        }
         if (passwordProvided) {
-            if (newPassword.length < 6) {
-                _uiState.value = SecurityUiState.Error("La nueva contraseña debe tener al menos 6 caracteres.")
+            val passwordError = AuthValidation.passwordError(newPassword)
+            if (passwordError != null) {
+                _uiState.value = SecurityUiState.Error(passwordError.asUiText())
                 return
             }
             if (newPassword != confirmPassword) {
-                _uiState.value = SecurityUiState.Error("Las contraseñas no coinciden.")
+                _uiState.value = SecurityUiState.Error(UiText.StringResource(R.string.error_passwords_dont_match))
                 return
             }
         }
@@ -87,8 +108,14 @@ class SecurityViewModel @Inject constructor(
             if (emailChanged) {
                 val result = authRepository.updateEmail(email)
                 if (result.isFailure) {
+                    val error = result.exceptionOrNull()
                     _uiState.value = SecurityUiState.Error(
-                        result.exceptionOrNull()?.message ?: "No se pudo actualizar el correo.",
+                        if (error is AuthError.RecentLoginRequired) {
+                            UiText.StringResource(R.string.error_security_recent_login_required)
+                        } else {
+                            error?.message?.let(UiText::DynamicString)
+                                ?: UiText.StringResource(R.string.error_security_update_email_generic)
+                        },
                     )
                     return@launch
                 }
@@ -96,8 +123,14 @@ class SecurityViewModel @Inject constructor(
             if (passwordProvided) {
                 val result = authRepository.updatePassword(newPassword)
                 if (result.isFailure) {
+                    val error = result.exceptionOrNull()
                     _uiState.value = SecurityUiState.Error(
-                        result.exceptionOrNull()?.message ?: "No se pudo actualizar la contraseña.",
+                        if (error is AuthError.RecentLoginRequired) {
+                            UiText.StringResource(R.string.error_security_recent_login_required)
+                        } else {
+                            error?.message?.let(UiText::DynamicString)
+                                ?: UiText.StringResource(R.string.error_security_update_password_generic)
+                        },
                     )
                     return@launch
                 }

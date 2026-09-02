@@ -8,6 +8,8 @@ import androidx.lifecycle.viewModelScope
 import com.example.aicollect.application.items.Item
 import com.example.aicollect.application.items.ItemRepository
 import com.example.aicollect.application.items.PortfolioAnalytics
+import com.example.aicollect.R
+import com.example.aicollect.presentation.UiText
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -22,7 +24,7 @@ data class TopValuedItemUi(
     val imageUrl: String?,
     val nombre: String,
     val subtitle: String,
-    val valueLabel: String,
+    val valueLabel: UiText,
 )
 
 sealed interface MyVaultUiState {
@@ -30,7 +32,6 @@ sealed interface MyVaultUiState {
     data object Empty : MyVaultUiState
     data class Content(
         val totalValueLabel: String,
-        val changeLabel: String?,
         val evolution: List<Float>,
         val monthLabels: List<String>,
         val sportDistribution: List<Pair<String, Int>>,
@@ -40,7 +41,7 @@ sealed interface MyVaultUiState {
         val totalItemsLabel: String,
         val topValuedItems: List<TopValuedItemUi>,
     ) : MyVaultUiState
-    data class Error(val message: String) : MyVaultUiState
+    data class Error(val message: UiText) : MyVaultUiState
 }
 
 @HiltViewModel
@@ -54,7 +55,13 @@ class MyVaultViewModel @Inject constructor(itemRepository: ItemRepository) : Vie
     ) { items, selectedSport ->
         if (items.isEmpty()) MyVaultUiState.Empty else buildContent(items, selectedSport)
     }
-        .catch { emit(MyVaultUiState.Error(it.message ?: "No se pudo cargar tu cartera.")) }
+        .catch {
+            emit(
+                MyVaultUiState.Error(
+                    it.message?.let(UiText::DynamicString) ?: UiText.StringResource(R.string.error_myvault_load_generic),
+                ),
+            )
+        }
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(STOP_TIMEOUT_MS), MyVaultUiState.Loading)
 
     fun selectSport(sport: String?) {
@@ -65,8 +72,7 @@ class MyVaultViewModel @Inject constructor(itemRepository: ItemRepository) : Vie
         val evolution = PortfolioAnalytics.monthlyEvolution(items)
         val itemsForSelectedSport = selectedSport?.let { sport -> items.filter { it.deporte == sport } } ?: items
         return MyVaultUiState.Content(
-            totalValueLabel = ItemFormatting.formatValue(PortfolioAnalytics.totalValue(items), CURRENCY),
-            changeLabel = ItemFormatting.formatChangePercent(PortfolioAnalytics.changePercent(evolution)),
+            totalValueLabel = ItemFormatting.formatKnownValue(PortfolioAnalytics.totalValue(items), CURRENCY),
             evolution = evolution,
             monthLabels = PortfolioAnalytics.monthLabels(),
             sportDistribution = PortfolioAnalytics.distributionBy(items) { it.deporte },

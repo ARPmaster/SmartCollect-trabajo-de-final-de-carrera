@@ -42,7 +42,7 @@
                     android:contentDescription="@string/cd_open_menu"
                     android:padding="14dp"
                     android:src="@drawable/ic_hamburger"
-                    android:tint="@color/collect_menu_icon" />
+                    app:tint="@color/collect_menu_icon" />
 
                 <ImageButton
                     android:id="@+id/btn_open_filters"
@@ -53,7 +53,7 @@
                     android:contentDescription="@string/cd_open_filters"
                     android:padding="16dp"
                     android:src="@drawable/ic_filter"
-                    android:tint="@color/collect_menu_icon" />
+                    app:tint="@color/collect_menu_icon" />
             </androidx.appcompat.widget.Toolbar>
 
             <View

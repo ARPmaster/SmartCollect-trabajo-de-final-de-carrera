@@ -1,20 +1,27 @@
 // Test unitario de NewPostViewModel: reconocimiento de fotos, gestión de la lista de fotos, validación de campos y publicación de un ítem (incluida la detección de duplicados).
 package com.example.aicollect.presentation.newpost
 
+import android.content.Context
 import com.example.aicollect.application.items.Item
 import com.example.aicollect.application.items.ItemRepository
 import com.example.aicollect.application.items.ValuationResult
 import com.example.aicollect.application.recognition.RankedCandidate
 import com.example.aicollect.application.recognition.RecognitionRepository
+import com.example.aicollect.presentation.UiText
+import com.example.aicollect.presentation.isOnline
 import com.example.aicollect.testutil.MainDispatcherRule
 import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.every
 import io.mockk.mockk
+import io.mockk.mockkStatic
 import io.mockk.slot
+import io.mockk.unmockkStatic
 import kotlinx.coroutines.flow.flowOf
+import org.junit.After
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
+import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 
@@ -25,9 +32,21 @@ class NewPostViewModelTest {
 
     private val recognitionRepository = mockk<RecognitionRepository>()
     private val itemRepository = mockk<ItemRepository>()
+    private val context = mockk<Context>()
+
+    @Before
+    fun setUpConnectivity() {
+        mockkStatic("com.example.aicollect.presentation.NetworkUtilsKt")
+        every { context.isOnline() } returns true
+    }
+
+    @After
+    fun tearDownConnectivity() {
+        unmockkStatic("com.example.aicollect.presentation.NetworkUtilsKt")
+    }
 
     private fun buildViewModel(): NewPostViewModel =
-        NewPostViewModel(recognitionRepository, itemRepository)
+        NewPostViewModel(recognitionRepository, itemRepository, context)
 
     private fun existingItem(nombre: String) = Item(
         id = "existing-1",
@@ -80,7 +99,7 @@ class NewPostViewModelTest {
 
         val state = viewModel.recognitionState.value
         assertTrue(state is RecognitionUiState.Error)
-        assertEquals("Sin cuota", (state as RecognitionUiState.Error).message)
+        assertEquals(UiText.DynamicString("Sin cuota"), (state as RecognitionUiState.Error).message)
     }
 
     @Test
@@ -224,7 +243,20 @@ class NewPostViewModelTest {
 
         val state = viewModel.saveState.value
         assertTrue(state is SaveItemUiState.Error)
-        assertEquals("Sin conexión", (state as SaveItemUiState.Error).message)
+        assertEquals(UiText.DynamicString("Sin conexión"), (state as SaveItemUiState.Error).message)
+    }
+
+    @Test
+    fun `saveItem reports NoConnection and does not publish when there is no network`() {
+        every { context.isOnline() } returns false
+
+        val viewModel = buildViewModel()
+        viewModel.saveItem("Nike Air Force 1", null, "Baloncesto", "Nuevo")
+        mainDispatcherRule.dispatcher.scheduler.advanceUntilIdle()
+
+        assertEquals(SaveItemUiState.NoConnection, viewModel.saveState.value)
+        coVerify(exactly = 0) { itemRepository.observeItems() }
+        coVerify(exactly = 0) { itemRepository.createItem(any(), any()) }
     }
 
     @Test
@@ -256,6 +288,22 @@ class NewPostViewModelTest {
 
         assertEquals(SaveItemUiState.Success, viewModel.saveState.value)
         coVerify(exactly = 1) { itemRepository.createItem(any(), any()) }
+    }
+
+    @Test
+    fun `confirmPublishDespiteDuplicate reports NoConnection when the network drops after the warning`() {
+        every { itemRepository.observeItems() } returns flowOf(listOf(existingItem("Nike Air Force 1")))
+
+        val viewModel = buildViewModel()
+        viewModel.saveItem("Nike Air Force 1", null, "Baloncesto", "Nuevo")
+        mainDispatcherRule.dispatcher.scheduler.advanceUntilIdle()
+
+        every { context.isOnline() } returns false
+        viewModel.confirmPublishDespiteDuplicate()
+        mainDispatcherRule.dispatcher.scheduler.advanceUntilIdle()
+
+        assertEquals(SaveItemUiState.NoConnection, viewModel.saveState.value)
+        coVerify(exactly = 0) { itemRepository.createItem(any(), any()) }
     }
 
     @Test

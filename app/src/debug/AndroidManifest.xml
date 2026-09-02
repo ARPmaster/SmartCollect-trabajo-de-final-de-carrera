@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- HiltTestActivity vive aquí (no en src/androidTest) para empaquetarse dentro de la app
+     (com.example.aicollect) en builds debug, en vez de en el APK de test aparte
+     (com.example.aicollect.test): ActivityScenario la necesita en el mismo proceso que la
+     instrumentación. -->
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <application>
+        <!-- Sin intent-filter LAUNCHER a propósito: ActivityScenario la arranca por clase
+             (Intent explícito), no por resolución implícita — un intent-filter aquí solo
+             consigue que aparezca como una segunda app en el launcher del usuario final. -->
+        <activity
+            android:name=".HiltTestActivity"
+            android:exported="true"
+            android:theme="@style/Theme.HiltTestActivity" />
+    </application>
+
+</manifest>

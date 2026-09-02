@@ -115,7 +115,7 @@
                         android:text="@string/filter_min_label"
                         android:textAllCaps="true"
                         android:textColor="@color/auth_icon"
-                        android:textSize="10sp" />
+                        android:textSize="12sp" />
 
                     <FrameLayout
                         android:layout_width="match_parent"
@@ -167,7 +167,7 @@
                         android:text="@string/filter_max_label"
                         android:textAllCaps="true"
                         android:textColor="@color/auth_icon"
-                        android:textSize="10sp" />
+                        android:textSize="12sp" />
 
                     <FrameLayout
                         android:layout_width="match_parent"

@@ -2,6 +2,7 @@
 package com.example.aicollect.presentation.auth
 
 import com.example.aicollect.application.auth.AuthRepository
+import com.example.aicollect.presentation.UiText
 import com.example.aicollect.testutil.MainDispatcherRule
 import io.mockk.coEvery
 import io.mockk.coVerify
@@ -59,6 +60,6 @@ class LoginViewModelTest {
 
         val state = viewModel.uiState.value
         assertTrue(state is LoginUiState.Error)
-        assertEquals("Credenciales inválidas", (state as LoginUiState.Error).message)
+        assertEquals(UiText.DynamicString("Credenciales inválidas"), (state as LoginUiState.Error).message)
     }
 }

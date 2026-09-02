@@ -20,6 +20,9 @@ object DatabaseModule {
     @Singleton
     fun provideAppDatabase(@ApplicationContext context: Context): AppDatabase =
         Room.databaseBuilder(context, AppDatabase::class.java, "aicollect.db")
+            // Estrategia deliberada: Room es únicamente caché de lectura de Firestore (fuente de verdad).
+            // Ante un cambio de esquema se descarta la copia local y se re-sincroniza desde el servidor,
+            // lo que evita mantener migraciones para datos que se pueden reconstruir íntegramente.
             .fallbackToDestructiveMigration(dropAllTables = true)
             .build()
 

@@ -16,6 +16,7 @@
 
     <FrameLayout
         android:id="@+id/track_distribution"
+        android:importantForAccessibility="noHideDescendants"
         style="@style/VaultDistributionTrack">
         <View
             android:id="@+id/fill_distribution"

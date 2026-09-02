@@ -4,6 +4,7 @@ package com.example.aicollect.presentation.collection
 import com.example.aicollect.application.items.Item
 import com.example.aicollect.application.items.ItemRepository
 import com.example.aicollect.application.items.ItemSortOption
+import com.example.aicollect.presentation.UiText
 import com.example.aicollect.testutil.MainDispatcherRule
 import io.mockk.every
 import io.mockk.mockk
@@ -161,7 +162,7 @@ class HomeViewModelTest {
 
         val state = viewModel.uiState.value
         assertTrue(state is HomeUiState.Error)
-        assertEquals("Fallo de Firestore", (state as HomeUiState.Error).message)
+        assertEquals(UiText.DynamicString("Fallo de Firestore"), (state as HomeUiState.Error).message)
         job.cancel()
     }
 }

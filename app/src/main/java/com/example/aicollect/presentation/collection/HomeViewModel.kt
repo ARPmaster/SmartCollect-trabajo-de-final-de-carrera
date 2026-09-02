@@ -10,6 +10,8 @@ import com.example.aicollect.application.items.ItemRepository
 import com.example.aicollect.application.items.ItemSortOption
 import com.example.aicollect.application.items.PortfolioAnalytics
 import com.example.aicollect.application.items.sortedByOption
+import com.example.aicollect.R
+import com.example.aicollect.presentation.UiText
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -27,7 +29,7 @@ sealed interface HomeUiState {
         val visibleItems: List<Item>,
         val summary: CollectionSummary,
     ) : HomeUiState
-    data class Error(val message: String) : HomeUiState
+    data class Error(val message: UiText) : HomeUiState
 }
 
 private data class ActiveFilters(
@@ -62,7 +64,13 @@ class HomeViewModel @Inject constructor(itemRepository: ItemRepository) : ViewMo
         )
         content
     }
-        .catch { emit(HomeUiState.Error(it.message ?: "No se pudo cargar tu colección.")) }
+        .catch {
+            emit(
+                HomeUiState.Error(
+                    it.message?.let(UiText::DynamicString) ?: UiText.StringResource(R.string.home_load_error),
+                ),
+            )
+        }
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(STOP_TIMEOUT_MS), HomeUiState.Loading)
 
     fun setFilters(minPrice: Int, maxPrice: Int, sport: String?, condition: String?, sort: ItemSortOption) {
@@ -70,11 +78,9 @@ class HomeViewModel @Inject constructor(itemRepository: ItemRepository) : ViewMo
     }
 
     private fun summaryFor(items: List<Item>): CollectionSummary {
-        val evolution = PortfolioAnalytics.monthlyEvolution(items)
         val itemCount = items.size
         return CollectionSummary(
-            totalValueLabel = ItemFormatting.formatValue(PortfolioAnalytics.totalValue(items), CURRENCY),
-            changeLabel = ItemFormatting.formatChangePercent(PortfolioAnalytics.changePercent(evolution)),
+            totalValueLabel = ItemFormatting.formatKnownValue(PortfolioAnalytics.totalValue(items), CURRENCY),
             itemCountLabel = if (itemCount == 1) "1 artículo en tu colección" else "$itemCount artículos en tu colección",
         )
     }

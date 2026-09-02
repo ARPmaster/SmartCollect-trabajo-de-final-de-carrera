@@ -4,6 +4,7 @@ package com.example.aicollect.presentation.edititem
 import androidx.lifecycle.SavedStateHandle
 import com.example.aicollect.application.items.Item
 import com.example.aicollect.application.items.ItemRepository
+import com.example.aicollect.presentation.UiText
 import com.example.aicollect.testutil.MainDispatcherRule
 import io.mockk.coEvery
 import io.mockk.coVerify
@@ -70,7 +71,7 @@ class EditItemViewModelTest {
 
         val state = viewModel.uiState.value
         assertTrue(state is EditItemUiState.Error)
-        assertEquals("Sin conexión", (state as EditItemUiState.Error).message)
+        assertEquals(UiText.DynamicString("Sin conexión"), (state as EditItemUiState.Error).message)
     }
 
     @Test
@@ -176,6 +177,6 @@ class EditItemViewModelTest {
 
         val state = viewModel.saveState.value
         assertTrue(state is SaveEditUiState.Error)
-        assertEquals("Sin conexión", (state as SaveEditUiState.Error).message)
+        assertEquals(UiText.DynamicString("Sin conexión"), (state as SaveEditUiState.Error).message)
     }
 }
