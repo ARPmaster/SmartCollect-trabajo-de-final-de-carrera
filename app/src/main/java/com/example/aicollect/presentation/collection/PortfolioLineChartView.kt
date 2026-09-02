@@ -76,13 +76,17 @@ class PortfolioLineChartView @JvmOverloads constructor(
         val bottomPadding = 8f
         val labelGap = 8f
 
-        // Escala realista: el eje Y siempre arranca en 0 y sus marcas son múltiplos de 100
-        // (AXIS_STEP), con un techo de referencia de 10 000 € — el techo real solo crece si
-        // algún valor de la cartera lo supera, para no recortar datos legítimos.
+        // Escala realista: el eje Y siempre arranca en 0, con un techo base de 1000 € que
+        // salta a 5000 € y luego a 10 000 € (y sigue creciendo en tramos de 5000 €) según
+        // haga falta, para no recortar datos legítimos de la cartera.
         val min = 0f
         val dataMax = values.max()
-        val niceMax = kotlin.math.ceil(dataMax / AXIS_STEP) * AXIS_STEP
-        val max = maxOf(AXIS_DEFAULT_MAX, niceMax)
+        val max = when {
+            dataMax <= AXIS_MAX_TIER_1 -> AXIS_MAX_TIER_1
+            dataMax <= AXIS_MAX_TIER_2 -> AXIS_MAX_TIER_2
+            dataMax <= AXIS_MAX_TIER_3 -> AXIS_MAX_TIER_3
+            else -> kotlin.math.ceil(dataMax / AXIS_MAX_TIER_2) * AXIS_MAX_TIER_2
+        }
 
         val range = max - min
         val midValue = min + range / 2f
@@ -149,7 +153,8 @@ class PortfolioLineChartView @JvmOverloads constructor(
     }
 
     private companion object {
-        const val AXIS_STEP = 100f
-        const val AXIS_DEFAULT_MAX = 10_000f
+        const val AXIS_MAX_TIER_1 = 1_000f
+        const val AXIS_MAX_TIER_2 = 5_000f
+        const val AXIS_MAX_TIER_3 = 10_000f
     }
 }

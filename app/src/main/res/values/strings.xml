@@ -101,7 +101,9 @@
     <string-array name="filter_sport_options">
         <item>Todos</item>
         <item>Baloncesto</item>
-        <item>Fútbol Americano</item>
+        <item>Tenis</item>
+        <item>Running</item>
+        <item>Rugby</item>
         <item>Fútbol</item>
         <item>Béisbol</item>
         <item>Otro</item>
@@ -269,7 +271,9 @@
 
     <string-array name="sport_options">
         <item>Baloncesto</item>
-        <item>Fútbol Americano</item>
+        <item>Tenis</item>
+        <item>Running</item>
+        <item>Rugby</item>
         <item>Fútbol</item>
         <item>Béisbol</item>
         <item>Otro</item>
